@@ -9,6 +9,7 @@ namespace HaskellTools.Windows.DebugData
     public class DataItem
     {
         public string VariableName { get; set; }
-        public string Value { get; set; }
+        public string Type { get; set; }
+        public string EvaluatedValue { get; set; }
     }
 }
