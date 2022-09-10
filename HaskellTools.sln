@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HaskellTools", "HaskellRunner\HaskellTools.csproj", "{D1F9B2DB-F80F-4C35-B693-2C2B486DA250}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HaskellTools", "HaskellTools\HaskellTools.csproj", "{D1F9B2DB-F80F-4C35-B693-2C2B486DA250}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
