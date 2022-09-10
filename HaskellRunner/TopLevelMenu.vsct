@@ -6,9 +6,9 @@
   <Commands package="guidHaskellRunnerPackage">
 	  <Groups>
 		  <Group guid="guidHaskellRunnerPackageCmdSet" id="MyMenuGroup" priority="0x0600">
-			  <Parent guid="guidHaskellRunnerPackageCmdSet" id="TopLevelMenu"/>
+			  <Parent guid="guidHaskellRunnerPackageCmdSet" id="TopLevelMenu" />
 		  </Group>
-	  </Groups>
+    </Groups>
 
 	  <Menus>
 		  <Menu guid="guidHaskellRunnerPackageCmdSet" id="TopLevelMenu" priority="0x700" type="Menu">
@@ -19,9 +19,10 @@
 			  </Strings>
 		  </Menu>
 	  </Menus>
-	  
-    <Bitmaps>
+
+	  <Bitmaps>
       <Bitmap guid="guidImages" href="Resources\RunHaskellFile.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages1" href="Resources\RunGHCi.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
     </Bitmaps>
 	  
     <Buttons>
@@ -32,16 +33,29 @@
           <ButtonText>Run Haskell File</ButtonText>
         </Strings>
       </Button>
+      <Button guid="guidHaskellRunnerPackageCmdSet" id="CommandId2" priority="0x0100" type="Button">
+        <Parent guid="guidHaskellRunnerPackageCmdSet" id="MyMenuGroup" />
+        <Icon guid="guidImages1" id="bmpPic1" />
+        <Strings>
+          <ButtonText>Run GHCi</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
   </Commands>
-
+	
+	<KeyBindings>
+		<KeyBinding guid="guidHaskellRunnerPackageCmdSet" id="CommandId" editor="guidVSStd97" key1="M" mod1="ALT"/>
+		<KeyBinding guid="guidHaskellRunnerPackageCmdSet" id="CommandId2" editor="guidVSStd97" key1="J" mod1="ALT"/>
+	</KeyBindings>
+	
 	<Symbols>
 		<GuidSymbol value="{6eaa553c-a41f-487b-99a1-a8383b6d1f74}" name="guidHaskellRunnerPackage" />
 
 		<GuidSymbol value="{c8d29eda-f85f-4c3f-8620-6b8c0c6ebd51}" name="guidHaskellRunnerPackageCmdSet">
 			<IDSymbol name="MyMenuGroup" value="0x1020" />
 			<IDSymbol name="CommandId" value="256" />
-			<IDSymbol name="TopLevelMenu" value="0x1021"/>
+			<IDSymbol name="CommandId2" value="257" />
+			<IDSymbol name="TopLevelMenu" value="0x1021" />
 		</GuidSymbol>
 
 		<GuidSymbol value="{bb64ec71-4259-41eb-9775-43fbb84988af}" name="guidImages">
@@ -52,5 +66,14 @@
 			<IDSymbol name="bmpPicArrows" value="5" />
 			<IDSymbol name="bmpPicStrikethrough" value="6" />
 		</GuidSymbol>
-	</Symbols>
+  
+    <GuidSymbol value="{ab93ee69-1eca-4ef3-b557-ed1f4d984735}" name="guidImages1">
+      <IDSymbol name="bmpPic1" value="1" />
+      <IDSymbol name="bmpPic2" value="2" />
+      <IDSymbol name="bmpPicSearch" value="3" />
+      <IDSymbol name="bmpPicX" value="4" />
+      <IDSymbol name="bmpPicArrows" value="5" />
+      <IDSymbol name="bmpPicStrikethrough" value="6" />
+    </GuidSymbol>
+  </Symbols>
 </CommandTable>

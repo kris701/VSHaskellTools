@@ -1,12 +1,15 @@
 ﻿using EnvDTE;
 using HaskellRunner.Helpers;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
@@ -16,13 +19,14 @@ namespace HaskellRunner
     /// <summary>
     /// Command handler
     /// </summary>
-    internal sealed class RunHaskellFile
+    internal sealed class RunGHCi
     {
-        private static OutputPanelController OutputPanel = new OutputPanelController("Haskell");
+        private static OutputPanelController OutputPanel = new OutputPanelController("Haskell GHCi");
+
         /// <summary>
         /// Command ID.
         /// </summary>
-        public const int CommandId = 256;
+        public const int CommandId = 257;
 
         /// <summary>
         /// Command menu group (command set GUID).
@@ -35,12 +39,12 @@ namespace HaskellRunner
         private readonly AsyncPackage package;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RunHaskellFile"/> class.
+        /// Initializes a new instance of the <see cref="RunGHCi"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file)
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
         /// <param name="commandService">Command service to add command to, not null.</param>
-        private RunHaskellFile(AsyncPackage package, OleMenuCommandService commandService)
+        private RunGHCi(AsyncPackage package, OleMenuCommandService commandService)
         {
             this.package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
@@ -53,7 +57,7 @@ namespace HaskellRunner
         /// <summary>
         /// Gets the instance of the command.
         /// </summary>
-        public static RunHaskellFile Instance
+        public static RunGHCi Instance
         {
             get;
             private set;
@@ -76,12 +80,12 @@ namespace HaskellRunner
         /// <param name="package">Owner package, not null.</param>
         public static async Task InitializeAsync(AsyncPackage package)
         {
-            // Switch to the main thread - the call to AddCommand in RunHaskellFile's constructor requires
+            // Switch to the main thread - the call to AddCommand in RunGHCi's constructor requires
             // the UI thread.
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-            Instance = new RunHaskellFile(package, commandService);
+            Instance = new RunGHCi(package, commandService);
         }
 
         /// <summary>
@@ -102,30 +106,48 @@ namespace HaskellRunner
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = @"powershell.exe";
-            startInfo.Arguments = $"runhaskell {value}";
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardInput = true;
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             process.StartInfo = startInfo;
             process.Start();
 
-            OutputPanel.WriteLine($"Executing Haskell File '{value}'");
+            OutputPanel.WriteLine("Running GHCi...");
+
+            process.StandardInput.WriteLine($"cd '{GetSourcePath()}'");
+            process.StandardInput.WriteLine($"GHCi");
+            System.Threading.Thread.Sleep(1000);
+            process.StandardInput.WriteLine($":load {GetSourceFileName()}");
+            process.StandardInput.WriteLine($"{GetSelectedText()}");
+            process.StandardInput.WriteLine($":quit");
+            System.Threading.Thread.Sleep(1000);
+            process.StandardInput.WriteLine($"exit");
+
+            process.WaitForExit();
+
             if (!process.StandardError.EndOfStream)
             {
-                
                 while (!process.StandardError.EndOfStream)
                     OutputPanel.WriteLine($"Error! {process.StandardError.ReadLine()}");
             }
             else
             {
+                bool reading = false;
                 while (!process.StandardOutput.EndOfStream)
-                    OutputPanel.WriteLine(process.StandardOutput.ReadLine());
+                {
+                    string line = process.StandardOutput.ReadLine();
+                    if (line.Contains("Leaving GHCi"))
+                        reading = true;
+                    if (reading)
+                        OutputPanel.WriteLine(line);
+                    if (line.Contains("module loaded"))
+                        reading = true;
+                }
             }
         }
-
-        
 
         private static EnvDTE80.DTE2 GetDTE2()
         {
@@ -137,6 +159,28 @@ namespace HaskellRunner
             EnvDTE80.DTE2 _applicationObject = GetDTE2();
             var uih = _applicationObject.ActiveDocument;
             return uih.FullName;
+        }
+
+        private string GetSourceFileName()
+        {
+            EnvDTE80.DTE2 _applicationObject = GetDTE2();
+            var uih = _applicationObject.ActiveDocument;
+            return uih.Name;
+        }
+
+        private string GetSourcePath()
+        {
+            EnvDTE80.DTE2 _applicationObject = GetDTE2();
+            var uih = _applicationObject.ActiveDocument;
+            return uih.Path;
+        }
+
+        private string GetSelectedText()
+        {
+            EnvDTE80.DTE2 _applicationObject = GetDTE2();
+            var uih = _applicationObject.ActiveDocument;
+            var value = ComUtils.Get(uih.Selection, "Text").ToString();
+            return value;
         }
     }
 }
