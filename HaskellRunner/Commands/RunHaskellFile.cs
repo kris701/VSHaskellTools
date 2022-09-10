@@ -100,9 +100,11 @@ namespace HaskellRunner
 
             string value = GetSourceFilePath();
 
+            HaskellToolsOptionsPackage myToolsOptionsPackage = this.package as HaskellToolsOptionsPackage;
+
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = @"powershell.exe";
-            startInfo.Arguments = $"runhaskell {value}";
+            startInfo.Arguments = $"'{myToolsOptionsPackage.RunHaskellPath}' {value}";
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.UseShellExecute = false;

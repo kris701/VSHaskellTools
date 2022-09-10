@@ -117,8 +117,10 @@ namespace HaskellRunner
 
             OutputPanel.WriteLine("Running GHCi...");
 
+            HaskellToolsOptionsPackage myToolsOptionsPackage = this.package as HaskellToolsOptionsPackage;
+
             process.StandardInput.WriteLine($"cd '{GetSourcePath()}'");
-            process.StandardInput.WriteLine($"GHCi");
+            process.StandardInput.WriteLine($"{myToolsOptionsPackage.GHCIPath}");
             System.Threading.Thread.Sleep(1000);
             process.StandardInput.WriteLine($":load {GetSourceFileName()}");
             process.StandardInput.WriteLine($"{GetSelectedText()}");
