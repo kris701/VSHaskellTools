@@ -45,6 +45,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GitHub.cs" />
     <Compile Include="Helpers\ComUtils.cs" />
     <Compile Include="Helpers\OutputPanelController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -61,6 +62,7 @@
     <Content Include="Grammars\Haskell.tmLanguage">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Resources\GitHub.png" />
     <Content Include="Resources\RunGHCi.png" />
     <Content Include="Resources\RunHaskellFile.png" />
     <None Include="source.extension.vsixmanifest">

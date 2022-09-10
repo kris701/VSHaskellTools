@@ -49,6 +49,7 @@ namespace HaskellRunner
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await RunHaskellFile.InitializeAsync(this);
             await RunGHCi.InitializeAsync(this);
+            await GitHub.InitializeAsync(this);
         }
 
         #endregion
