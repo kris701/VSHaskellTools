@@ -7,12 +7,43 @@
              Background="{DynamicResource {x:Static vsshell:VsBrushes.WindowKey}}"
              Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300"
-             Name="MyToolWindow">
+             d:DesignHeight="800" d:DesignWidth="1600"
+             Name="MyToolWindow"
+             Loaded="MyToolWindow_Loaded">
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <TextBlock Margin="10" HorizontalAlignment="Center">GHCiDebuggerWindow</TextBlock>
-            <Button Content="Click me!" Click="button1_Click" Width="120" Height="80" Name="button1"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="5">
+            <Button x:Name="StartDebuggingButton" Content="Start Debugging" Click="StartDebuggingButton_Click"/>
+            <Button x:Name="StopDebuggingButton" Content="Stop Debugging" Click="StopDebuggingButton_Click"/>
+            <Button x:Name="ContinueButton" Content="Continue" Click="ContinueButton_Click"/>
+            <CheckBox x:Name="BreakOnExceptionCheckbox" Content="Break on Exception"/>
+            <CheckBox x:Name="ForceValueChecks" Content="Force Value Checking"/>
         </StackPanel>
+
+        <StackPanel x:Name="BreakpointPanel" Grid.Row="1" Margin="5">
+            
+        </StackPanel>
+
+        <RichTextBox x:Name="OutputTextbox" Grid.Column="1" Margin="5" IsReadOnly="True" Background="Transparent" Foreground="White">
+            <RichTextBox.Resources>
+                <Style TargetType="{x:Type Paragraph}">
+                    <Setter Property="Margin" Value="0"/>
+                </Style>
+            </RichTextBox.Resources>
+        </RichTextBox>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
+            <Button x:Name="ForceEvaluate" Content="Force Evaluate Variables" Click="ForceEvaluate_Click"/>
+            <DataGrid x:Name="DebugDataPanel" Margin="5"/>
+        </StackPanel>
+        
     </Grid>
 </UserControl>

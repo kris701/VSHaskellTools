@@ -54,7 +54,7 @@
 			<Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
 			<Icon guid="guidImages5" id="bmpPic1" />
 			<Strings>
-				<ButtonText>GHCiDebuggerWindow</ButtonText>
+				<ButtonText>Run GHCi Debugger</ButtonText>
 			</Strings>
 		</Button>
 		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId3" priority="0x0104" type="Button">

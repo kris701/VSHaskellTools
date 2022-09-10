@@ -52,6 +52,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\GitHub.cs" />
+    <Compile Include="Windows\DebugData\DataItem.cs" />
     <Compile Include="Windows\GHCiDebuggerWindow.cs" />
     <Compile Include="Windows\GHCiDebuggerWindowCommand.cs" />
     <Compile Include="Windows\GHCiDebuggerWindowControl.xaml.cs">
@@ -73,6 +74,9 @@
     <Compile Include="HaskellToolsPackage.cs" />
     <Compile Include="Commands\RunGHCi.cs" />
     <Compile Include="Commands\RunHaskellFile.cs" />
+    <Compile Include="Windows\UserControls\DebuggerLine.xaml.cs">
+      <DependentUpon>DebuggerLine.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <VSCTCompile Include="TopLevelMenu.vsct">
@@ -136,7 +140,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\UserControls\DebuggerLine.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

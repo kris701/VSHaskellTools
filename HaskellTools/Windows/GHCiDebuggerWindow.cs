@@ -30,5 +30,10 @@ namespace HaskellTools
             // the object returned by the Content property.
             this.Content = new GHCiDebuggerWindowControl();
         }
+
+        public void SetData(string path)
+        {
+            (this.Content as GHCiDebuggerWindowControl).GHCiPath = path;
+        }
     }
 }
