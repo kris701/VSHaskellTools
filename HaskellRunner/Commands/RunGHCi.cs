@@ -120,7 +120,7 @@ namespace HaskellRunner
             HaskellRunnerPackage myToolsOptionsPackage = this.package as HaskellRunnerPackage;
 
             process.StandardInput.WriteLine($"cd '{GetSourcePath()}'");
-            process.StandardInput.WriteLine($"{myToolsOptionsPackage.GHCIPath}");
+            process.StandardInput.WriteLine($"& '{myToolsOptionsPackage.GHCIPath}'");
             System.Threading.Thread.Sleep(1000);
             process.StandardInput.WriteLine($":load {GetSourceFileName()}");
             process.StandardInput.WriteLine($"{GetSelectedText()}");
