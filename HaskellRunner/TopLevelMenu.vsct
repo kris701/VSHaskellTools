@@ -43,7 +43,7 @@
         </Strings>
       </Button>
 		<Button guid="guidHaskellRunnerPackageCmdSet" id="CommandId4" priority="0x0102" type="Button">
-			<Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
+			<Parent guid="guidHaskellRunnerPackageCmdSet" id="MyMenuGroup" />
 			<Icon guid="guidImages4" id="bmpPic1" />
 			<Strings>
 				<ButtonText>Haskell Interactive Window</ButtonText>

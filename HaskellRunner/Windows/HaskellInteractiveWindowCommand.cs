@@ -89,6 +89,8 @@ namespace HaskellRunner
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
                 ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(HaskellInteractiveWindow), 0, true, this.package.DisposalToken);
+                HaskellRunnerPackage myToolsOptionsPackage = this.package as HaskellRunnerPackage;
+                (window as HaskellInteractiveWindow).SetData(myToolsOptionsPackage.GHCIPath);
                 if ((null == window) || (null == window.Frame))
                 {
                     throw new NotSupportedException("Cannot create tool window");
