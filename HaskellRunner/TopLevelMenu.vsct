@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h" />
+  <Extern href="vsshlids.h" />
+	
+  <Commands package="guidHaskellRunnerPackage">
+	  <Groups>
+		  <Group guid="guidHaskellRunnerPackageCmdSet" id="MyMenuGroup" priority="0x0600">
+			  <Parent guid="guidHaskellRunnerPackageCmdSet" id="TopLevelMenu"/>
+		  </Group>
+	  </Groups>
+
+	  <Menus>
+		  <Menu guid="guidHaskellRunnerPackageCmdSet" id="TopLevelMenu" priority="0x700" type="Menu">
+			  <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_FILEEDITVIEW" />
+			  <Strings>
+				  <ButtonText>Haskell Tools</ButtonText>
+				  <CommandName>Haskell Tools</CommandName>
+			  </Strings>
+		  </Menu>
+	  </Menus>
+	  
+    <Bitmaps>
+      <Bitmap guid="guidImages" href="Resources\RunHaskellFile.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+    </Bitmaps>
+	  
+    <Buttons>
+      <Button guid="guidHaskellRunnerPackageCmdSet" id="CommandId" priority="0x0100" type="Button">
+        <Parent guid="guidHaskellRunnerPackageCmdSet" id="MyMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <ButtonText>Run Haskell File</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+	<Symbols>
+		<GuidSymbol value="{6eaa553c-a41f-487b-99a1-a8383b6d1f74}" name="guidHaskellRunnerPackage" />
+
+		<GuidSymbol value="{c8d29eda-f85f-4c3f-8620-6b8c0c6ebd51}" name="guidHaskellRunnerPackageCmdSet">
+			<IDSymbol name="MyMenuGroup" value="0x1020" />
+			<IDSymbol name="CommandId" value="256" />
+			<IDSymbol name="TopLevelMenu" value="0x1021"/>
+		</GuidSymbol>
+
+		<GuidSymbol value="{bb64ec71-4259-41eb-9775-43fbb84988af}" name="guidImages">
+			<IDSymbol name="bmpPic1" value="1" />
+			<IDSymbol name="bmpPic2" value="2" />
+			<IDSymbol name="bmpPicSearch" value="3" />
+			<IDSymbol name="bmpPicX" value="4" />
+			<IDSymbol name="bmpPicArrows" value="5" />
+			<IDSymbol name="bmpPicStrikethrough" value="6" />
+		</GuidSymbol>
+	</Symbols>
+</CommandTable>
