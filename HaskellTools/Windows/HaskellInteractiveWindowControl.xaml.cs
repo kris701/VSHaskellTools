@@ -1,4 +1,4 @@
-﻿using HaskellRunner.Helpers;
+﻿using HaskellTools.Helpers;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel;
@@ -10,7 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace HaskellRunner
+namespace HaskellTools
 {
     /// <summary>
     /// Interaction logic for HaskellInteractiveWindowControl.

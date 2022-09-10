@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HaskellRunner.Helpers
+namespace HaskellTools.Helpers
 {
     public static class ComUtils
     {

@@ -1,5 +1,5 @@
 ﻿using EnvDTE;
-using HaskellRunner.Helpers;
+using HaskellTools.Helpers;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Task = System.Threading.Tasks.Task;
 
-namespace HaskellRunner
+namespace HaskellTools
 {
     /// <summary>
     /// Command handler

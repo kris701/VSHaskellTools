@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
-namespace HaskellRunner
+namespace HaskellTools
 {
     /// <summary>
     /// Command handler

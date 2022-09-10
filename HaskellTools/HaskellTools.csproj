@@ -19,8 +19,8 @@
     <ProjectGuid>{D1F9B2DB-F80F-4C35-B693-2C2B486DA250}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HaskellRunner</RootNamespace>
-    <AssemblyName>HaskellRunner</AssemblyName>
+    <RootNamespace>HaskellTools</RootNamespace>
+    <AssemblyName>HaskellTools</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <UseCodebase>true</UseCodebase>

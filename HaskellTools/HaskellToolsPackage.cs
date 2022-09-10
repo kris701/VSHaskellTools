@@ -1,11 +1,11 @@
-﻿using HaskellRunner.Options;
+﻿using HaskellTools.Options;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
 
-namespace HaskellRunner
+namespace HaskellTools
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
