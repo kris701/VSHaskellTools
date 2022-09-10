@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using Task = System.Threading.Tasks.Task;
 
 namespace HaskellRunner
@@ -94,6 +95,12 @@ namespace HaskellRunner
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (FileHelper.GetSourceFileExtension() != ".hs")
+            {
+                MessageBox.Show("File must be a '.hs' file!");
+                return;
+            }
 
             OutputPanel.Initialize();
             OutputPanel.ClearOutput();

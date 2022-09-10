@@ -31,6 +31,12 @@ namespace HaskellRunner.Helpers
             return uih.Name;
         }
 
+        public static string GetSourceFileExtension()
+        {
+            string name = GetSourceFileName();
+            return name.Substring(name.LastIndexOf('.'));
+        }
+
         public static string GetSourcePath()
         {
             ThreadHelper.ThrowIfNotOnUIThread();

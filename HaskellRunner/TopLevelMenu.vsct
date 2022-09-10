@@ -21,10 +21,10 @@
 	  </Menus>
 
 	  <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\RunHaskellFile.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages1" href="Resources\RunGHCi.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages2" href="Resources\GitHub.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages4" href="Resources\HaskellInteractiveWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages" href="Resources\RunHaskellFile.png"/>
+      <Bitmap guid="guidImages1" href="Resources\RunGHCi.png"/>
+      <Bitmap guid="guidImages2" href="Resources\GitHub.png"/>
+      <Bitmap guid="guidImages4" href="Resources\HaskellInteractiveWindowCommand.png"/>
     </Bitmaps>
 	  
     <Buttons>
@@ -79,47 +79,22 @@
 
 		<GuidSymbol value="{bb64ec71-4259-41eb-9775-43fbb84988af}" name="guidImages">
 			<IDSymbol name="bmpPic1" value="1" />
-			<IDSymbol name="bmpPic2" value="2" />
-			<IDSymbol name="bmpPicSearch" value="3" />
-			<IDSymbol name="bmpPicX" value="4" />
-			<IDSymbol name="bmpPicArrows" value="5" />
-			<IDSymbol name="bmpPicStrikethrough" value="6" />
 		</GuidSymbol>
   
     <GuidSymbol value="{ab93ee69-1eca-4ef3-b557-ed1f4d984735}" name="guidImages1">
       <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   
     <GuidSymbol value="{ff48a4e6-0aab-49a4-987a-0a3ed7ff4d23}" name="guidImages2">
       <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   
     <GuidSymbol value="{40885fc9-cc01-4cbb-9ac0-fa5b92fbf7b9}" name="guidImages3">
       <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   
     <GuidSymbol value="{a8a14ee9-9eae-4cb0-87a1-40b2244dbd5a}" name="guidImages4">
       <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

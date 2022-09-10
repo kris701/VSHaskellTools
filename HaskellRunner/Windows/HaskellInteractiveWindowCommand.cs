@@ -1,10 +1,12 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using HaskellRunner.Helpers;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using Task = System.Threading.Tasks.Task;
 
 namespace HaskellRunner
@@ -86,6 +88,12 @@ namespace HaskellRunner
         /// <param name="e">The event args.</param>
         private void Execute(object sender, EventArgs e)
         {
+            if (FileHelper.GetSourceFileExtension() != ".hs")
+            {
+                MessageBox.Show("File must be a '.hs' file!");
+                return;
+            }
+
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
                 ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(HaskellInteractiveWindow), 0, true, this.package.DisposalToken);

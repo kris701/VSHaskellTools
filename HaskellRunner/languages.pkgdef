@@ -5,4 +5,4 @@
 ; Associate icons with file extensions in Solution Explorer
 ; Find more icons at http://glyphlist.azurewebsites.net/knownmonikers/
 [$RootKey$\ShellFileAssociations\.hs]
-"DefaultIconMoniker"="KnownMonikers.Spy"
+"DefaultIconMoniker"="KnownMonikers.UserFunction"
