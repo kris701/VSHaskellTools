@@ -2,7 +2,7 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
         <Identity Id="HaskellRunner.6eaa553c-a41f-487b-99a1-a8383b6d1f74" Version="1.14" Language="en-US" Publisher="Kristian Skov Johansen" />
-        <DisplayName>HaskellRunner</DisplayName>
+        <DisplayName>Haskell Tools</DisplayName>
         <Description xml:space="preserve">A set of tools to run and do some light debugging of Haskell programs using GHCi</Description>
         <MoreInfo>https://github.com/kris701/HaskellRunner</MoreInfo>
         <Icon>Resources\Icon.png</Icon>
@@ -25,7 +25,7 @@
     </Prerequisites>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="File" Path="languages.pkgdef" />
-        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="HaskellTools" Path="|HaskellTools|" />
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="HaskellTools" Path="|HaskellTools;PkgdefProjectOutputGroup|" />
     </Assets>
 </PackageManifest>

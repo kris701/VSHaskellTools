@@ -107,7 +107,7 @@ namespace HaskellRunner
 
             string value = FileHelper.GetSourceFilePath();
 
-            HaskellRunnerPackage myToolsOptionsPackage = this.package as HaskellRunnerPackage;
+            HaskellToolsPackage myToolsOptionsPackage = this.package as HaskellToolsPackage;
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = @"powershell.exe";

@@ -25,12 +25,12 @@ namespace HaskellRunner
     /// </para>
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [Guid(HaskellRunnerPackage.PackageGuidString)]
+    [Guid(HaskellToolsPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideOptionPage(typeof(OptionPageGrid),
     "Haskell Tools", "Options", 0, 0, true)]
     [ProvideToolWindow(typeof(HaskellInteractiveWindow))]
-    public sealed class HaskellRunnerPackage : AsyncPackage
+    public sealed class HaskellToolsPackage : AsyncPackage
     {
         #region Settings
         public string RunHaskellPath

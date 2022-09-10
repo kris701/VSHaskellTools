@@ -3,15 +3,15 @@
   <Extern href="stdidcmd.h" />
   <Extern href="vsshlids.h" />
 	
-  <Commands package="guidHaskellRunnerPackage">
+  <Commands package="guidHaskellToolsPackage">
 	  <Groups>
-		  <Group guid="guidHaskellRunnerPackageCmdSet" id="MyMenuGroup" priority="0x0600">
-			  <Parent guid="guidHaskellRunnerPackageCmdSet" id="TopLevelMenu" />
+		  <Group guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" priority="0x0600">
+			  <Parent guid="guidHaskellToolsPackageCmdSet" id="TopLevelMenu" />
 		  </Group>
     </Groups>
 
 	  <Menus>
-		  <Menu guid="guidHaskellRunnerPackageCmdSet" id="TopLevelMenu" priority="0x700" type="Menu">
+		  <Menu guid="guidHaskellToolsPackageCmdSet" id="TopLevelMenu" priority="0x700" type="Menu">
 			  <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_FILEEDITVIEW" />
 			  <Strings>
 				  <ButtonText>Haskell Tools</ButtonText>
@@ -28,29 +28,29 @@
     </Bitmaps>
 	  
     <Buttons>
-      <Button guid="guidHaskellRunnerPackageCmdSet" id="CommandId" priority="0x0100" type="Button">
-        <Parent guid="guidHaskellRunnerPackageCmdSet" id="MyMenuGroup" />
+      <Button guid="guidHaskellToolsPackageCmdSet" id="CommandId" priority="0x0100" type="Button">
+        <Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
           <ButtonText>Run Haskell File</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidHaskellRunnerPackageCmdSet" id="CommandId2" priority="0x0101" type="Button">
-        <Parent guid="guidHaskellRunnerPackageCmdSet" id="MyMenuGroup" />
+      <Button guid="guidHaskellToolsPackageCmdSet" id="CommandId2" priority="0x0101" type="Button">
+        <Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages1" id="bmpPic1" />
         <Strings>
           <ButtonText>Run GHCi</ButtonText>
         </Strings>
       </Button>
-		<Button guid="guidHaskellRunnerPackageCmdSet" id="CommandId4" priority="0x0102" type="Button">
-			<Parent guid="guidHaskellRunnerPackageCmdSet" id="MyMenuGroup" />
+		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId4" priority="0x0102" type="Button">
+			<Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
 			<Icon guid="guidImages4" id="bmpPic1" />
 			<Strings>
 				<ButtonText>Haskell Interactive Window</ButtonText>
 			</Strings>
 		</Button>
-		<Button guid="guidHaskellRunnerPackageCmdSet" id="CommandId3" priority="0x0103" type="Button">
-			<Parent guid="guidHaskellRunnerPackageCmdSet" id="MyMenuGroup" />
+		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId3" priority="0x0103" type="Button">
+			<Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
 			<Icon guid="guidImages2" id="bmpPic1" />
 			<Strings>
 				<ButtonText>GitHub</ButtonText>
@@ -60,15 +60,15 @@
   </Commands>
 	
 	<KeyBindings>
-		<KeyBinding guid="guidHaskellRunnerPackageCmdSet" id="CommandId" editor="guidVSStd97" key1="M" mod1="ALT" />
-		<KeyBinding guid="guidHaskellRunnerPackageCmdSet" id="CommandId2" editor="guidVSStd97" key1="J" mod1="ALT" />
-		<KeyBinding guid="guidHaskellRunnerPackageCmdSet" id="CommandId4" editor="guidVSStd97" key1="K" mod1="ALT" />
+		<KeyBinding guid="guidHaskellToolsPackageCmdSet" id="CommandId" editor="guidVSStd97" key1="M" mod1="ALT" />
+		<KeyBinding guid="guidHaskellToolsPackageCmdSet" id="CommandId2" editor="guidVSStd97" key1="J" mod1="ALT" />
+		<KeyBinding guid="guidHaskellToolsPackageCmdSet" id="CommandId4" editor="guidVSStd97" key1="K" mod1="ALT" />
 	</KeyBindings>
 	
 	<Symbols>
-		<GuidSymbol value="{6eaa553c-a41f-487b-99a1-a8383b6d1f74}" name="guidHaskellRunnerPackage" />
+		<GuidSymbol value="{6eaa553c-a41f-487b-99a1-a8383b6d1f74}" name="guidHaskellToolsPackage" />
 
-		<GuidSymbol value="{c8d29eda-f85f-4c3f-8620-6b8c0c6ebd51}" name="guidHaskellRunnerPackageCmdSet">
+		<GuidSymbol value="{c8d29eda-f85f-4c3f-8620-6b8c0c6ebd51}" name="guidHaskellToolsPackageCmdSet">
 			<IDSymbol name="MyMenuGroup" value="0x1020" />
 			<IDSymbol name="CommandId" value="256" />
 			<IDSymbol name="CommandId2" value="257" />
