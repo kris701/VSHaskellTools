@@ -1,5 +1,6 @@
 # VS Haskell Tools
 This is a small extension to Visual Studio to enable the execution and debugging of Haskell programs. It uses GHCi both as compiler and interpreter, so you must have GHCi installed. The install location of GHCi can be costumised in the Tools -> Options in visual studio if needed.
+The extension can also be found on the [Visual Studio Markedplace](https://marketplace.visualstudio.com/items?itemName=KristianSkovJohansen.VSHaskellTools).
 
 ## Syntax Highlighting
 This extension includes syntax highlighting of Haskell programs. It is enabled for all files with the '.hs' extension
