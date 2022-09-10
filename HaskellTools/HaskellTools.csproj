@@ -52,6 +52,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\GitHub.cs" />
+    <Compile Include="Windows\GHCiDebuggerWindow.cs" />
+    <Compile Include="Windows\GHCiDebuggerWindowCommand.cs" />
+    <Compile Include="Windows\GHCiDebuggerWindowControl.xaml.cs">
+      <DependentUpon>GHCiDebuggerWindowControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\ControlsHelper.cs" />
     <Compile Include="Windows\HaskellInteractiveWindow.cs" />
     <Compile Include="Windows\HaskellInteractiveWindowCommand.cs" />
@@ -78,6 +83,7 @@
     <Content Include="Grammars\Haskell.tmLanguage">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Resources\GHCiDebuggerWindowCommand.png" />
     <Content Include="Resources\GitHub.png" />
     <Content Include="Resources\HaskellInteractiveWindowCommand.png" />
     <Content Include="Resources\RunGHCi.png" />
@@ -122,6 +128,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Windows\GHCiDebuggerWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\HaskellInteractiveWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

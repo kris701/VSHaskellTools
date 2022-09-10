@@ -30,6 +30,7 @@ namespace HaskellTools
     [ProvideOptionPage(typeof(OptionPageGrid),
     "Haskell Tools", "Options", 0, 0, true)]
     [ProvideToolWindow(typeof(HaskellInteractiveWindow))]
+    [ProvideToolWindow(typeof(GHCiDebuggerWindow))]
     public sealed class HaskellToolsPackage : AsyncPackage
     {
         #region Settings
@@ -75,6 +76,7 @@ namespace HaskellTools
             await RunGHCi.InitializeAsync(this);
             await GitHub.InitializeAsync(this);
             await HaskellInteractiveWindowCommand.InitializeAsync(this);
+            await GHCiDebuggerWindowCommand.InitializeAsync(this);
         }
 
         #endregion

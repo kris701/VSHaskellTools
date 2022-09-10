@@ -21,10 +21,11 @@
 	  </Menus>
 
 	  <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\RunHaskellFile.png"/>
-      <Bitmap guid="guidImages1" href="Resources\RunGHCi.png"/>
-      <Bitmap guid="guidImages2" href="Resources\GitHub.png"/>
-      <Bitmap guid="guidImages4" href="Resources\HaskellInteractiveWindowCommand.png"/>
+      <Bitmap guid="guidImages" href="Resources\RunHaskellFile.png" />
+      <Bitmap guid="guidImages1" href="Resources\RunGHCi.png" />
+      <Bitmap guid="guidImages2" href="Resources\GitHub.png" />
+      <Bitmap guid="guidImages4" href="Resources\HaskellInteractiveWindowCommand.png" />
+      <Bitmap guid="guidImages5" href="Resources\GHCiDebuggerWindowCommand.png"/>
     </Bitmaps>
 	  
     <Buttons>
@@ -49,7 +50,14 @@
 				<ButtonText>Haskell Interactive Window</ButtonText>
 			</Strings>
 		</Button>
-		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId3" priority="0x0103" type="Button">
+		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId5" priority="0x0103" type="Button">
+			<Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
+			<Icon guid="guidImages5" id="bmpPic1" />
+			<Strings>
+				<ButtonText>GHCiDebuggerWindow</ButtonText>
+			</Strings>
+		</Button>
+		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId3" priority="0x0104" type="Button">
 			<Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
 			<Icon guid="guidImages2" id="bmpPic1" />
 			<Strings>
@@ -74,6 +82,7 @@
 			<IDSymbol name="CommandId2" value="257" />
 			<IDSymbol name="CommandId3" value="258" />
 			<IDSymbol name="CommandId4" value="259" />
+			<IDSymbol name="CommandId5" value="260" />
 			<IDSymbol name="TopLevelMenu" value="0x1021" />
     </GuidSymbol>
 
@@ -94,6 +103,10 @@
     </GuidSymbol>
   
     <GuidSymbol value="{a8a14ee9-9eae-4cb0-87a1-40b2244dbd5a}" name="guidImages4">
+      <IDSymbol name="bmpPic1" value="1" />
+    </GuidSymbol>
+  
+    <GuidSymbol value="{00f2ca33-0f42-4576-a4f2-255ec77838d8}" name="guidImages5">
       <IDSymbol name="bmpPic1" value="1" />
     </GuidSymbol>
   </Symbols>
