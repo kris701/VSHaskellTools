@@ -52,9 +52,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\GitHub.cs" />
-    <Compile Include="Options\HaskellToolsOptionsPackage.cs" />
     <Compile Include="Helpers\ComUtils.cs" />
     <Compile Include="Helpers\OutputPanelController.cs" />
+    <Compile Include="Options\OptionsPageGrid.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HaskellRunnerPackage.cs" />
     <Compile Include="Commands\RunGHCi.cs" />

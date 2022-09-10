@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using HaskellRunner.Options;
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -26,8 +27,30 @@ namespace HaskellRunner
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(HaskellRunnerPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideOptionPage(typeof(OptionPageGrid),
+    "Haskell Tools", "Options", 0, 0, true)]
     public sealed class HaskellRunnerPackage : AsyncPackage
     {
+        #region Settings
+        public string RunHaskellPath
+        {
+            get
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                return page.RunHaskellPath;
+            }
+        }
+
+        public string GHCIPath
+        {
+            get
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                return page.GHCIPath;
+            }
+        }
+        #endregion
+
         /// <summary>
         /// HaskellRunnerPackage GUID string.
         /// </summary>

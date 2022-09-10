@@ -117,7 +117,7 @@ namespace HaskellRunner
 
             OutputPanel.WriteLine("Running GHCi...");
 
-            HaskellToolsOptionsPackage myToolsOptionsPackage = this.package as HaskellToolsOptionsPackage;
+            HaskellRunnerPackage myToolsOptionsPackage = this.package as HaskellRunnerPackage;
 
             process.StandardInput.WriteLine($"cd '{GetSourcePath()}'");
             process.StandardInput.WriteLine($"{myToolsOptionsPackage.GHCIPath}");
