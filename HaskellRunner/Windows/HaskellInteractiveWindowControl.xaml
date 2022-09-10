@@ -19,7 +19,13 @@
         <StackPanel Orientation="Horizontal" Margin="2">
             <Button x:Name="ReloadButton" Content="⟳" Width="30" Click="ReloadButton_Click"/>
         </StackPanel>
-        <TextBox x:Name="OutputTextbox" Grid.Row="1" IsReadOnly="true" Margin="5" Background="Transparent" Foreground="White" TextChanged="OutputTextbox_TextChanged"/>
+        <RichTextBox x:Name="OutputTextbox" Grid.Row="1" IsReadOnly="true" Margin="5" FontSize="15" Background="Transparent" Foreground="White" TextChanged="OutputTextbox_TextChanged">
+            <RichTextBox.Resources>
+                <Style TargetType="{x:Type Paragraph}">
+                    <Setter Property="Margin" Value="0"/>
+                </Style>
+            </RichTextBox.Resources>
+        </RichTextBox>
         <TextBox x:Name="InputTextbox" Grid.Row="2" Margin="5" IsEnabled="False" Background="Transparent" Foreground="White" KeyDown="InputTextbox_KeyDown"/>
     </Grid>
 </UserControl>

@@ -52,6 +52,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\GitHub.cs" />
+    <Compile Include="Helpers\ControlsHelper.cs" />
     <Compile Include="Windows\HaskellInteractiveWindow.cs" />
     <Compile Include="Windows\HaskellInteractiveWindowCommand.cs" />
     <Compile Include="Windows\HaskellInteractiveWindowControl.xaml.cs">

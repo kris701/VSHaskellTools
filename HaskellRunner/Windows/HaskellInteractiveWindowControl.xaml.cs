@@ -7,6 +7,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace HaskellRunner
 {
@@ -31,6 +33,7 @@ namespace HaskellRunner
             if (e.Key == System.Windows.Input.Key.Enter)
             {
                 process.StandardInput.WriteLine(InputTextbox.Text);
+                OutputTextbox.AppendText($"> {InputTextbox.Text}{Environment.NewLine}", "#4e6fb5");
                 InputTextbox.Text = "";
             }
         }
@@ -42,7 +45,7 @@ namespace HaskellRunner
 
         private void OutputTextbox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            (sender as TextBox).ScrollToEnd();
+            (sender as RichTextBox).ScrollToEnd();
         }
 
         private async void ReloadButton_Click(object sender, RoutedEventArgs e)
@@ -53,7 +56,8 @@ namespace HaskellRunner
         private async Task LoadSession()
         {
             enableOutput = false;
-            OutputTextbox.Text = "";
+            InputTextbox.IsEnabled = false;
+            OutputTextbox.Document.Blocks.Clear();
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = @"powershell.exe";
@@ -67,16 +71,14 @@ namespace HaskellRunner
 
             process.ErrorDataReceived += new DataReceivedEventHandler((sender1, e1) => {
                 Application.Current.Dispatcher.Invoke(new Action(() => {
-                    if (enableOutput)
-                        OutputTextbox.Text += $"{e1.Data}{Environment.NewLine}";
-                    string read = e1.Data;
+                    if (enableOutput && e1.Data != "")
+                        OutputTextbox.AppendText($"{e1.Data}{Environment.NewLine}", "#ba4141");
                 }));
             });
             process.OutputDataReceived += new DataReceivedEventHandler((sender2, e2) => {
                 Application.Current.Dispatcher.Invoke(new Action(() => {
-                    if (enableOutput)
-                        OutputTextbox.Text += $"{e2.Data}{Environment.NewLine}";
-                    string read = e2.Data;
+                    if (enableOutput && e2.Data != "")
+                        OutputTextbox.AppendText($"{e2.Data}{Environment.NewLine}", "#ffffff");
                 }));
             });
 
@@ -85,7 +87,7 @@ namespace HaskellRunner
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
-            OutputTextbox.Text += $"Starting GHCi...{Environment.NewLine}";
+            OutputTextbox.AppendText($"Starting GHCi...{Environment.NewLine}", "#787878");
 
             while (GHCiPath == "")
                 await Task.Delay(1000);
@@ -96,7 +98,7 @@ namespace HaskellRunner
             process.StandardInput.WriteLine($":load {FileHelper.GetSourceFileName()}");
 
             await Task.Delay(100);
-            OutputTextbox.Text += $"GHCI started and '{FileHelper.GetSourceFileName()}' loaded!{Environment.NewLine}";
+            OutputTextbox.AppendText($"GHCI started and '{FileHelper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
 
             InputTextbox.IsEnabled = true;
             enableOutput = true;
