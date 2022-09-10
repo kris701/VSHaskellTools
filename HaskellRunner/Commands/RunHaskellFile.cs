@@ -98,7 +98,7 @@ namespace HaskellRunner
             OutputPanel.Initialize();
             OutputPanel.ClearOutput();
 
-            string value = GetSourceFilePath();
+            string value = FileHelper.GetSourceFilePath();
 
             HaskellRunnerPackage myToolsOptionsPackage = this.package as HaskellRunnerPackage;
 
@@ -125,20 +125,6 @@ namespace HaskellRunner
                 while (!process.StandardOutput.EndOfStream)
                     OutputPanel.WriteLine(process.StandardOutput.ReadLine());
             }
-        }
-
-        
-
-        private static EnvDTE80.DTE2 GetDTE2()
-        {
-            return Package.GetGlobalService(typeof(DTE)) as EnvDTE80.DTE2;
-        }
-
-        private string GetSourceFilePath()
-        {
-            EnvDTE80.DTE2 _applicationObject = GetDTE2();
-            var uih = _applicationObject.ActiveDocument;
-            return uih.FullName;
         }
     }
 }

@@ -29,6 +29,7 @@ namespace HaskellRunner
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideOptionPage(typeof(OptionPageGrid),
     "Haskell Tools", "Options", 0, 0, true)]
+    [ProvideToolWindow(typeof(HaskellInteractiveWindow))]
     public sealed class HaskellRunnerPackage : AsyncPackage
     {
         #region Settings
@@ -73,6 +74,7 @@ namespace HaskellRunner
             await RunHaskellFile.InitializeAsync(this);
             await RunGHCi.InitializeAsync(this);
             await GitHub.InitializeAsync(this);
+            await HaskellInteractiveWindowCommand.InitializeAsync(this);
         }
 
         #endregion

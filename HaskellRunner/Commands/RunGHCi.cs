@@ -102,8 +102,6 @@ namespace HaskellRunner
             OutputPanel.Initialize();
             OutputPanel.ClearOutput();
 
-            string value = GetSourceFilePath();
-
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = @"powershell.exe";
             startInfo.RedirectStandardOutput = true;
@@ -119,11 +117,11 @@ namespace HaskellRunner
 
             HaskellRunnerPackage myToolsOptionsPackage = this.package as HaskellRunnerPackage;
 
-            process.StandardInput.WriteLine($"cd '{GetSourcePath()}'");
+            process.StandardInput.WriteLine($"cd '{FileHelper.GetSourcePath()}'");
             process.StandardInput.WriteLine($"& '{myToolsOptionsPackage.GHCIPath}'");
             System.Threading.Thread.Sleep(1000);
-            process.StandardInput.WriteLine($":load {GetSourceFileName()}");
-            process.StandardInput.WriteLine($"{GetSelectedText()}");
+            process.StandardInput.WriteLine($":load {FileHelper.GetSourceFileName()}");
+            process.StandardInput.WriteLine($"{FileHelper.GetSelectedText()}");
             process.StandardInput.WriteLine($":quit");
             System.Threading.Thread.Sleep(1000);
             process.StandardInput.WriteLine($"exit");
@@ -149,40 +147,6 @@ namespace HaskellRunner
                         reading = true;
                 }
             }
-        }
-
-        private static EnvDTE80.DTE2 GetDTE2()
-        {
-            return Package.GetGlobalService(typeof(DTE)) as EnvDTE80.DTE2;
-        }
-
-        private string GetSourceFilePath()
-        {
-            EnvDTE80.DTE2 _applicationObject = GetDTE2();
-            var uih = _applicationObject.ActiveDocument;
-            return uih.FullName;
-        }
-
-        private string GetSourceFileName()
-        {
-            EnvDTE80.DTE2 _applicationObject = GetDTE2();
-            var uih = _applicationObject.ActiveDocument;
-            return uih.Name;
-        }
-
-        private string GetSourcePath()
-        {
-            EnvDTE80.DTE2 _applicationObject = GetDTE2();
-            var uih = _applicationObject.ActiveDocument;
-            return uih.Path;
-        }
-
-        private string GetSelectedText()
-        {
-            EnvDTE80.DTE2 _applicationObject = GetDTE2();
-            var uih = _applicationObject.ActiveDocument;
-            var value = ComUtils.Get(uih.Selection, "Text").ToString();
-            return value;
         }
     }
 }
