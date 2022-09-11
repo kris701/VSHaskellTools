@@ -310,6 +310,7 @@ namespace HaskellTools
             ResetBreakpoints.IsEnabled = false;
             _currentReadState = ReadState.Breakpoint;
             await LoadSession();
+            InputTextbox.IsEnabled = true;
             InsertBreakPoints();
             _process.StandardInput.WriteLine($":trace main");
         }
@@ -318,6 +319,7 @@ namespace HaskellTools
         {
             if (IsDebuggerRunning)
                 _process.Close();
+            InputTextbox.IsEnabled = false;
             BreakpointPanel.IsEnabled = true;
             ResetBreakpoints.IsEnabled = true;
             ContinueButton.IsEnabled = false;
@@ -357,6 +359,16 @@ namespace HaskellTools
         private void HistoryTraceBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             (sender as TextBox).ScrollToEnd();
+        }
+
+        private void InputTextbox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                _process.StandardInput.WriteLine(InputTextbox.Text);
+                OutputTextbox.AppendText($"> {InputTextbox.Text}{Environment.NewLine}", "#4e6fb5");
+                InputTextbox.Text = "";
+            }
         }
     }
 }
