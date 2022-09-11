@@ -23,7 +23,7 @@ namespace HaskellTools
     /// </summary>
     public partial class GHCiDebuggerWindowControl : UserControl
     {
-        private enum ReadState { None, Breakpoint, DebugData, EvaluteDebugData }
+        private enum ReadState { None, Breakpoint, Tracing, DebugData, EvaluteDebugData }
         private ReadState _currentReadState = ReadState.Breakpoint;
 
         private DispatcherTimer _debugTimer = new DispatcherTimer();
@@ -153,6 +153,7 @@ namespace HaskellTools
                             MarkBreakpoint(number);
 
                             _debugData.Clear();
+                            HistoryTraceBox.Text = "";
                             _currentReadState = ReadState.DebugData;
                         }
                         break;
@@ -189,6 +190,14 @@ namespace HaskellTools
                             _debugEvaluateTimer.Start();
                         }
                         break;
+                    case ReadState.Tracing:
+                        if (!text.Contains("<end of history>"))
+                        {
+                            HistoryTraceBox.Text += $"{text}{Environment.NewLine}";
+                        }
+                        else
+                            _currentReadState = ReadState.DebugData;
+                        break;
                 }
                 OutputTextbox.AppendText($"{text}{Environment.NewLine}", "#ffffff");
             }
@@ -202,14 +211,23 @@ namespace HaskellTools
             _debugTimer.Stop();
             if ((bool)ForceValueChecks.IsChecked)
                 EvaluateDebugData();
+            else
+            {
+                _currentReadState = ReadState.Tracing;
+                _process.StandardInput.WriteLine($":hist");
+            }
         }
 
         private void EvaluateDebugReadOver(object sender, EventArgs e)
         {
             DebugDataPanel.ItemsSource = null;
             DebugDataPanel.ItemsSource = _debugData;
-            _currentReadState = ReadState.Breakpoint;
             _debugEvaluateTimer.Stop();
+            if ((bool)ForceValueChecks.IsChecked)
+            {
+                _currentReadState = ReadState.Tracing;
+                _process.StandardInput.WriteLine($":hist");
+            }
         }
 
         private void ContinueButton_Click(object sender, RoutedEventArgs e)
@@ -218,6 +236,7 @@ namespace HaskellTools
             ResetBreakpointPanel();
             if (!IsDebuggerRunning)
                 return;
+            _currentReadState = ReadState.Breakpoint;
             _process.StandardInput.WriteLine($":continue");
         }
 
@@ -288,10 +307,11 @@ namespace HaskellTools
         private async Task StartDebugger()
         {
             BreakpointPanel.IsEnabled = false;
+            ResetBreakpoints.IsEnabled = false;
             _currentReadState = ReadState.Breakpoint;
             await LoadSession();
             InsertBreakPoints();
-            _process.StandardInput.WriteLine($"main");
+            _process.StandardInput.WriteLine($":trace main");
         }
 
         private async Task StopDebugger()
@@ -299,11 +319,13 @@ namespace HaskellTools
             if (IsDebuggerRunning)
                 _process.Close();
             BreakpointPanel.IsEnabled = true;
+            ResetBreakpoints.IsEnabled = true;
             ContinueButton.IsEnabled = false;
             StepButton.IsEnabled = false;
             _currentReadState = ReadState.Breakpoint;
             DebugDataPanel.ItemsSource = null;
             OutputTextbox.Document.Blocks.Clear();
+            HistoryTraceBox.Text = "";
             ResetBreakpointPanel();
             _process = null;
         }
@@ -314,7 +336,27 @@ namespace HaskellTools
                 return;
 
             ResetBreakpointPanel();
+            _currentReadState = ReadState.Breakpoint;
             _process.StandardInput.WriteLine($":step");
+        }
+
+        private void ResetBreakpoints_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsDebuggerRunning)
+                return;
+            foreach (var item in BreakpointPanel.Children)
+                if (item is DebuggerLine line)
+                    line.BreakPoint.IsChecked = false;
+        }
+
+        private void OutputTextbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            (sender as RichTextBox).ScrollToEnd();
+        }
+
+        private void HistoryTraceBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            (sender as TextBox).ScrollToEnd();
         }
     }
 }

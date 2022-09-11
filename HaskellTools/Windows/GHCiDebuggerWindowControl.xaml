@@ -25,26 +25,46 @@
             <Button x:Name="StopDebuggingButton" Content="Stop Debugging" IsEnabled="False" Click="StopDebuggingButton_Click"/>
             <Button x:Name="ContinueButton" Content="Continue" IsEnabled="False" Click="ContinueButton_Click"/>
             <Button x:Name="StepButton" Content="Step" IsEnabled="False" Click="StepButton_Click"/>
-            <CheckBox x:Name="BreakOnExceptionCheckbox" Content="Break on Exception"/>
-            <CheckBox x:Name="ForceValueChecks" Content="Force Value Checking"/>
+            <CheckBox x:Name="ForceValueChecks" Content="Force Value Checking" Foreground="White"/>
         </StackPanel>
 
-        <StackPanel x:Name="BreakpointPanel" Grid.Row="1" Margin="5">
+        <StackPanel Grid.Row="1" Margin="5">
+            <Label Content="Breakpoints" Foreground="White" HorizontalContentAlignment="Center"/>
+            <Button x:Name="ResetBreakpoints" Content="Reset Breakpoints" Click="ResetBreakpoints_Click"/>
+            <StackPanel x:Name="BreakpointPanel" Margin="5">
             
+            </StackPanel>
         </StackPanel>
 
-        <RichTextBox x:Name="OutputTextbox" Grid.Column="1" Margin="5" IsReadOnly="True" Background="Transparent" Foreground="White">
-            <RichTextBox.Resources>
-                <Style TargetType="{x:Type Paragraph}">
-                    <Setter Property="Margin" Value="0"/>
-                </Style>
-            </RichTextBox.Resources>
-        </RichTextBox>
+        <Grid Grid.Column="1" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label Content="Output" Foreground="White" HorizontalContentAlignment="Center"/>
+            <RichTextBox x:Name="OutputTextbox" Grid.Row="1" Margin="5" IsReadOnly="True" Background="Transparent" Foreground="White" TextChanged="OutputTextbox_TextChanged">
+                <RichTextBox.Resources>
+                    <Style TargetType="{x:Type Paragraph}">
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
+                </RichTextBox.Resources>
+            </RichTextBox>
+        </Grid>
 
-        <StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
-            <Button x:Name="ForceEvaluate" Content="Force Evaluate Variables" Click="ForceEvaluate_Click"/>
-            <DataGrid x:Name="DebugDataPanel" Margin="5"/>
-        </StackPanel>
-        
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Margin="5">
+                <Label Content="Locals" Foreground="White" HorizontalContentAlignment="Center"/>
+                <Button x:Name="ForceEvaluate" Content="Force Evaluate Variables" Click="ForceEvaluate_Click"/>
+                <DataGrid x:Name="DebugDataPanel" Margin="5"/>
+            </StackPanel>
+            <StackPanel Margin="5" Grid.Column="1">
+                <Label Content="History Trace" Foreground="White" HorizontalContentAlignment="Center"/>
+                <TextBox x:Name="HistoryTraceBox" IsReadOnly="True" Background="Transparent" Foreground="White" TextChanged="HistoryTraceBox_TextChanged"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
