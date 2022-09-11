@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace HaskellTools
 {
@@ -25,11 +26,15 @@ namespace HaskellTools
         private enum ReadState { None, Breakpoint, DebugData, EvaluteDebugData }
         private ReadState _currentReadState = ReadState.Breakpoint;
 
-        private Process process;
-        private string fileName = "";
-        private List<DataItem> debugData = new List<DataItem>();
-        private int haveUpdatedCount = 0;
+        private DispatcherTimer _debugTimer = new DispatcherTimer();
+        private DispatcherTimer _debugEvaluateTimer = new DispatcherTimer();
 
+        private Process _process;
+        private string _sourcePath = "";
+        private string _fileName = "";
+        private List<DataItem> _debugData = new List<DataItem>();
+
+        public bool IsDebuggerRunning => _process != null && !_process.HasExited;
         public string GHCiPath { get; set; } = "";
 
         /// <summary>
@@ -38,39 +43,29 @@ namespace HaskellTools
         public GHCiDebuggerWindowControl()
         {
             this.InitializeComponent();
+            _debugTimer.Interval = TimeSpan.FromMilliseconds(100);
+            _debugTimer.Tick += DebugReadOver;
+            _debugEvaluateTimer.Interval = TimeSpan.FromMilliseconds(100);
+            _debugEvaluateTimer.Tick += EvaluateDebugReadOver;
         }
 
         private void MyToolWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            DebugDataPanel.ItemsSource = debugData;
             FillBreakPointLines();
         }
 
         private async void StartDebuggingButton_Click(object sender, RoutedEventArgs e)
         {
-            await LoadSession();
-            foreach(var control in BreakpointPanel.Children)
-            {
-                if (control is DebuggerLine line)
-                {
-                    if (line.DoBreak)
-                    {
-                        process.StandardInput.WriteLine($":break {line.LineNumber}");
-                    }
-                }
-            }
-            process.StandardInput.WriteLine($"main");
+            StartDebuggingButton.IsEnabled = false;
+            StopDebuggingButton.IsEnabled = true;
+            await StartDebugger();
         }
 
-        private void StopDebuggingButton_Click(object sender, RoutedEventArgs e)
+        private async void StopDebuggingButton_Click(object sender, RoutedEventArgs e)
         {
-            if (process != null)
-                process.Close();
-            BreakpointPanel.IsEnabled = true;
-            _currentReadState = ReadState.Breakpoint;
-            DebugDataPanel.ItemsSource = null;
-            OutputTextbox.Document.Blocks.Clear();
-            ResetBreakpointPanel();
+            StartDebuggingButton.IsEnabled = true;
+            StopDebuggingButton.IsEnabled = false;
+            await StopDebugger();
         }
 
         public void FillBreakPointLines()
@@ -88,12 +83,8 @@ namespace HaskellTools
 
         private async Task LoadSession()
         {
-            if (process != null)
-                process.Close();
-            BreakpointPanel.IsEnabled = false;
-            _currentReadState = ReadState.Breakpoint;
-            DebugDataPanel.ItemsSource = null;
-            OutputTextbox.Document.Blocks.Clear();
+            if (IsDebuggerRunning)
+                await StopDebugger();
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = @"powershell.exe";
@@ -102,22 +93,21 @@ namespace HaskellTools
             startInfo.RedirectStandardInput = true;
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
-            process = new Process();
-            process.StartInfo = startInfo;
-            process.EnableRaisingEvents = true;
-            process.Exited += new EventHandler((sender1, e1) => {
-                BreakpointPanel.IsEnabled = true;
-                ResetBreakpointPanel();
+            _process = new Process();
+            _process.StartInfo = startInfo;
+            _process.EnableRaisingEvents = true;
+            _process.Exited += new EventHandler((sender1, e1) => {
+                StopDebugger();
                 });
 
-            process.ErrorDataReceived += new DataReceivedEventHandler((sender1, e1) =>
+            _process.ErrorDataReceived += new DataReceivedEventHandler((sender1, e1) =>
             {
                 Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
                     OutputTextbox.AppendText($"{e1.Data}{Environment.NewLine}", "#ba4141");
                 }));
             });
-            process.OutputDataReceived += new DataReceivedEventHandler((sender2, e2) =>
+            _process.OutputDataReceived += new DataReceivedEventHandler((sender2, e2) =>
             {
                 Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
@@ -125,22 +115,23 @@ namespace HaskellTools
                 }));
             });
 
-            process.Start();
+            _process.Start();
 
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
+            _process.BeginOutputReadLine();
+            _process.BeginErrorReadLine();
 
             OutputTextbox.AppendText($"Starting GHCi...{Environment.NewLine}", "#787878");
 
+            if (_sourcePath == "")
+                _sourcePath = FileHelper.GetSourcePath();
+            await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
             while (GHCiPath == "")
                 await Task.Delay(1000);
-
-            await process.StandardInput.WriteLineAsync($"cd '{FileHelper.GetSourcePath()}'");
-            await process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
-            System.Threading.Thread.Sleep(1000);
-            if (fileName == "")
-                fileName = FileHelper.GetSourceFileName();
-            await process.StandardInput.WriteLineAsync($":load {fileName}");
+            await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
+            await Task.Delay(1000);
+            if (_fileName == "")
+                _fileName = FileHelper.GetSourceFileName();
+            await _process.StandardInput.WriteLineAsync($":load {_fileName}");
 
             await Task.Delay(100);
             OutputTextbox.AppendText($"GHCI started and '{FileHelper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
@@ -159,19 +150,10 @@ namespace HaskellTools
                             lineNumber = lineNumber.Substring(lineNumber.IndexOf(':') + 1);
                             lineNumber = lineNumber.Substring(0, lineNumber.IndexOf(':'));
                             int number = Int32.Parse(lineNumber);
-                            foreach (var control in BreakpointPanel.Children)
-                            {
-                                if (control is DebuggerLine line)
-                                {
-                                    if (line.LineNumber == number)
-                                    {
-                                        line.Background = Brushes.Red;
-                                        break;
-                                    }
-                                }
-                            }
+                            MarkBreakpoint(number);
+
+                            _debugData.Clear();
                             _currentReadState = ReadState.DebugData;
-                            process.StandardInput.WriteLine($"");
                         }
                         break;
                     case ReadState.DebugData:
@@ -181,18 +163,13 @@ namespace HaskellTools
                             string type = text.Substring(text.IndexOf("::") + 2);
                             type = type.Substring(0, type.IndexOf("="));
                             string value = text.Substring(text.IndexOf("=") + 1);
-                            debugData.Add(new DataItem()
+                            _debugData.Add(new DataItem()
                             {
                                 VariableName = name,
                                 Type = type,
                                 EvaluatedValue = value
                             });
-                        }
-                        else
-                        {
-                            DebugDataPanel.ItemsSource = null;
-                            DebugDataPanel.ItemsSource = debugData;
-                            _currentReadState = ReadState.Breakpoint;
+                            _debugTimer.Start();
                         }
                         break;
                     case ReadState.EvaluteDebugData:
@@ -201,24 +178,15 @@ namespace HaskellTools
                             string rname = text.Substring(text.IndexOf(">") + 1);
                             rname = rname.Substring(0, rname.IndexOf("="));
                             string rvalue = text.Substring(text.IndexOf("=") + 1);
-                            foreach (var item in debugData)
+                            foreach (var item in _debugData)
                             {
                                 if (item.VariableName.Trim() == rname.Trim())
                                 {
                                     item.EvaluatedValue = rvalue;
-                                    haveUpdatedCount++;
                                     break;
                                 }
                             }
-                            if (haveUpdatedCount == debugData.Count)
-                            {
-                                haveUpdatedCount = 0;
-
-                                DebugDataPanel.ItemsSource = null;
-                                DebugDataPanel.ItemsSource = debugData;
-
-                                _currentReadState = ReadState.Breakpoint;
-                            }
+                            _debugEvaluateTimer.Start();
                         }
                         break;
                 }
@@ -226,10 +194,65 @@ namespace HaskellTools
             }
         }
 
+        private void DebugReadOver(object sender, EventArgs e)
+        {
+            DebugDataPanel.ItemsSource = null;
+            DebugDataPanel.ItemsSource = _debugData;
+            _currentReadState = ReadState.Breakpoint;
+            _debugTimer.Stop();
+            if ((bool)ForceValueChecks.IsChecked)
+                EvaluateDebugData();
+        }
+
+        private void EvaluateDebugReadOver(object sender, EventArgs e)
+        {
+            DebugDataPanel.ItemsSource = null;
+            DebugDataPanel.ItemsSource = _debugData;
+            _currentReadState = ReadState.Breakpoint;
+            _debugEvaluateTimer.Stop();
+        }
+
         private void ContinueButton_Click(object sender, RoutedEventArgs e)
         {
+            ContinueButton.IsEnabled = false;
             ResetBreakpointPanel();
-            process.StandardInput.WriteLine($":continue");
+            if (!IsDebuggerRunning)
+                return;
+            _process.StandardInput.WriteLine($":continue");
+        }
+
+        private void ForceEvaluate_Click(object sender, RoutedEventArgs e)
+        {
+            EvaluateDebugData();
+        }
+
+        private void EvaluateDebugData()
+        {
+            if (!IsDebuggerRunning)
+                return;
+
+            _currentReadState = ReadState.EvaluteDebugData;
+            foreach (var item in _debugData)
+            {
+                _process.StandardInput.WriteLine($":force {item.VariableName}");
+            }
+        }
+
+        private void InsertBreakPoints()
+        {
+            if (!IsDebuggerRunning)
+                return;
+
+            foreach (var control in BreakpointPanel.Children)
+            {
+                if (control is DebuggerLine line)
+                {
+                    if (line.DoBreak)
+                    {
+                        _process.StandardInput.WriteLine($":break {line.LineNumber}");
+                    }
+                }
+            }
         }
 
         private void ResetBreakpointPanel()
@@ -242,14 +265,56 @@ namespace HaskellTools
                 }
             }
         }
-
-        private void ForceEvaluate_Click(object sender, RoutedEventArgs e)
+        private void MarkBreakpoint(int lineNumber)
         {
-            _currentReadState = ReadState.EvaluteDebugData;
-            foreach (var item in debugData)
+            foreach (var control in BreakpointPanel.Children)
             {
-                process.StandardInput.WriteLine($":force {item.VariableName}");
+                if (control is DebuggerLine line)
+                {
+                    if (line.LineNumber == lineNumber)
+                    {
+                        if (line.DoBreak)
+                            line.Background = Brushes.Red;
+                        else
+                            line.Background = Brushes.Orange;
+                        ContinueButton.IsEnabled = true;
+                        StepButton.IsEnabled = true;
+                        break;
+                    }
+                }
             }
+        }
+
+        private async Task StartDebugger()
+        {
+            BreakpointPanel.IsEnabled = false;
+            _currentReadState = ReadState.Breakpoint;
+            await LoadSession();
+            InsertBreakPoints();
+            _process.StandardInput.WriteLine($"main");
+        }
+
+        private async Task StopDebugger()
+        {
+            if (IsDebuggerRunning)
+                _process.Close();
+            BreakpointPanel.IsEnabled = true;
+            ContinueButton.IsEnabled = false;
+            StepButton.IsEnabled = false;
+            _currentReadState = ReadState.Breakpoint;
+            DebugDataPanel.ItemsSource = null;
+            OutputTextbox.Document.Blocks.Clear();
+            ResetBreakpointPanel();
+            _process = null;
+        }
+
+        private void StepButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!IsDebuggerRunning)
+                return;
+
+            ResetBreakpointPanel();
+            _process.StandardInput.WriteLine($":step");
         }
     }
 }

@@ -22,8 +22,9 @@
 
         <StackPanel Margin="5">
             <Button x:Name="StartDebuggingButton" Content="Start Debugging" Click="StartDebuggingButton_Click"/>
-            <Button x:Name="StopDebuggingButton" Content="Stop Debugging" Click="StopDebuggingButton_Click"/>
-            <Button x:Name="ContinueButton" Content="Continue" Click="ContinueButton_Click"/>
+            <Button x:Name="StopDebuggingButton" Content="Stop Debugging" IsEnabled="False" Click="StopDebuggingButton_Click"/>
+            <Button x:Name="ContinueButton" Content="Continue" IsEnabled="False" Click="ContinueButton_Click"/>
+            <Button x:Name="StepButton" Content="Step" IsEnabled="False" Click="StepButton_Click"/>
             <CheckBox x:Name="BreakOnExceptionCheckbox" Content="Break on Exception"/>
             <CheckBox x:Name="ForceValueChecks" Content="Force Value Checking"/>
         </StackPanel>
