@@ -36,25 +36,25 @@
           <ButtonText>Run Haskell File</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidHaskellToolsPackageCmdSet" id="CommandId2" priority="0x0101" type="Button">
+		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId5" priority="0x0101" type="Button">
+			<Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
+			<Icon guid="guidImages5" id="bmpPic1" />
+			<Strings>
+				<ButtonText>Debug Haskell File</ButtonText>
+			</Strings>
+		</Button>
+      <Button guid="guidHaskellToolsPackageCmdSet" id="CommandId2" priority="0x0102" type="Button">
         <Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages1" id="bmpPic1" />
         <Strings>
-          <ButtonText>Run GHCi</ButtonText>
+          <ButtonText>Run Selected Function</ButtonText>
         </Strings>
       </Button>
-		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId4" priority="0x0102" type="Button">
+		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId4" priority="0x0103" type="Button">
 			<Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
 			<Icon guid="guidImages4" id="bmpPic1" />
 			<Strings>
 				<ButtonText>Haskell Interactive Window</ButtonText>
-			</Strings>
-		</Button>
-		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId5" priority="0x0103" type="Button">
-			<Parent guid="guidHaskellToolsPackageCmdSet" id="MyMenuGroup" />
-			<Icon guid="guidImages5" id="bmpPic1" />
-			<Strings>
-				<ButtonText>Run GHCi Debugger</ButtonText>
 			</Strings>
 		</Button>
 		<Button guid="guidHaskellToolsPackageCmdSet" id="CommandId3" priority="0x0104" type="Button">
@@ -71,6 +71,7 @@
 		<KeyBinding guid="guidHaskellToolsPackageCmdSet" id="CommandId" editor="guidVSStd97" key1="M" mod1="ALT" />
 		<KeyBinding guid="guidHaskellToolsPackageCmdSet" id="CommandId2" editor="guidVSStd97" key1="J" mod1="ALT" />
 		<KeyBinding guid="guidHaskellToolsPackageCmdSet" id="CommandId4" editor="guidVSStd97" key1="K" mod1="ALT" />
+		<KeyBinding guid="guidHaskellToolsPackageCmdSet" id="CommandId5" editor="guidVSStd97" key1="L" mod1="ALT" />
 	</KeyBindings>
 	
 	<Symbols>

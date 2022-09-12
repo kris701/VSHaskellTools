@@ -100,20 +100,8 @@ namespace HaskellTools
                 StopDebugger();
                 });
 
-            _process.ErrorDataReceived += new DataReceivedEventHandler((sender1, e1) =>
-            {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    OutputTextbox.AppendText($"{e1.Data}{Environment.NewLine}", "#ba4141");
-                }));
-            });
-            _process.OutputDataReceived += new DataReceivedEventHandler((sender2, e2) =>
-            {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    EvaluateOutput(e2.Data);
-                }));
-            });
+            _process.ErrorDataReceived += RecieveErrorData;
+            _process.OutputDataReceived += RecieveNormalData;
 
             _process.Start();
 
@@ -135,6 +123,22 @@ namespace HaskellTools
 
             await Task.Delay(100);
             OutputTextbox.AppendText($"GHCI started and '{FileHelper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
+        }
+
+        private void RecieveErrorData(object sender, DataReceivedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                OutputTextbox.AppendText($"{e.Data}{Environment.NewLine}", "#ba4141");
+            }));
+        }
+
+        private void RecieveNormalData(object sender, DataReceivedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                EvaluateOutput(e.Data);
+            }));
         }
 
         private void EvaluateOutput(string text)
@@ -348,7 +352,7 @@ namespace HaskellTools
                 return;
             foreach (var item in BreakpointPanel.Children)
                 if (item is DebuggerLine line)
-                    line.BreakPoint.IsChecked = false;
+                    line.SetBreakpoint(false);
         }
 
         private void OutputTextbox_TextChanged(object sender, TextChangedEventArgs e)

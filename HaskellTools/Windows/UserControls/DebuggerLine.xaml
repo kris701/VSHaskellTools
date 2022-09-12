@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:HaskellTools.Windows.UserControls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="30" d:DesignWidth="100">
     <StackPanel Orientation="Horizontal">
-        <Label x:Name="LineNumberLabel" Content="0" Width="30" Foreground="White"/>
-        <CheckBox x:Name="BreakPoint" Click="BreakPoint_Click"/>
-        <Label x:Name="LineLabel" Foreground="White"/>
+        <Label x:Name="LineNumberLabel" Content="0" Width="30" Foreground="White" VerticalContentAlignment="Center"/>
+        <Button x:Name="BreakPointButton" Width="30" Background="Red" Opacity="0" Click="ToggleBreakpoint_Click" VerticalContentAlignment="Center"/>
+        <Label x:Name="LineLabel" Content="Line" Foreground="White" Background="Transparent" VerticalContentAlignment="Center"/>
     </StackPanel>
 </UserControl>

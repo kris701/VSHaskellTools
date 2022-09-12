@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Windows.Resources;
 using System.Windows.Shapes;
 
 namespace HaskellTools.Windows.UserControls
@@ -31,9 +32,18 @@ namespace HaskellTools.Windows.UserControls
             LineLabel.Content = text;
         }
 
-        private void BreakPoint_Click(object sender, RoutedEventArgs e)
+        private void ToggleBreakpoint_Click(object sender, RoutedEventArgs e)
         {
-            DoBreak = (bool)(sender as CheckBox).IsChecked;
+            SetBreakpoint(!DoBreak);
+        }
+
+        public void SetBreakpoint(bool toValue)
+        {
+            DoBreak = toValue;
+            if (DoBreak)
+                BreakPointButton.Opacity = 1;
+            else
+                BreakPointButton.Opacity = 0;
         }
     }
 }
