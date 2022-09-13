@@ -1,4 +1,5 @@
-﻿using HaskellTools.Helpers;
+﻿using HaskellTools.Events;
+using HaskellTools.Helpers;
 using HaskellTools.Windows.DebugData;
 using HaskellTools.Windows.UserControls;
 using Microsoft.VisualStudio.Threading;
@@ -29,14 +30,17 @@ namespace HaskellTools
         private DispatcherTimer _debugTimer = new DispatcherTimer();
         private DispatcherTimer _debugEvaluateTimer = new DispatcherTimer();
 
+        private HaskellToolsPackage package;
         private Process _process;
         private string _sourcePath = "";
-        private string _fileName = "";
         private List<DataItem> _debugData = new List<DataItem>();
 
         public bool IsDebuggerRunning => _process != null && !_process.HasExited;
         public string GHCiPath { get; set; } = "";
         public bool IsFileLoaded { get; internal set; } = false;
+        public string FileLoaded { get; internal set; } = "None";
+
+        public event RequestSettingsDataHandler RequestSettingsData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GHCiDebuggerWindowControl"/> class.
@@ -52,26 +56,47 @@ namespace HaskellTools
 
         public void Load()
         {
-            FillBreakPointLines();
-            IsFileLoaded = true;
+            if (DTE2Helper.IsValidFileOpen()) {
+                if (!IsDebuggerRunning)
+                {
+                    var newName = DTE2Helper.GetSourceFileName();
+                    if (FileLoaded != newName)
+                    {
+                        if (_sourcePath == "")
+                            _sourcePath = DTE2Helper.GetSourcePath();
+
+                        FileLoaded = newName;
+                        CurrentlyDebuggingLabel.Content = $"Loaded File: {FileLoaded}";
+                        ErrorLabel.Visibility = Visibility.Hidden;
+                        MainGrid.Visibility = Visibility.Visible;
+                        FillBreakPointLines();
+                        IsFileLoaded = true;
+                        MainGrid.IsEnabled = true;
+                    }
+                }
+            }
+            else
+            {
+                ErrorLabel.Visibility = Visibility.Visible;
+                MainGrid.Visibility = Visibility.Hidden;
+            }
         }
 
         public void Unload()
         {
             StopDebugger();
+            BreakpointPanel.Children.Clear();
+            IsFileLoaded = false;
+            FileLoaded = "None";
         }
 
         private async void StartDebuggingButton_Click(object sender, RoutedEventArgs e)
         {
-            StartDebuggingButton.IsEnabled = false;
-            StopDebuggingButton.IsEnabled = true;
             await StartDebugger();
         }
 
         private async void StopDebuggingButton_Click(object sender, RoutedEventArgs e)
         {
-            StartDebuggingButton.IsEnabled = true;
-            StopDebuggingButton.IsEnabled = false;
             await StopDebugger();
         }
 
@@ -117,16 +142,15 @@ namespace HaskellTools
 
             OutputTextbox.AppendText($"Starting GHCi...{Environment.NewLine}", "#787878");
 
-            if (_sourcePath == "")
-                _sourcePath = DTE2Helper.GetSourcePath();
             await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
-            while (GHCiPath == "")
-                await Task.Delay(1000);
+            if (GHCiPath == "")
+            {
+                package = RequestSettingsData.Invoke();
+                GHCiPath = package.GHCIPath;
+            }
             await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
             await Task.Delay(1000);
-            if (_fileName == "")
-                _fileName = DTE2Helper.GetSourceFileName();
-            await _process.StandardInput.WriteLineAsync($":load {_fileName}");
+            await _process.StandardInput.WriteLineAsync($":load \"{FileLoaded}\"");
 
             await Task.Delay(100);
             OutputTextbox.AppendText($"GHCI started and '{DTE2Helper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
@@ -318,6 +342,8 @@ namespace HaskellTools
         private async Task StartDebugger()
         {
             MainGrid.IsEnabled = false;
+            StartDebuggingButton.IsEnabled = false;
+            StopDebuggingButton.IsEnabled = true;
             BreakpointPanel.IsEnabled = false;
             ResetBreakpoints.IsEnabled = false;
             await LoadSession();
@@ -335,6 +361,8 @@ namespace HaskellTools
         private async Task StopDebugger()
         {
             MainGrid.IsEnabled = false;
+            StartDebuggingButton.IsEnabled = true;
+            StopDebuggingButton.IsEnabled = false;
             if (IsDebuggerRunning)
                 _process.Close();
             IsDebuggerOnBorder.BorderBrush = Brushes.Transparent;
@@ -391,7 +419,7 @@ namespace HaskellTools
             }
         }
 
-        private async void MyToolWindow_ContextMenuClosing(object sender, ContextMenuEventArgs e)
+        private async void KillDebuggingButton_Click(object sender, RoutedEventArgs e)
         {
             await StopDebugger();
         }

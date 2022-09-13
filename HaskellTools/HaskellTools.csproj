@@ -52,6 +52,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\GitHub.cs" />
+    <Compile Include="Events\EventDelegates.cs" />
     <Compile Include="Windows\DebugData\DataItem.cs" />
     <Compile Include="Windows\GHCiDebuggerWindow.cs" />
     <Compile Include="Windows\GHCiDebuggerWindowCommand.cs" />

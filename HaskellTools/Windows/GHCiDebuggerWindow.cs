@@ -1,4 +1,5 @@
-﻿using HaskellTools.Helpers;
+﻿using HaskellTools.Events;
+using HaskellTools.Helpers;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -20,6 +21,8 @@ namespace HaskellTools
     [Guid("39870e3c-4df7-484e-a548-274d6d694954")]
     public class GHCiDebuggerWindow : ToolWindowPane, IVsWindowFrameNotify3
     {
+        public event RequestSettingsDataHandler RequestSettingsData;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="GHCiDebuggerWindow"/> class.
         /// </summary>
@@ -31,11 +34,7 @@ namespace HaskellTools
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
             // the object returned by the Content property.
             this.Content = new GHCiDebuggerWindowControl();
-        }
-
-        public void SetData(string path)
-        {
-            (this.Content as GHCiDebuggerWindowControl).GHCiPath = path;
+            (this.Content as GHCiDebuggerWindowControl).RequestSettingsData += () => { return RequestSettingsData.Invoke(); };
         }
 
         public int OnClose(ref uint pgrfSaveOptions)
@@ -56,8 +55,7 @@ namespace HaskellTools
 
         public int OnShow(int fShow)
         {
-            if (DTE2Helper.IsValidFileOpen())
-                (this.Content as GHCiDebuggerWindowControl).Load();
+            (this.Content as GHCiDebuggerWindowControl).Load();
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
 
