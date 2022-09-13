@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace HaskellTools.Helpers
 {
@@ -61,6 +62,14 @@ namespace HaskellTools.Helpers
 
             targetPanel.Activate();
             targetPanel.OutputString($"{text}{Environment.NewLine}");
+        }
+
+        public void WriteLineInvoke(string text)
+        {
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                WriteLine(text);
+            }));
         }
 
         private static EnvDTE80.DTE2 GetDTE2()

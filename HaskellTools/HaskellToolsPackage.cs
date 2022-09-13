@@ -35,6 +35,15 @@ namespace HaskellTools
                 return page.GHCIPath;
             }
         }
+
+        public int HaskellFileExecutionTimeout
+        {
+            get
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                return page.HaskellFileExecutionTimeout;
+            }
+        }
         #endregion
 
         public const string PackageGuidString = "6eaa553c-a41f-487b-99a1-a8383b6d1f74";

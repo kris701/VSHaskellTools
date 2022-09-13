@@ -12,6 +12,7 @@ namespace HaskellTools.Options
     {
         private string runHaskellPath = "runhaskell";
         private string ghciPath = "ghci";
+        private int haskellFileExecutionTimeout = 10;
 
         [Category("Haskell Tools")]
         [DisplayName("'runhaskell' path")]
@@ -29,6 +30,15 @@ namespace HaskellTools.Options
         {
             get { return ghciPath; }
             set { ghciPath = value; }
+        }
+
+        [Category("Haskell Tools")]
+        [DisplayName("Haskell File Execution Timeout")]
+        [Description("How much time should pass before the GHCi instance is killed in seconds.")]
+        public int HaskellFileExecutionTimeout
+        {
+            get { return haskellFileExecutionTimeout; }
+            set { haskellFileExecutionTimeout = value; }
         }
     }
 }
