@@ -8,7 +8,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Options\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -54,16 +54,16 @@
     <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Commands\GitHub.cs" />
     <Compile Include="Events\EventDelegates.cs" />
-    <Compile Include="Windows\DebugData\DataItem.cs" />
-    <Compile Include="Windows\GHCiDebuggerWindow.cs" />
+    <Compile Include="Windows\GHCiDebuggerWindow\DebugData\DataItem.cs" />
+    <Compile Include="Windows\GHCiDebuggerWindow\GHCiDebuggerWindow.cs" />
     <Compile Include="Commands\GHCiDebuggerWindowCommand.cs" />
-    <Compile Include="Windows\GHCiDebuggerWindowControl.xaml.cs">
+    <Compile Include="Windows\GHCiDebuggerWindow\GHCiDebuggerWindowControl.xaml.cs">
       <DependentUpon>GHCiDebuggerWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ControlsHelper.cs" />
-    <Compile Include="Windows\HaskellInteractiveWindow.cs" />
+    <Compile Include="Windows\HaskellInteractiveWindow\HaskellInteractiveWindow.cs" />
     <Compile Include="Commands\HaskellInteractiveWindowCommand.cs" />
-    <Compile Include="Windows\HaskellInteractiveWindowControl.xaml.cs">
+    <Compile Include="Windows\HaskellInteractiveWindow\HaskellInteractiveWindowControl.xaml.cs">
       <DependentUpon>HaskellInteractiveWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ComUtils.cs" />
@@ -76,7 +76,7 @@
     <Compile Include="HaskellToolsPackage.cs" />
     <Compile Include="Commands\RunGHCi.cs" />
     <Compile Include="Commands\RunHaskellFile.cs" />
-    <Compile Include="Windows\UserControls\DebuggerLine.xaml.cs">
+    <Compile Include="Windows\GHCiDebuggerWindow\UserControls\DebuggerLine.xaml.cs">
       <DependentUpon>DebuggerLine.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -94,13 +94,13 @@
     <Content Include="Resources\HaskellInteractiveWindowCommand.png" />
     <Content Include="Resources\RunGHCi.png" />
     <Content Include="Resources\RunHaskellFile.png" />
-    <Resource Include="Windows\Resources\evaluate.png" />
-    <Resource Include="Windows\Resources\reset.png" />
-    <Resource Include="Windows\Resources\continue.png" />
-    <Resource Include="Windows\Resources\step.png" />
-    <Resource Include="Windows\Resources\stopdebugging.png" />
-    <Resource Include="Windows\Resources\startdebugging.png" />
-    <None Include="Options\Key.snk" />
+    <Resource Include="Windows\GHCiDebuggerWindow\Resources\evaluate.png" />
+    <Resource Include="Windows\GHCiDebuggerWindow\Resources\reset.png" />
+    <Resource Include="Windows\GHCiDebuggerWindow\Resources\continue.png" />
+    <Resource Include="Windows\GHCiDebuggerWindow\Resources\step.png" />
+    <Resource Include="Windows\GHCiDebuggerWindow\Resources\stopdebugging.png" />
+    <Resource Include="Windows\GHCiDebuggerWindow\Resources\startdebugging.png" />
+    <None Include="Key.snk" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -140,15 +140,15 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Windows\GHCiDebuggerWindowControl.xaml">
+    <Page Include="Windows\GHCiDebuggerWindow\GHCiDebuggerWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\HaskellInteractiveWindowControl.xaml">
+    <Page Include="Windows\HaskellInteractiveWindow\HaskellInteractiveWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\UserControls\DebuggerLine.xaml">
+    <Page Include="Windows\GHCiDebuggerWindow\UserControls\DebuggerLine.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
