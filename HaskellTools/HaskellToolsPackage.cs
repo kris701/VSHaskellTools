@@ -1,4 +1,5 @@
-﻿using HaskellTools.Options;
+﻿using HaskellTools.Commands;
+using HaskellTools.Options;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Runtime.InteropServices;

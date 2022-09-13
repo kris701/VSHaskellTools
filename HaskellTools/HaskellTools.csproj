@@ -51,17 +51,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Commands\GitHub.cs" />
     <Compile Include="Events\EventDelegates.cs" />
     <Compile Include="Windows\DebugData\DataItem.cs" />
     <Compile Include="Windows\GHCiDebuggerWindow.cs" />
-    <Compile Include="Windows\GHCiDebuggerWindowCommand.cs" />
+    <Compile Include="Commands\GHCiDebuggerWindowCommand.cs" />
     <Compile Include="Windows\GHCiDebuggerWindowControl.xaml.cs">
       <DependentUpon>GHCiDebuggerWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ControlsHelper.cs" />
     <Compile Include="Windows\HaskellInteractiveWindow.cs" />
-    <Compile Include="Windows\HaskellInteractiveWindowCommand.cs" />
+    <Compile Include="Commands\HaskellInteractiveWindowCommand.cs" />
     <Compile Include="Windows\HaskellInteractiveWindowControl.xaml.cs">
       <DependentUpon>HaskellInteractiveWindowControl.xaml</DependentUpon>
     </Compile>
