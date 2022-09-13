@@ -92,13 +92,13 @@ namespace HaskellTools
             while (GHCiPath == "")
                 await Task.Delay(1000);
 
-            process.StandardInput.WriteLine($"cd '{FileHelper.GetSourcePath()}'");
+            process.StandardInput.WriteLine($"cd '{DTE2Helper.GetSourcePath()}'");
             process.StandardInput.WriteLine($"& '{GHCiPath}'");
             System.Threading.Thread.Sleep(1000);
-            process.StandardInput.WriteLine($":load {FileHelper.GetSourceFileName()}");
+            process.StandardInput.WriteLine($":load {DTE2Helper.GetSourceFileName()}");
 
             await Task.Delay(100);
-            OutputTextbox.AppendText($"GHCI started and '{FileHelper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
+            OutputTextbox.AppendText($"GHCI started and '{DTE2Helper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
 
             InputTextbox.IsEnabled = true;
             enableOutput = true;

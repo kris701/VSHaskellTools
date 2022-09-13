@@ -36,6 +36,7 @@ namespace HaskellTools
 
         public bool IsDebuggerRunning => _process != null && !_process.HasExited;
         public string GHCiPath { get; set; } = "";
+        public bool IsFileLoaded { get; internal set; } = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GHCiDebuggerWindowControl"/> class.
@@ -49,9 +50,15 @@ namespace HaskellTools
             _debugEvaluateTimer.Tick += EvaluateDebugReadOver;
         }
 
-        private void MyToolWindow_Loaded(object sender, RoutedEventArgs e)
+        public void Load()
         {
             FillBreakPointLines();
+            IsFileLoaded = true;
+        }
+
+        public void Unload()
+        {
+            StopDebugger();
         }
 
         private async void StartDebuggingButton_Click(object sender, RoutedEventArgs e)
@@ -71,7 +78,7 @@ namespace HaskellTools
         public void FillBreakPointLines()
         {
             BreakpointPanel.Children.Clear();
-            string fileName = FileHelper.GetSourceFilePath();
+            string fileName = DTE2Helper.GetSourceFilePath();
             string[] text = File.ReadAllLines(fileName);
             int index = 1;
             foreach(string line in text)
@@ -111,18 +118,18 @@ namespace HaskellTools
             OutputTextbox.AppendText($"Starting GHCi...{Environment.NewLine}", "#787878");
 
             if (_sourcePath == "")
-                _sourcePath = FileHelper.GetSourcePath();
+                _sourcePath = DTE2Helper.GetSourcePath();
             await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
             while (GHCiPath == "")
                 await Task.Delay(1000);
             await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
             await Task.Delay(1000);
             if (_fileName == "")
-                _fileName = FileHelper.GetSourceFileName();
+                _fileName = DTE2Helper.GetSourceFileName();
             await _process.StandardInput.WriteLineAsync($":load {_fileName}");
 
             await Task.Delay(100);
-            OutputTextbox.AppendText($"GHCI started and '{FileHelper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
+            OutputTextbox.AppendText($"GHCI started and '{DTE2Helper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
@@ -310,19 +317,27 @@ namespace HaskellTools
 
         private async Task StartDebugger()
         {
+            MainGrid.IsEnabled = false;
             BreakpointPanel.IsEnabled = false;
             ResetBreakpoints.IsEnabled = false;
-            _currentReadState = ReadState.Breakpoint;
             await LoadSession();
-            InputTextbox.IsEnabled = true;
-            InsertBreakPoints();
-            _process.StandardInput.WriteLine($":trace main");
+            if (IsDebuggerRunning)
+            {
+                _currentReadState = ReadState.Breakpoint;
+                IsDebuggerOnBorder.BorderBrush = Brushes.Red;
+                InputTextbox.IsEnabled = true;
+                InsertBreakPoints();
+                _process.StandardInput.WriteLine($":trace main");
+            }
+            MainGrid.IsEnabled = true;
         }
 
         private async Task StopDebugger()
         {
+            MainGrid.IsEnabled = false;
             if (IsDebuggerRunning)
                 _process.Close();
+            IsDebuggerOnBorder.BorderBrush = Brushes.Transparent;
             InputTextbox.IsEnabled = false;
             BreakpointPanel.IsEnabled = true;
             ResetBreakpoints.IsEnabled = true;
@@ -334,6 +349,7 @@ namespace HaskellTools
             HistoryTraceBox.Text = "";
             ResetBreakpointPanel();
             _process = null;
+            MainGrid.IsEnabled = true;
         }
 
         private void StepButton_Click(object sender, RoutedEventArgs e)
@@ -373,6 +389,11 @@ namespace HaskellTools
                 OutputTextbox.AppendText($"> {InputTextbox.Text}{Environment.NewLine}", "#4e6fb5");
                 InputTextbox.Text = "";
             }
+        }
+
+        private async void MyToolWindow_ContextMenuClosing(object sender, ContextMenuEventArgs e)
+        {
+            await StopDebugger();
         }
     }
 }

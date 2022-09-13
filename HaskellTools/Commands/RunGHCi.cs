@@ -100,7 +100,7 @@ namespace HaskellTools
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (FileHelper.GetSourceFileExtension() != ".hs")
+            if (DTE2Helper.GetSourceFileExtension() != ".hs")
             {
                 MessageBox.Show("File must be a '.hs' file!");
                 return;
@@ -124,11 +124,11 @@ namespace HaskellTools
 
             HaskellToolsPackage myToolsOptionsPackage = this.package as HaskellToolsPackage;
 
-            process.StandardInput.WriteLine($"cd '{FileHelper.GetSourcePath()}'");
+            process.StandardInput.WriteLine($"cd '{DTE2Helper.GetSourcePath()}'");
             process.StandardInput.WriteLine($"& '{myToolsOptionsPackage.GHCIPath}'");
             System.Threading.Thread.Sleep(1000);
-            process.StandardInput.WriteLine($":load {FileHelper.GetSourceFileName()}");
-            process.StandardInput.WriteLine($"{FileHelper.GetSelectedText()}");
+            process.StandardInput.WriteLine($":load {DTE2Helper.GetSourceFileName()}");
+            process.StandardInput.WriteLine($"{DTE2Helper.GetSelectedText()}");
             process.StandardInput.WriteLine($":quit");
             System.Threading.Thread.Sleep(1000);
             process.StandardInput.WriteLine($"exit");

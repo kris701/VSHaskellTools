@@ -8,11 +8,26 @@ using System.Threading.Tasks;
 
 namespace HaskellTools.Helpers
 {
-    public static class FileHelper
+    public static class DTE2Helper
     {
         public static EnvDTE80.DTE2 GetDTE2()
         {
             return Package.GetGlobalService(typeof(DTE)) as EnvDTE80.DTE2;
+        }
+
+        public static bool IsValidFileOpen()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            EnvDTE80.DTE2 _applicationObject = GetDTE2();
+            if (_applicationObject == null)
+                return false;
+            var uih = _applicationObject.ActiveDocument;
+            if (uih == null)
+                return false;
+            var extension = GetSourceFileExtension();
+            if (extension != "hs")
+                return false;
+            return true;
         }
 
         public static string GetSourceFilePath()

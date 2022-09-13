@@ -96,7 +96,7 @@ namespace HaskellTools
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (FileHelper.GetSourceFileExtension() != ".hs")
+            if (DTE2Helper.GetSourceFileExtension() != ".hs")
             {
                 MessageBox.Show("File must be a '.hs' file!");
                 return;
@@ -105,7 +105,7 @@ namespace HaskellTools
             OutputPanel.Initialize();
             OutputPanel.ClearOutput();
 
-            string value = FileHelper.GetSourceFilePath();
+            string value = DTE2Helper.GetSourceFilePath();
 
             HaskellToolsPackage myToolsOptionsPackage = this.package as HaskellToolsPackage;
 

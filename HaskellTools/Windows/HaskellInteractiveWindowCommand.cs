@@ -88,7 +88,7 @@ namespace HaskellTools
         /// <param name="e">The event args.</param>
         private void Execute(object sender, EventArgs e)
         {
-            if (FileHelper.GetSourceFileExtension() != ".hs")
+            if (DTE2Helper.GetSourceFileExtension() != ".hs")
             {
                 MessageBox.Show("File must be a '.hs' file!");
                 return;

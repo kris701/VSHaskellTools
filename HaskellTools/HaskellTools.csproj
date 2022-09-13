@@ -65,7 +65,7 @@
       <DependentUpon>HaskellInteractiveWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ComUtils.cs" />
-    <Compile Include="Helpers\FileHelper.cs" />
+    <Compile Include="Helpers\DTE2Helper.cs" />
     <Compile Include="Helpers\OutputPanelController.cs" />
     <Compile Include="Options\OptionsPageGrid.cs">
       <SubType>Component</SubType>
