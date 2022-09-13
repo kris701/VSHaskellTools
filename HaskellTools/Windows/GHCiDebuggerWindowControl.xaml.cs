@@ -189,6 +189,7 @@ namespace HaskellTools
 
                             _debugData.Clear();
                             HistoryTraceBox.Text = "";
+
                             _currentReadState = ReadState.DebugData;
                         }
                         break;
@@ -228,10 +229,12 @@ namespace HaskellTools
                     case ReadState.Tracing:
                         if (!text.Contains("<end of history>"))
                         {
+                            if (text.Contains("*Main>"))
+                                text = text.Substring(text.IndexOf("*Main>") + 7);
                             HistoryTraceBox.Text += $"{text}{Environment.NewLine}";
                         }
                         else
-                            _currentReadState = ReadState.DebugData;
+                            _currentReadState = ReadState.Breakpoint;
                         break;
                 }
                 OutputTextbox.AppendText($"{text}{Environment.NewLine}", "#ffffff");

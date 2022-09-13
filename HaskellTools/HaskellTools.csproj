@@ -93,6 +93,12 @@
     <Content Include="Resources\HaskellInteractiveWindowCommand.png" />
     <Content Include="Resources\RunGHCi.png" />
     <Content Include="Resources\RunHaskellFile.png" />
+    <Resource Include="Windows\Resources\evaluate.png" />
+    <Resource Include="Windows\Resources\reset.png" />
+    <Resource Include="Windows\Resources\continue.png" />
+    <Resource Include="Windows\Resources\step.png" />
+    <Resource Include="Windows\Resources\stopdebugging.png" />
+    <Resource Include="Windows\Resources\startdebugging.png" />
     <None Include="Options\Key.snk" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>

@@ -9,6 +9,36 @@
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1600"
              Name="HaskellDebugger">
+    <UserControl.Resources>
+        <Style TargetType="Button" x:Key="StandardButton">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Background" Value="MediumAquamarine" />
+            <Setter Property="Foreground" Value="MediumBlue" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter x:Name="MyContentPresenter" 
+                                          Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.6"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="True">
+                    <Setter Property="Opacity" Value="1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
     <Border x:Name="IsDebuggerOnBorder" BorderThickness="3" BorderBrush="Transparent">
         <Grid>
             <Grid.RowDefinitions>
@@ -24,26 +54,78 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
-                    <RowDefinition/>
+                    <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Margin="5">
+                <Grid Margin="5" Grid.RowSpan="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
                     <Label x:Name="CurrentlyDebuggingLabel" Content="Loaded File: None" Foreground="White"/>
-                    <Button x:Name="StartDebuggingButton" Content="Start Debugging" Click="StartDebuggingButton_Click"/>
-                    <Button x:Name="StopDebuggingButton" Content="Stop Debugging" IsEnabled="False" Click="StopDebuggingButton_Click"/>
-                    <Button x:Name="ContinueButton" Content="Continue" IsEnabled="False" Click="ContinueButton_Click"/>
-                    <Button x:Name="StepButton" Content="Step" IsEnabled="False" Click="StepButton_Click"/>
-                    <CheckBox x:Name="ForceValueChecks" Content="Force Value Checking" Foreground="White"/>
-                </StackPanel>
-
-                <StackPanel Grid.Row="1" Margin="5">
-                    <Label Content="Breakpoints" Foreground="White" HorizontalContentAlignment="Center"/>
-                    <Button x:Name="ResetBreakpoints" Content="Reset Breakpoints" Click="ResetBreakpoints_Click"/>
-                    <StackPanel x:Name="BreakpointPanel" Margin="5">
-            
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Height="30" Margin="5">
+                        <Button x:Name="StartDebuggingButton" Width="30" Click="StartDebuggingButton_Click" Style="{StaticResource StandardButton}">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/startdebugging.png" TileMode="None" Stretch="Uniform"/>
+                            </Button.Background>
+                            <Button.ToolTip>
+                                Start Debugging
+                            </Button.ToolTip>
+                        </Button>
+                        <Button x:Name="StopDebuggingButton" Width="30" IsEnabled="False" Click="StopDebuggingButton_Click" Style="{StaticResource StandardButton}">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/stopdebugging.png" Stretch="Uniform" TileMode="None"/>
+                            </Button.Background>
+                            <Button.ToolTip>
+                                Stop Debugging
+                            </Button.ToolTip>
+                        </Button>
+                        <Button x:Name="ContinueButton" Width="30" IsEnabled="False" Click="ContinueButton_Click" Style="{StaticResource StandardButton}">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/continue.png" Stretch="Uniform"/>
+                            </Button.Background>
+                            <Button.ToolTip>
+                                Continue from breakpoint
+                            </Button.ToolTip>
+                        </Button>
+                        <Button x:Name="StepButton" Width="30" IsEnabled="False" Click="StepButton_Click" Style="{StaticResource StandardButton}">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/step.png" Stretch="Uniform"/>
+                            </Button.Background>
+                            <Button.ToolTip>
+                                Step from breakpoint
+                            </Button.ToolTip>
+                        </Button>
                     </StackPanel>
-                </StackPanel>
 
+                    <Grid Grid.Row="2" Margin="5" Background="#1e1e1e" Grid.ColumnSpan="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="ResetBreakpoints" Width="30" Click="ResetBreakpoints_Click" Style="{StaticResource StandardButton}">
+                                <Button.Background>
+                                    <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/reset.png" Stretch="Uniform"/>
+                                </Button.Background>
+                                <Button.ToolTip>
+                                    Reset Breakpoints
+                                </Button.ToolTip>
+                            </Button>
+                        </StackPanel>
+                        <ScrollViewer Grid.Row="1">
+                            <StackPanel x:Name="BreakpointPanel" Margin="5">
+
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+                
                 <Grid Grid.Column="1" Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
@@ -51,7 +133,7 @@
                         <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
                     <Label Content="Output" Foreground="White" HorizontalContentAlignment="Center"/>
-                    <RichTextBox x:Name="OutputTextbox" Grid.Row="1" Margin="5" IsReadOnly="True" Background="Transparent" Foreground="White" TextChanged="OutputTextbox_TextChanged">
+                    <RichTextBox x:Name="OutputTextbox" Grid.Row="1" Margin="5" IsReadOnly="True" Background="#1e1e1e" Foreground="White" TextChanged="OutputTextbox_TextChanged">
                         <RichTextBox.Resources>
                             <Style TargetType="{x:Type Paragraph}">
                                 <Setter Property="Margin" Value="0"/>
@@ -66,18 +148,43 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Margin="5">
+
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
                         <Label Content="Locals" Foreground="White" HorizontalContentAlignment="Center"/>
-                        <Button x:Name="ForceEvaluate" Content="Force Evaluate Variables" Click="ForceEvaluate_Click"/>
-                        <DataGrid x:Name="DebugDataPanel" Margin="5"/>
-                    </StackPanel>
-                    <StackPanel Margin="5" Grid.Column="1">
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <CheckBox x:Name="ForceValueChecks" Content="Force Value Checks" IsChecked="False" Foreground="White" VerticalAlignment="Center"/>
+                            <Separator Width="20" Height="0"/>
+
+                            <Button x:Name="ForceEvaluate" Width="30" Click="ForceEvaluate_Click" Style="{StaticResource StandardButton}">
+                                <Button.Background>
+                                    <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/evaluate.png" Stretch="Uniform"/>
+                                </Button.Background>
+                                <Button.ToolTip>
+                                    Force Evaluate Variables
+                                </Button.ToolTip>
+                            </Button>
+                        </StackPanel>
+
+                        <DataGrid x:Name="DebugDataPanel" Grid.Row="2" Margin="5"/>
+                    </Grid>
+                    
+                    <Grid Margin="5" Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
                         <Label Content="History Trace" Foreground="White" HorizontalContentAlignment="Center"/>
-                        <TextBox x:Name="HistoryTraceBox" IsReadOnly="True" Background="Transparent" Foreground="White" TextChanged="HistoryTraceBox_TextChanged"/>
-                    </StackPanel>
+                        <TextBox x:Name="HistoryTraceBox" Grid.Row="2" IsReadOnly="True" Background="#1e1e1e" Foreground="White" TextChanged="HistoryTraceBox_TextChanged"/>
+                    </Grid>
                 </Grid>
             </Grid>
-
+           
             <StackPanel Grid.Row="1" Orientation="Horizontal">
                 <Button x:Name="KillDebuggingButton" Content="Force Stop GHCi" Click="KillDebuggingButton_Click"/>
             </StackPanel>
