@@ -17,19 +17,19 @@ using System.Windows;
 
 namespace HaskellTools.Commands
 {
-    internal sealed class RunGHCi : BaseCommand
+    internal sealed class RunSelectedFunctionCommand : BaseCommand
     {
         private static OutputPanelController OutputPanel = new OutputPanelController("Haskell GHCi");
         public override int CommandId { get; } = 257;
-        public static RunGHCi Instance { get; internal set; }
+        public static RunSelectedFunctionCommand Instance { get; internal set; }
 
-        private RunGHCi(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
+        private RunSelectedFunctionCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
         {
         }
 
         public static async Task InitializeAsync(AsyncPackage package)
         {
-            Instance = new RunGHCi(package, await InitializeCommandServiceAsync(package));
+            Instance = new RunSelectedFunctionCommand(package, await InitializeCommandServiceAsync(package));
         }
 
         public override void Execute(object sender, EventArgs e)

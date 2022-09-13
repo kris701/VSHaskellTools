@@ -15,19 +15,19 @@ using Task = System.Threading.Tasks.Task;
 
 namespace HaskellTools.Commands
 {
-    internal sealed class RunHaskellFile : BaseCommand
+    internal sealed class RunHaskellFileCommand : BaseCommand
     {
         private static OutputPanelController OutputPanel = new OutputPanelController("Haskell");
         public override int CommandId { get; } = 256;
-        public static RunHaskellFile Instance { get; internal set; }
+        public static RunHaskellFileCommand Instance { get; internal set; }
 
-        private RunHaskellFile(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
+        private RunHaskellFileCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
         {
         }
 
         public static async Task InitializeAsync(AsyncPackage package)
         {
-            Instance = new RunHaskellFile(package, await InitializeCommandServiceAsync(package));
+            Instance = new RunHaskellFileCommand(package, await InitializeCommandServiceAsync(package));
         }
 
         public override void Execute(object sender, EventArgs e)

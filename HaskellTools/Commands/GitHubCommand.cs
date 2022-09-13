@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 
 namespace HaskellTools.Commands
 {
-    internal sealed class GitHub : BaseCommand
+    internal sealed class GitHubCommand : BaseCommand
     {
         public override int CommandId { get; } = 258;
-        public static GitHub Instance { get; internal set; }
+        public static GitHubCommand Instance { get; internal set; }
 
-        private GitHub(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
+        private GitHubCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
         {
         }
 
         public static async Task InitializeAsync(AsyncPackage package)
         {
-            Instance = new GitHub(package, await InitializeCommandServiceAsync(package));
+            Instance = new GitHubCommand(package, await InitializeCommandServiceAsync(package));
         }
 
         public override void Execute(object sender, EventArgs e)

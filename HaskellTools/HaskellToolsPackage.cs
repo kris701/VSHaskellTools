@@ -44,9 +44,9 @@ namespace HaskellTools
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-            await RunHaskellFile.InitializeAsync(this);
-            await RunGHCi.InitializeAsync(this);
-            await GitHub.InitializeAsync(this);
+            await RunHaskellFileCommand.InitializeAsync(this);
+            await RunSelectedFunctionCommand.InitializeAsync(this);
+            await GitHubCommand.InitializeAsync(this);
             await HaskellInteractiveWindowCommand.InitializeAsync(this);
             await GHCiDebuggerWindowCommand.InitializeAsync(this);
         }
