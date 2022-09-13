@@ -81,7 +81,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="TopLevelMenu.vsct">
+    <VSCTCompile Include="HaskellToolsMenu.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
   </ItemGroup>
