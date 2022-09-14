@@ -20,7 +20,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Margin="2">
+        <StackPanel Orientation="Horizontal">
             <Button x:Name="ReloadButton" Width="30" Click="ReloadButton_Click">
                 <Button.Background>
                     <ImageBrush ImageSource="/HaskellTools;component/Windows/HaskellInteractiveWindow/Resources/reset.png" Stretch="Uniform"/>
@@ -29,14 +29,15 @@
                     Reload GHCi Instance
                 </Button.ToolTip>
             </Button>
+            <Label x:Name="LoadedFileNameLabel" Content="File Loaded: None" Foreground="White"/>
         </StackPanel>
-        <RichTextBox x:Name="OutputTextbox" Grid.Row="1" IsReadOnly="true" Margin="5" FontSize="15" Background="Transparent" Foreground="White" TextChanged="OutputTextbox_TextChanged">
+        <RichTextBox x:Name="OutputTextbox" Grid.Row="1" IsReadOnly="true" Margin="5" FontSize="15" Background="#1e1e1e" Foreground="White" TextChanged="OutputTextbox_TextChanged">
             <RichTextBox.Resources>
                 <Style TargetType="{x:Type Paragraph}">
                     <Setter Property="Margin" Value="0"/>
                 </Style>
             </RichTextBox.Resources>
         </RichTextBox>
-        <TextBox x:Name="InputTextbox" Grid.Row="2" Margin="5" IsEnabled="False" Background="Transparent" Foreground="White" KeyDown="InputTextbox_KeyDown"/>
+        <TextBox x:Name="InputTextbox" Grid.Row="2" Margin="5" IsEnabled="False" Background="#1e1e1e" Foreground="White" PreviewKeyDown="InputTextbox_KeyDown"/>
     </Grid>
 </UserControl>

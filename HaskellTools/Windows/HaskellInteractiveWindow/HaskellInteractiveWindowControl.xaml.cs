@@ -2,6 +2,7 @@
 using HaskellTools.Helpers;
 using Microsoft.VisualStudio.Shell;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +10,6 @@ using System.IO.Packaging;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace HaskellTools
@@ -26,6 +26,8 @@ namespace HaskellTools
         private Process _process;
         private bool _isLoaded = false;
         private HaskellToolsPackage _package;
+        private List<string> _previousText = new List<string>();
+        private int _previousTextIndex = 0;
 
         public HaskellInteractiveWindowControl()
         {
@@ -40,7 +42,26 @@ namespace HaskellTools
                 {
                     await _process.StandardInput.WriteLineAsync(InputTextbox.Text);
                     OutputTextbox.AppendText($"> {InputTextbox.Text}{Environment.NewLine}", "#4e6fb5");
+                    if (_previousText.Count == 0)
+                        _previousText.Insert(0, InputTextbox.Text);
+                    if (InputTextbox.Text != _previousText[0])
+                        _previousText.Insert(0, InputTextbox.Text);
                     InputTextbox.Text = "";
+                    _previousTextIndex = 0;
+                } 
+                else if (e.Key == System.Windows.Input.Key.Up)
+                {
+                    _previousTextIndex--;
+                    if (_previousTextIndex < 0)
+                        _previousTextIndex = 0;
+                    InputTextbox.Text = _previousText[_previousTextIndex];
+                }
+                else if (e.Key == System.Windows.Input.Key.Down)
+                {
+                    _previousTextIndex++;
+                    if (_previousTextIndex >= _previousText.Count)
+                        _previousTextIndex = _previousText.Count - 1;
+                    InputTextbox.Text = _previousText[_previousTextIndex];
                 }
             }
         }
@@ -58,6 +79,7 @@ namespace HaskellTools
 
         private async void HaskellInteractiveWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            await Task.Delay(1000);
             await Load();
         }
 
@@ -65,18 +87,13 @@ namespace HaskellTools
         {
             if (!_isLoaded)
             {
-                await Task.Delay(1000);
-                InputTextbox.IsEnabled = false;
-                OutputTextbox.Document.Blocks.Clear();
-
+                LoadedFileNameLabel.Content = $"Starting...";
                 SetupProcess();
 
                 _process.Start();
 
                 _process.BeginOutputReadLine();
                 _process.BeginErrorReadLine();
-
-                OutputTextbox.AppendText($"Starting GHCi...{Environment.NewLine}", "#787878");
 
                 if (GHCiPath == "")
                 {
@@ -86,8 +103,10 @@ namespace HaskellTools
 
                 await _process.StandardInput.WriteLineAsync($"cd '{DTE2Helper.GetSourcePath()}'");
                 await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
-                await _process.StandardInput.WriteLineAsync($":load {DTE2Helper.GetSourceFileName()}");
-                OutputTextbox.AppendText($"GHCI started and '{DTE2Helper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
+                string fileName = DTE2Helper.GetSourceFileName();
+                await _process.StandardInput.WriteLineAsync($":load {fileName}");
+                await Task.Delay(100);
+                LoadedFileNameLabel.Content = $"File Loaded: '{fileName}'";
 
                 InputTextbox.IsEnabled = true;
                 _isLoaded = true;
@@ -96,21 +115,25 @@ namespace HaskellTools
 
         public async Task Unload()
         {
+            InputTextbox.IsEnabled = false;
+            OutputTextbox.Document.Blocks.Clear();
             ProcessHelper.KillProcessAndChildrens(_process.Id);
-            OutputTextbox.AppendText($"GHCi Unloaded{Environment.NewLine}", "#787878");
+            LoadedFileNameLabel.Content = $"GHCi Unloaded";
+            _previousText.Clear();
+            _previousTextIndex = 0;
             _isLoaded = false;
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
             if (e.Data != null && _isLoaded)
-                OutputTextbox.AppendTextInvoke($"{e.Data}{Environment.NewLine}", "#ba4141");
+                OutputTextbox.AppendTextInvoke($"{e.Data.Replace("*Main>", "")}{Environment.NewLine}", "#ba4141");
         }
 
         private void RecieveOutputData(object sender, DataReceivedEventArgs e)
         {
             if (e.Data != null && _isLoaded)
-                OutputTextbox.AppendTextInvoke($"{e.Data}{Environment.NewLine}", "#ffffff");
+                OutputTextbox.AppendTextInvoke($"{e.Data.Replace("*Main>", "")}{Environment.NewLine}", "#ffffff");
         }
 
         private void SetupProcess()
