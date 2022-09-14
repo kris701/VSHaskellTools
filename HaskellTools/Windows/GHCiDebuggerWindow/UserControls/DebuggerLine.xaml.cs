@@ -48,13 +48,11 @@ namespace HaskellTools.Windows.UserControls
 
         private void BreakPointButton_MouseEnter(object sender, MouseEventArgs e)
         {
-            //BreakPointButton.Visibility = Visibility.Visible;
             BreakPointButton.Opacity = 1;
         }
 
         private void BreakPointButton_MouseLeave(object sender, MouseEventArgs e)
         {
-            //BreakPointButton.Visibility = Visibility.Hidden;
             BreakPointButton.Opacity = 0.01;
         }
     }

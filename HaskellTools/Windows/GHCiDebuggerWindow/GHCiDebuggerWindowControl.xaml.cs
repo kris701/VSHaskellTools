@@ -1,6 +1,7 @@
 ﻿using HaskellTools.Events;
 using HaskellTools.Helpers;
 using HaskellTools.Windows.DebugData;
+using HaskellTools.Windows.GHCiDebuggerWindow.UserControls;
 using HaskellTools.Windows.UserControls;
 using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json.Linq;
@@ -241,10 +242,16 @@ namespace HaskellTools
             }
         }
 
+        private void SetLocalsData()
+        {
+            DebugDataPanel.Children.Clear();
+            foreach (var item in _debugData)
+                DebugDataPanel.Children.Add(new LocalsLine(item));
+        }
+
         private void DebugReadOver(object sender, EventArgs e)
         {
-            DebugDataPanel.ItemsSource = null;
-            DebugDataPanel.ItemsSource = _debugData;
+            SetLocalsData();
             _currentReadState = ReadState.Breakpoint;
             _debugTimer.Stop();
             if ((bool)ForceValueChecks.IsChecked)
@@ -258,8 +265,7 @@ namespace HaskellTools
 
         private void EvaluateDebugReadOver(object sender, EventArgs e)
         {
-            DebugDataPanel.ItemsSource = null;
-            DebugDataPanel.ItemsSource = _debugData;
+            SetLocalsData();
             _debugEvaluateTimer.Stop();
             if ((bool)ForceValueChecks.IsChecked)
             {
@@ -373,7 +379,7 @@ namespace HaskellTools
             ContinueButton.IsEnabled = false;
             StepButton.IsEnabled = false;
             _currentReadState = ReadState.Breakpoint;
-            DebugDataPanel.ItemsSource = null;
+            DebugDataPanel.Children.Clear();
             OutputTextbox.Document.Blocks.Clear();
             HistoryTraceBox.Text = "";
             ResetBreakpointPanel();

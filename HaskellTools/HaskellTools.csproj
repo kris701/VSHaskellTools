@@ -71,6 +71,9 @@
       <DependentUpon>GHCiDebuggerWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ControlsHelper.cs" />
+    <Compile Include="Windows\GHCiDebuggerWindow\UserControls\LocalsLine.xaml.cs">
+      <DependentUpon>LocalsLine.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\HaskellInteractiveWindow\HaskellInteractiveWindow.cs" />
     <Compile Include="Commands\HaskellInteractiveWindowCommand.cs" />
     <Compile Include="Windows\HaskellInteractiveWindow\HaskellInteractiveWindowControl.xaml.cs">
@@ -157,6 +160,10 @@
     <Page Include="Windows\GHCiDebuggerWindow\GHCiDebuggerWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\GHCiDebuggerWindow\UserControls\LocalsLine.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\HaskellInteractiveWindow\HaskellInteractiveWindowControl.xaml">
       <SubType>Designer</SubType>
