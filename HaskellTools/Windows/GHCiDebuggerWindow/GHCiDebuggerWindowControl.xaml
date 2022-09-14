@@ -10,33 +10,7 @@
              d:DesignHeight="800" d:DesignWidth="1600"
              Name="HaskellDebugger">
     <UserControl.Resources>
-        <Style TargetType="Button" x:Key="StandardButton">
-            <Setter Property="OverridesDefaultStyle" Value="True" />
-            <Setter Property="Background" Value="MediumAquamarine" />
-            <Setter Property="Foreground" Value="MediumBlue" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Grid Background="{TemplateBinding Background}">
-                            <ContentPresenter x:Name="MyContentPresenter" 
-                                          Content="{TemplateBinding Content}"
-                                          HorizontalAlignment="Center" 
-                                          VerticalAlignment="Center" />
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.6"/>
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="True">
-                    <Setter Property="Opacity" Value="1"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary Source="../ResourceDictionary/Styles.xaml"/>
     </UserControl.Resources>
 
     <Border x:Name="IsDebuggerOnBorder" BorderThickness="3" BorderBrush="Transparent">
@@ -71,7 +45,7 @@
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Height="30" Margin="5">
                         <Button x:Name="StartDebuggingButton" Width="30" Click="StartDebuggingButton_Click" Style="{StaticResource StandardButton}">
                             <Button.Background>
-                                <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/startdebugging.png" TileMode="None" Stretch="Uniform"/>
+                                <ImageBrush ImageSource="/HaskellTools;component/Windows/GHCiDebuggerWindow/Resources/startdebugging.png" TileMode="None" Stretch="Uniform"/>
                             </Button.Background>
                             <Button.ToolTip>
                                 Start Debugging
@@ -79,7 +53,7 @@
                         </Button>
                         <Button x:Name="StopDebuggingButton" Width="30" IsEnabled="False" Click="StopDebuggingButton_Click" Style="{StaticResource StandardButton}">
                             <Button.Background>
-                                <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/stopdebugging.png" Stretch="Uniform" TileMode="None"/>
+                                <ImageBrush ImageSource="/HaskellTools;component/Windows/GHCiDebuggerWindow/Resources/stopdebugging.png" Stretch="Uniform" TileMode="None"/>
                             </Button.Background>
                             <Button.ToolTip>
                                 Stop Debugging
@@ -87,7 +61,7 @@
                         </Button>
                         <Button x:Name="ContinueButton" Width="30" IsEnabled="False" Click="ContinueButton_Click" Style="{StaticResource StandardButton}">
                             <Button.Background>
-                                <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/continue.png" Stretch="Uniform"/>
+                                <ImageBrush ImageSource="/HaskellTools;component/Windows/GHCiDebuggerWindow/Resources/continue.png" Stretch="Uniform"/>
                             </Button.Background>
                             <Button.ToolTip>
                                 Continue from breakpoint
@@ -95,7 +69,7 @@
                         </Button>
                         <Button x:Name="StepButton" Width="30" IsEnabled="False" Click="StepButton_Click" Style="{StaticResource StandardButton}">
                             <Button.Background>
-                                <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/step.png" Stretch="Uniform"/>
+                                <ImageBrush ImageSource="/HaskellTools;component/Windows/GHCiDebuggerWindow/Resources/step.png" Stretch="Uniform"/>
                             </Button.Background>
                             <Button.ToolTip>
                                 Step from breakpoint
@@ -111,7 +85,7 @@
                         <StackPanel Orientation="Horizontal">
                             <Button x:Name="ResetBreakpoints" Width="30" Click="ResetBreakpoints_Click" Style="{StaticResource StandardButton}">
                                 <Button.Background>
-                                    <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/reset.png" Stretch="Uniform"/>
+                                    <ImageBrush ImageSource="/HaskellTools;component/Windows/GHCiDebuggerWindow/Resources/reset.png" Stretch="Uniform"/>
                                 </Button.Background>
                                 <Button.ToolTip>
                                     Reset Breakpoints
@@ -162,7 +136,7 @@
 
                             <Button x:Name="ForceEvaluate" Width="30" Click="ForceEvaluate_Click" Style="{StaticResource StandardButton}">
                                 <Button.Background>
-                                    <ImageBrush ImageSource="/HaskellTools;component/Windows/Resources/evaluate.png" Stretch="Uniform"/>
+                                    <ImageBrush ImageSource="/HaskellTools;component/Windows/GHCiDebuggerWindow/Resources/evaluate.png" Stretch="Uniform"/>
                                 </Button.Background>
                                 <Button.ToolTip>
                                     Force Evaluate Variables

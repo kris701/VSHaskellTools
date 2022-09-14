@@ -8,8 +8,12 @@
              Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
-             Name="MyToolWindow"
-             Loaded="MyToolWindow_Loaded">
+             Name="HaskellInteractiveWindow"
+             Loaded="HaskellInteractiveWindow_Loaded">
+    <UserControl.Resources>
+        <ResourceDictionary Source="../ResourceDictionary/Styles.xaml"/>
+    </UserControl.Resources>
+    
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -17,7 +21,14 @@
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Margin="2">
-            <Button x:Name="ReloadButton" Content="⟳" Width="30" Click="ReloadButton_Click"/>
+            <Button x:Name="ReloadButton" Width="30" Click="ReloadButton_Click">
+                <Button.Background>
+                    <ImageBrush ImageSource="/HaskellTools;component/Windows/HaskellInteractiveWindow/Resources/reset.png" Stretch="Uniform"/>
+                </Button.Background>
+                <Button.ToolTip>
+                    Reload GHCi Instance
+                </Button.ToolTip>
+            </Button>
         </StackPanel>
         <RichTextBox x:Name="OutputTextbox" Grid.Row="1" IsReadOnly="true" Margin="5" FontSize="15" Background="Transparent" Foreground="White" TextChanged="OutputTextbox_TextChanged">
             <RichTextBox.Resources>

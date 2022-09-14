@@ -1,9 +1,11 @@
-﻿using HaskellTools.Helpers;
+﻿using HaskellTools.Events;
+using HaskellTools.Helpers;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO.Packaging;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,30 +19,30 @@ namespace HaskellTools
     /// </summary>
     public partial class HaskellInteractiveWindowControl : UserControl
     {
-        private Process process;
-        private bool enableOutput = false;
+        public event RequestSettingsDataHandler RequestSettingsData;
+
         public string GHCiPath { get; set; } = "";
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HaskellInteractiveWindowControl"/> class.
-        /// </summary>
+
+        private Process _process;
+        private bool _isLoaded = false;
+        private HaskellToolsPackage _package;
+
         public HaskellInteractiveWindowControl()
         {
             this.InitializeComponent();
         }
 
-        private void InputTextbox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private async void InputTextbox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.Enter)
+            if (_isLoaded && !_process.HasExited)
             {
-                process.StandardInput.WriteLine(InputTextbox.Text);
-                OutputTextbox.AppendText($"> {InputTextbox.Text}{Environment.NewLine}", "#4e6fb5");
-                InputTextbox.Text = "";
+                if (e.Key == System.Windows.Input.Key.Enter)
+                {
+                    await _process.StandardInput.WriteLineAsync(InputTextbox.Text);
+                    OutputTextbox.AppendText($"> {InputTextbox.Text}{Environment.NewLine}", "#4e6fb5");
+                    InputTextbox.Text = "";
+                }
             }
-        }
-
-        private async void MyToolWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            await LoadSession();
         }
 
         private void OutputTextbox_TextChanged(object sender, TextChangedEventArgs e)
@@ -50,15 +52,69 @@ namespace HaskellTools
 
         private async void ReloadButton_Click(object sender, RoutedEventArgs e)
         {
-            await LoadSession();
+            await Unload();
+            await Load();
         }
 
-        private async Task LoadSession()
+        private async void HaskellInteractiveWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            enableOutput = false;
-            InputTextbox.IsEnabled = false;
-            OutputTextbox.Document.Blocks.Clear();
+            await Load();
+        }
 
+        public async Task Load()
+        {
+            if (!_isLoaded)
+            {
+                await Task.Delay(1000);
+                InputTextbox.IsEnabled = false;
+                OutputTextbox.Document.Blocks.Clear();
+
+                SetupProcess();
+
+                _process.Start();
+
+                _process.BeginOutputReadLine();
+                _process.BeginErrorReadLine();
+
+                OutputTextbox.AppendText($"Starting GHCi...{Environment.NewLine}", "#787878");
+
+                if (GHCiPath == "")
+                {
+                    _package = RequestSettingsData.Invoke();
+                    GHCiPath = _package.GHCIPath;
+                }
+
+                await _process.StandardInput.WriteLineAsync($"cd '{DTE2Helper.GetSourcePath()}'");
+                await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
+                await _process.StandardInput.WriteLineAsync($":load {DTE2Helper.GetSourceFileName()}");
+                OutputTextbox.AppendText($"GHCI started and '{DTE2Helper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
+
+                InputTextbox.IsEnabled = true;
+                _isLoaded = true;
+            }
+        }
+
+        public async Task Unload()
+        {
+            ProcessHelper.KillProcessAndChildrens(_process.Id);
+            OutputTextbox.AppendText($"GHCi Unloaded{Environment.NewLine}", "#787878");
+            _isLoaded = false;
+        }
+
+        private void RecieveErrorData(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data != null && _isLoaded)
+                OutputTextbox.AppendTextInvoke($"{e.Data}{Environment.NewLine}", "#ba4141");
+        }
+
+        private void RecieveOutputData(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data != null && _isLoaded)
+                OutputTextbox.AppendTextInvoke($"{e.Data}{Environment.NewLine}", "#ffffff");
+        }
+
+        private void SetupProcess()
+        {
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = @"powershell.exe";
             startInfo.RedirectStandardOutput = true;
@@ -66,42 +122,11 @@ namespace HaskellTools
             startInfo.RedirectStandardInput = true;
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
-            process = new Process();
-            process.StartInfo = startInfo;
+            _process = new Process();
+            _process.StartInfo = startInfo;
 
-            process.ErrorDataReceived += new DataReceivedEventHandler((sender1, e1) => {
-                Application.Current.Dispatcher.Invoke(new Action(() => {
-                    if (enableOutput && e1.Data != "")
-                        OutputTextbox.AppendText($"{e1.Data}{Environment.NewLine}", "#ba4141");
-                }));
-            });
-            process.OutputDataReceived += new DataReceivedEventHandler((sender2, e2) => {
-                Application.Current.Dispatcher.Invoke(new Action(() => {
-                    if (enableOutput && e2.Data != "")
-                        OutputTextbox.AppendText($"{e2.Data}{Environment.NewLine}", "#ffffff");
-                }));
-            });
-
-            process.Start();
-
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-
-            OutputTextbox.AppendText($"Starting GHCi...{Environment.NewLine}", "#787878");
-
-            while (GHCiPath == "")
-                await Task.Delay(1000);
-
-            process.StandardInput.WriteLine($"cd '{DTE2Helper.GetSourcePath()}'");
-            process.StandardInput.WriteLine($"& '{GHCiPath}'");
-            System.Threading.Thread.Sleep(1000);
-            process.StandardInput.WriteLine($":load {DTE2Helper.GetSourceFileName()}");
-
-            await Task.Delay(100);
-            OutputTextbox.AppendText($"GHCI started and '{DTE2Helper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
-
-            InputTextbox.IsEnabled = true;
-            enableOutput = true;
+            _process.ErrorDataReceived += RecieveErrorData;
+            _process.OutputDataReceived += RecieveOutputData;
         }
     }
 }
