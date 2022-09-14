@@ -8,17 +8,24 @@ This extension comes with a set of functions, that can be found under the Extens
 ## Syntax Highlighting
 This extension includes syntax highlighting of Haskell programs. It is enabled for all files with the '.hs' extension
 
-![image](https://user-images.githubusercontent.com/22596587/189486405-f3926f86-6dc1-42be-875b-b96fdbd31173.png)
+![image](https://user-images.githubusercontent.com/22596587/190102529-924892d3-61f8-4b83-93e8-cef4c7b5f66d.png)
 
 ## Run Haskell File
-This simply runs the Haskell file thats open, and sends the output to the "output" window
+This simply runs the Haskell file thats open, and sends the output to the "output" window.
 
 ![image](https://user-images.githubusercontent.com/22596587/189736392-123c4490-a0fe-4583-bbb8-3a701febacb0.png)
+
+## Run Selected Functions
+There is also the option to execute the currently selected function in your open Haskell file.
+
+![image](https://user-images.githubusercontent.com/22596587/190102894-02efaa0d-de5a-40bb-ae0d-820968c57a91.png)
 
 ## Debug Haskell File
 This opens up a debugging tool, that can be used to get an idea of what is going on in your Haskell program. It is possible to set breakpoints as well as take "steps" for each line call. It also provides information on the variables in use for a given line, as well as evaluate what the variables values are. There are also a history trace (somewhat like a stack trace) that can show you what lines where called.
 
-![image](https://user-images.githubusercontent.com/22596587/189736547-42063da3-2cfd-43f0-b7c2-80d663795539.png)
+![image](https://user-images.githubusercontent.com/22596587/190103094-0b37d4aa-1762-4771-877c-f0bb5a02039e.png)
 
 # Haskell Interactive Window
 This opens a sessions of GHCi with your '.hs' file loaded into, where you can then manually interact with the file.
+
+![image](https://user-images.githubusercontent.com/22596587/190103299-dc9f0402-a42a-43b9-b607-f7bc8c93d520.png)
