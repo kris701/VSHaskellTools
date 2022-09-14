@@ -29,7 +29,7 @@ namespace HaskellTools.Windows.UserControls
             LineNumber = lineNumber;
             InitializeComponent();
             LineNumberLabel.Content = LineNumber;
-            LineLabel.Content = text;
+            LineLabel.Text = text;
         }
 
         private void ToggleBreakpoint_Click(object sender, RoutedEventArgs e)
@@ -41,9 +41,21 @@ namespace HaskellTools.Windows.UserControls
         {
             DoBreak = toValue;
             if (DoBreak)
-                BreakPointButton.Opacity = 1;
+                HoverCanvas.Visibility = Visibility.Visible;
             else
-                BreakPointButton.Opacity = 0;
+                HoverCanvas.Visibility = Visibility.Hidden;
+        }
+
+        private void BreakPointButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            //BreakPointButton.Visibility = Visibility.Visible;
+            BreakPointButton.Opacity = 1;
+        }
+
+        private void BreakPointButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            //BreakPointButton.Visibility = Visibility.Hidden;
+            BreakPointButton.Opacity = 0.01;
         }
     }
 }

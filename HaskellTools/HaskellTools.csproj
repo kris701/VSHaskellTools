@@ -104,6 +104,8 @@
     <Content Include="Resources\HaskellInteractiveWindowCommand.png" />
     <Content Include="Resources\RunGHCi.png" />
     <Content Include="Resources\RunHaskellFile.png" />
+    <Resource Include="Windows\GHCiDebuggerWindow\UserControls\Resources\breakpointOption.png" />
+    <Resource Include="Windows\GHCiDebuggerWindow\UserControls\Resources\breakpoint.png" />
     <Resource Include="Windows\HaskellInteractiveWindow\Resources\reset.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\evaluate.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\reset.png" />

@@ -6,9 +6,31 @@
              xmlns:local="clr-namespace:HaskellTools.Windows.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="30" d:DesignWidth="100">
-    <StackPanel Orientation="Horizontal">
+    <UserControl.Resources>
+        <ResourceDictionary Source="../../ResourceDictionary/Styles.xaml"/>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="30"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         <Label x:Name="LineNumberLabel" Content="0" Width="30" Foreground="White" VerticalContentAlignment="Center"/>
-        <Button x:Name="BreakPointButton" Width="30" Background="Red" Opacity="0" Click="ToggleBreakpoint_Click" VerticalContentAlignment="Center"/>
-        <Label x:Name="LineLabel" Content="Line" Foreground="White" Background="Transparent" VerticalContentAlignment="Center"/>
-    </StackPanel>
+        <Canvas Grid.Column="1" Margin="2,0,2,0" Background="#FF333333"/>
+        <Canvas x:Name="HoverCanvas" Grid.Column="2" Visibility="Hidden">
+            <Canvas.Background>
+                <ImageBrush ImageSource="/HaskellTools;component/Windows/GHCiDebuggerWindow/UserControls/Resources/breakpoint.png" Stretch="Uniform"/>
+            </Canvas.Background>
+        </Canvas>
+        <Button x:Name="BreakPointButton" Grid.Column="2" Width="30" Opacity="0.01" Click="ToggleBreakpoint_Click" VerticalContentAlignment="Center" MouseEnter="BreakPointButton_MouseEnter" MouseLeave="BreakPointButton_MouseLeave" Style="{StaticResource StandardButton}">
+            <Button.Background>
+                <ImageBrush ImageSource="/HaskellTools;component/Windows/GHCiDebuggerWindow/UserControls/Resources/breakpointOption.png" Stretch="Uniform"/>
+            </Button.Background>
+        </Button>
+        <Canvas Grid.Column="3" Margin="2,0,7,0" Background="#FF333333"/>
+        <TextBlock x:Name="LineLabel" Grid.Column="4" Text="Line" Foreground="White" Background="Transparent" VerticalAlignment="Center"/>
+    </Grid>
 </UserControl>

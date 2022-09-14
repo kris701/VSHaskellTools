@@ -104,7 +104,6 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
                         <RowDefinition/>
-                        <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
                     <Label Content="Output" Foreground="White" HorizontalContentAlignment="Center"/>
                     <RichTextBox x:Name="OutputTextbox" Grid.Row="1" Margin="5" IsReadOnly="True" Background="#1e1e1e" Foreground="White" TextChanged="OutputTextbox_TextChanged">
@@ -114,7 +113,6 @@
                             </Style>
                         </RichTextBox.Resources>
                     </RichTextBox>
-                    <TextBox x:Name="InputTextbox" Grid.Row="2" Margin="5" IsEnabled="False" Background="Transparent" Foreground="White" KeyDown="InputTextbox_KeyDown"/>
                 </Grid>
 
                 <Grid Grid.Row="1" Grid.Column="1">
@@ -144,7 +142,7 @@
                             </Button>
                         </StackPanel>
 
-                        <DataGrid x:Name="DebugDataPanel" Grid.Row="2" Margin="5"/>
+                        <DataGrid x:Name="DebugDataPanel" Grid.Row="2" Margin="5" Background="#1e1e1e"/>
                     </Grid>
                     
                     <Grid Margin="5" Grid.Column="1">

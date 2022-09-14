@@ -354,7 +354,6 @@ namespace HaskellTools
             {
                 _currentReadState = ReadState.Breakpoint;
                 IsDebuggerOnBorder.BorderBrush = Brushes.Red;
-                InputTextbox.IsEnabled = true;
                 InsertBreakPoints();
                 _process.StandardInput.WriteLine($":trace main");
             }
@@ -367,9 +366,8 @@ namespace HaskellTools
             StartDebuggingButton.IsEnabled = true;
             StopDebuggingButton.IsEnabled = false;
             if (IsDebuggerRunning)
-                _process.Close();
+                ProcessHelper.KillProcessAndChildrens(_process.Id);
             IsDebuggerOnBorder.BorderBrush = Brushes.Transparent;
-            InputTextbox.IsEnabled = false;
             BreakpointPanel.IsEnabled = true;
             ResetBreakpoints.IsEnabled = true;
             ContinueButton.IsEnabled = false;
@@ -410,16 +408,6 @@ namespace HaskellTools
         private void HistoryTraceBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             (sender as TextBox).ScrollToEnd();
-        }
-
-        private void InputTextbox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == System.Windows.Input.Key.Enter)
-            {
-                _process.StandardInput.WriteLine(InputTextbox.Text);
-                OutputTextbox.AppendText($"> {InputTextbox.Text}{Environment.NewLine}", "#4e6fb5");
-                InputTextbox.Text = "";
-            }
         }
 
         private async void KillDebuggingButton_Click(object sender, RoutedEventArgs e)
