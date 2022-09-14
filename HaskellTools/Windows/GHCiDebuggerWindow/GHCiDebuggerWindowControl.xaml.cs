@@ -20,9 +20,6 @@ using System.Windows.Threading;
 
 namespace HaskellTools
 {
-    /// <summary>
-    /// Interaction logic for GHCiDebuggerWindowControl.
-    /// </summary>
     public partial class GHCiDebuggerWindowControl : UserControl
     {
         private enum ReadState { None, Breakpoint, Tracing, DebugData, EvaluteDebugData }
@@ -31,7 +28,7 @@ namespace HaskellTools
         private DispatcherTimer _debugTimer = new DispatcherTimer();
         private DispatcherTimer _debugEvaluateTimer = new DispatcherTimer();
 
-        private HaskellToolsPackage package;
+        private HaskellToolsPackage _package;
         private Process _process;
         private string _sourcePath = "";
         private List<DataItem> _debugData = new List<DataItem>();
@@ -43,9 +40,6 @@ namespace HaskellTools
 
         public event RequestSettingsDataHandler RequestSettingsData;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GHCiDebuggerWindowControl"/> class.
-        /// </summary>
         public GHCiDebuggerWindowControl()
         {
             this.InitializeComponent();
@@ -53,6 +47,65 @@ namespace HaskellTools
             _debugTimer.Tick += DebugReadOver;
             _debugEvaluateTimer.Interval = TimeSpan.FromMilliseconds(100);
             _debugEvaluateTimer.Tick += EvaluateDebugReadOver;
+        }
+
+        private async void StartDebuggingButton_Click(object sender, RoutedEventArgs e)
+        {
+            await StartDebugger();
+        }
+
+        private async void StopDebuggingButton_Click(object sender, RoutedEventArgs e)
+        {
+            await StopDebugger();
+        }
+
+        private async void ContinueButton_Click(object sender, RoutedEventArgs e)
+        {
+            ContinueButton.IsEnabled = false;
+            ResetBreakpointPanel();
+            if (!IsDebuggerRunning)
+                return;
+            _currentReadState = ReadState.Breakpoint;
+            await _process.StandardInput.WriteLineAsync($":continue");
+        }
+
+        private void ForceEvaluate_Click(object sender, RoutedEventArgs e)
+        {
+            EvaluateDebugDataAsync();
+        }
+
+        private void StepButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!IsDebuggerRunning)
+                return;
+
+            ResetBreakpointPanel();
+            _currentReadState = ReadState.Breakpoint;
+            _process.StandardInput.WriteLine($":step");
+        }
+
+        private void ResetBreakpoints_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsDebuggerRunning)
+                return;
+            foreach (var item in BreakpointPanel.Children)
+                if (item is DebuggerLine line)
+                    line.SetBreakpoint(false);
+        }
+
+        private void OutputTextbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            (sender as RichTextBox).ScrollToEnd();
+        }
+
+        private void HistoryTraceBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            (sender as TextBox).ScrollToEnd();
+        }
+
+        private async void KillDebuggingButton_Click(object sender, RoutedEventArgs e)
+        {
+            await StopDebugger();
         }
 
         public void Load()
@@ -91,78 +144,9 @@ namespace HaskellTools
             FileLoaded = "None";
         }
 
-        private async void StartDebuggingButton_Click(object sender, RoutedEventArgs e)
-        {
-            await StartDebugger();
-        }
-
-        private async void StopDebuggingButton_Click(object sender, RoutedEventArgs e)
-        {
-            await StopDebugger();
-        }
-
-        public void FillBreakPointLines()
-        {
-            BreakpointPanel.Children.Clear();
-            string fileName = DTE2Helper.GetSourceFilePath();
-            string[] text = File.ReadAllLines(fileName);
-            int index = 1;
-            foreach(string line in text)
-            {
-                BreakpointPanel.Children.Add(new DebuggerLine(index, line));
-                index++;
-            }
-        }
-
-        private async Task LoadSession()
-        {
-            if (IsDebuggerRunning)
-                await StopDebugger();
-
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"powershell.exe";
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardInput = true;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            _process = new Process();
-            _process.StartInfo = startInfo;
-            _process.EnableRaisingEvents = true;
-            _process.Exited += new EventHandler((sender1, e1) => {
-                StopDebugger();
-                });
-
-            _process.ErrorDataReceived += RecieveErrorData;
-            _process.OutputDataReceived += RecieveNormalData;
-
-            _process.Start();
-
-            _process.BeginOutputReadLine();
-            _process.BeginErrorReadLine();
-
-            OutputTextbox.AppendText($"Starting GHCi...{Environment.NewLine}", "#787878");
-
-            await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
-            if (GHCiPath == "")
-            {
-                package = RequestSettingsData.Invoke();
-                GHCiPath = package.GHCIPath;
-            }
-            await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
-            await Task.Delay(1000);
-            await _process.StandardInput.WriteLineAsync($":load \"{FileLoaded}\"");
-
-            await Task.Delay(100);
-            OutputTextbox.AppendText($"GHCI started and '{DTE2Helper.GetSourceFileName()}' loaded!{Environment.NewLine}", "#787878");
-        }
-
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                OutputTextbox.AppendText($"{e.Data}{Environment.NewLine}", "#ba4141");
-            }));
+            OutputTextbox.AppendTextInvoke($"{e.Data}{Environment.NewLine}", "#ba4141");
         }
 
         private void RecieveNormalData(object sender, DataReceivedEventArgs e)
@@ -249,47 +233,32 @@ namespace HaskellTools
                 DebugDataPanel.Children.Add(new LocalsLine(item));
         }
 
-        private void DebugReadOver(object sender, EventArgs e)
+        private async void DebugReadOver(object sender, EventArgs e)
         {
             SetLocalsData();
             _currentReadState = ReadState.Breakpoint;
             _debugTimer.Stop();
             if ((bool)ForceValueChecks.IsChecked)
-                EvaluateDebugData();
+                await EvaluateDebugDataAsync();
             else
             {
                 _currentReadState = ReadState.Tracing;
-                _process.StandardInput.WriteLine($":hist");
+                await _process.StandardInput.WriteLineAsync($":hist");
             }
         }
 
-        private void EvaluateDebugReadOver(object sender, EventArgs e)
+        private async void EvaluateDebugReadOver(object sender, EventArgs e)
         {
             SetLocalsData();
             _debugEvaluateTimer.Stop();
             if ((bool)ForceValueChecks.IsChecked)
             {
                 _currentReadState = ReadState.Tracing;
-                _process.StandardInput.WriteLine($":hist");
+                await _process.StandardInput.WriteLineAsync($":hist");
             }
         }
 
-        private void ContinueButton_Click(object sender, RoutedEventArgs e)
-        {
-            ContinueButton.IsEnabled = false;
-            ResetBreakpointPanel();
-            if (!IsDebuggerRunning)
-                return;
-            _currentReadState = ReadState.Breakpoint;
-            _process.StandardInput.WriteLine($":continue");
-        }
-
-        private void ForceEvaluate_Click(object sender, RoutedEventArgs e)
-        {
-            EvaluateDebugData();
-        }
-
-        private void EvaluateDebugData()
+        private async Task EvaluateDebugDataAsync()
         {
             if (!IsDebuggerRunning)
                 return;
@@ -297,11 +266,24 @@ namespace HaskellTools
             _currentReadState = ReadState.EvaluteDebugData;
             foreach (var item in _debugData)
             {
-                _process.StandardInput.WriteLine($":force {item.VariableName}");
+                await _process.StandardInput.WriteLineAsync($":force {item.VariableName}");
             }
         }
 
-        private void InsertBreakPoints()
+        public void FillBreakPointLines()
+        {
+            BreakpointPanel.Children.Clear();
+            string fileName = DTE2Helper.GetSourceFilePath();
+            string[] text = File.ReadAllLines(fileName);
+            int index = 1;
+            foreach (string line in text)
+            {
+                BreakpointPanel.Children.Add(new DebuggerLine(index, line));
+                index++;
+            }
+        }
+
+        private async Task InsertBreakPointsAsync()
         {
             if (!IsDebuggerRunning)
                 return;
@@ -312,7 +294,7 @@ namespace HaskellTools
                 {
                     if (line.DoBreak)
                     {
-                        _process.StandardInput.WriteLine($":break {line.LineNumber}");
+                        await _process.StandardInput.WriteLineAsync($":break {line.LineNumber}");
                     }
                 }
             }
@@ -360,10 +342,54 @@ namespace HaskellTools
             {
                 _currentReadState = ReadState.Breakpoint;
                 IsDebuggerOnBorder.BorderBrush = Brushes.Red;
-                InsertBreakPoints();
-                _process.StandardInput.WriteLine($":trace main");
+                await InsertBreakPointsAsync();
+                await _process.StandardInput.WriteLineAsync($":trace main");
             }
             MainGrid.IsEnabled = true;
+        }
+
+        private async Task LoadSession()
+        {
+            if (IsDebuggerRunning)
+                await StopDebugger();
+
+            SetupProcess();
+
+            _process.Start();
+            _process.BeginOutputReadLine();
+            _process.BeginErrorReadLine();
+
+            OutputTextbox.AppendText($"Starting GHCi...{Environment.NewLine}", "#787878");
+            await RunStartingCommandsAsync();
+            OutputTextbox.AppendText($"GHCI started and '{FileLoaded}' loaded!{Environment.NewLine}", "#787878");
+        }
+
+        private void SetupProcess()
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = @"powershell.exe";
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardInput = true;
+            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
+            _process = new Process();
+            _process.StartInfo = startInfo;
+
+            _process.ErrorDataReceived += RecieveErrorData;
+            _process.OutputDataReceived += RecieveNormalData;
+        }
+
+        private async Task RunStartingCommandsAsync()
+        {
+            await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
+            if (GHCiPath == "")
+            {
+                _package = RequestSettingsData.Invoke();
+                GHCiPath = _package.GHCIPath;
+            }
+            await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
+            await _process.StandardInput.WriteLineAsync($":load \"{FileLoaded}\"");
         }
 
         private async Task StopDebugger()
@@ -385,40 +411,6 @@ namespace HaskellTools
             ResetBreakpointPanel();
             _process = null;
             MainGrid.IsEnabled = true;
-        }
-
-        private void StepButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (!IsDebuggerRunning)
-                return;
-
-            ResetBreakpointPanel();
-            _currentReadState = ReadState.Breakpoint;
-            _process.StandardInput.WriteLine($":step");
-        }
-
-        private void ResetBreakpoints_Click(object sender, RoutedEventArgs e)
-        {
-            if (IsDebuggerRunning)
-                return;
-            foreach (var item in BreakpointPanel.Children)
-                if (item is DebuggerLine line)
-                    line.SetBreakpoint(false);
-        }
-
-        private void OutputTextbox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            (sender as RichTextBox).ScrollToEnd();
-        }
-
-        private void HistoryTraceBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            (sender as TextBox).ScrollToEnd();
-        }
-
-        private async void KillDebuggingButton_Click(object sender, RoutedEventArgs e)
-        {
-            await StopDebugger();
         }
     }
 }
