@@ -139,7 +139,7 @@ namespace HaskellTools.Commands
         {
             await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
             await _process.StandardInput.WriteLineAsync($"& '{_toolPackage.GHCIPath}'");
-            await _process.StandardInput.WriteLineAsync($":load {_sourceFileName}");
+            await _process.StandardInput.WriteLineAsync($":load \"{_sourceFileName}\"");
             await _process.StandardInput.WriteLineAsync($"{_selectedText}");
             await _process.StandardInput.WriteLineAsync($":quit");
             await _process.StandardInput.WriteLineAsync($"exit");
