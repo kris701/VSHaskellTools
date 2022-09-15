@@ -104,7 +104,7 @@ namespace HaskellTools
                 await _process.StandardInput.WriteLineAsync($"cd '{DTE2Helper.GetSourcePath()}'");
                 await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
                 string fileName = DTE2Helper.GetSourceFileName();
-                await _process.StandardInput.WriteLineAsync($":load {fileName}");
+                await _process.StandardInput.WriteLineAsync($":load \"{fileName}\"");
                 await Task.Delay(100);
                 LoadedFileNameLabel.Content = $"File Loaded: '{fileName}'";
 
