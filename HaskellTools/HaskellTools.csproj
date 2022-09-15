@@ -116,6 +116,9 @@
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\step.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\stopdebugging.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\startdebugging.png" />
+    <Content Include="Grammars\Haskell.tmTheme">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="Key.snk" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
