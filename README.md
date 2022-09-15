@@ -8,12 +8,12 @@ This extension comes with a set of functions, that can be found under the Extens
 ## Syntax Highlighting
 This extension includes syntax highlighting of Haskell programs. It is enabled for all files with the '.hs' extension
 
-![image](https://user-images.githubusercontent.com/22596587/190102529-924892d3-61f8-4b83-93e8-cef4c7b5f66d.png)
+![image](https://user-images.githubusercontent.com/22596587/190104879-58d989f1-3cce-463a-aba7-161999b4eec0.png)
 
 ## Run Haskell File
 This simply runs the Haskell file thats open, and sends the output to the "output" window.
 
-![image](https://user-images.githubusercontent.com/22596587/189736392-123c4490-a0fe-4583-bbb8-3a701febacb0.png)
+![image](https://user-images.githubusercontent.com/22596587/190102529-924892d3-61f8-4b83-93e8-cef4c7b5f66d.png)
 
 ## Run Selected Functions
 There is also the option to execute the currently selected function in your open Haskell file.
