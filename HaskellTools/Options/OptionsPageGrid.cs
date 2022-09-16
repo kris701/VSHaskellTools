@@ -10,27 +10,17 @@ namespace HaskellTools.Options
 {
     public class OptionPageGrid : DialogPage
     {
-        private string _runHaskellPath = "runhaskell";
-        private string _ghciPath = "ghci";
+        private string _ghcupPath = "";
         private int _haskellFileExecutionTimeout = 10;
         private string _debuggerEntryFunctionName = "main";
 
         [Category("Haskell Tools")]
-        [DisplayName("'runhaskell' path")]
-        [Description("The path to the 'runhaskell.exe' file to compile and run haskell files")]
-        public string RunHaskellPath
+        [DisplayName("Optional GHCUP Path")]
+        [Description("Optional path to your GHCUP installation folder. (Leave empty if environment variables is set)")]
+        public string GHCUPPath
         {
-            get { return _runHaskellPath; }
-            set { _runHaskellPath = value; }
-        }
-
-        [Category("Haskell Tools")]
-        [DisplayName("'GHCi' path")]
-        [Description("The path to the 'GHCi.exe' file to interpret haskell files")]
-        public string GHCIPath
-        {
-            get { return _ghciPath; }
-            set { _ghciPath = value; }
+            get { return _ghcupPath; }
+            set { _ghcupPath = value; }
         }
 
         [Category("Haskell Tools")]

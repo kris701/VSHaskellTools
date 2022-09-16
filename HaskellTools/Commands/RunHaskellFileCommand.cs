@@ -9,6 +9,7 @@ using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO.Packaging;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -106,7 +107,10 @@ namespace HaskellTools.Commands
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = @"powershell.exe";
-            startInfo.Arguments = $"& '{_toolPackage.RunHaskellPath}' '{_sourceFilePath}'";
+            if (_toolPackage.GHCUPPath == "")
+                startInfo.Arguments = $"& 'runhaskell' '{_sourceFilePath}'";
+            else
+                startInfo.Arguments = $"& '{DirHelper.CombinePathAndFile(_toolPackage.GHCUPPath, "bin/runhaskell.exe")}' '{_sourceFilePath}'";
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.UseShellExecute = false;

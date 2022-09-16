@@ -63,6 +63,7 @@
     <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Commands\GitHubCommand.cs" />
     <Compile Include="Events\EventDelegates.cs" />
+    <Compile Include="Helpers\DirHelper.cs" />
     <Compile Include="Helpers\ProcessHelper.cs" />
     <Compile Include="Windows\GHCiDebuggerWindow\DebugData\DataItem.cs" />
     <Compile Include="Windows\GHCiDebuggerWindow\GHCiDebuggerWindow.cs" />

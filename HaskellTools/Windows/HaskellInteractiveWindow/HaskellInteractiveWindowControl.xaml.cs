@@ -95,10 +95,9 @@ namespace HaskellTools
                 _process.BeginOutputReadLine();
                 _process.BeginErrorReadLine();
 
-                if (GHCiPath == "")
+                if (_package == null)
                 {
                     _package = RequestSettingsData.Invoke();
-                    GHCiPath = _package.GHCIPath;
                 }
 
                 await _process.StandardInput.WriteLineAsync($"cd '{DTE2Helper.GetSourcePath()}'");

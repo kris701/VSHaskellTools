@@ -34,8 +34,6 @@ namespace HaskellTools
         private List<DataItem> _debugData = new List<DataItem>();
 
         public bool IsDebuggerRunning => _process != null && !_process.HasExited;
-        public string GHCiPath { get; set; } = "";
-        public string DebuggerEntryFunctionName { get; set; } = "";
         public bool IsFileLoaded { get; internal set; } = false;
         public string FileLoaded { get; internal set; } = "None";
 
@@ -393,7 +391,7 @@ namespace HaskellTools
                 _currentReadState = ReadState.Waiting;
                 IsDebuggerOnBorder.BorderBrush = Brushes.Red;
                 await InsertBreakPointsAsync();
-                await _process.StandardInput.WriteLineAsync($":trace {DebuggerEntryFunctionName}");
+                await _process.StandardInput.WriteLineAsync($":trace {_package.DebuggerEntryFunctionName}");
             }
             MainGrid.IsEnabled = true;
         }
@@ -433,13 +431,14 @@ namespace HaskellTools
         private async Task RunStartingCommandsAsync()
         {
             await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
-            if (GHCiPath == "")
+            if (_package == null)
             {
                 _package = RequestSettingsData.Invoke();
-                GHCiPath = _package.GHCIPath;
-                DebuggerEntryFunctionName = _package.DebuggerEntryFunctionName;
             }
-            await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
+            if (_package.GHCUPPath == "")
+                await _process.StandardInput.WriteLineAsync($"& ghci");
+            else
+                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin/ghci.exe")}'");
             await _process.StandardInput.WriteLineAsync($":load \"{FileLoaded}\"");
             await _process.StandardInput.WriteLineAsync($":set -fbreak-on-exception");
         }

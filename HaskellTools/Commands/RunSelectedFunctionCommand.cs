@@ -138,7 +138,10 @@ namespace HaskellTools.Commands
         private async Task RunSetupCommandsAsync()
         {
             await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
-            await _process.StandardInput.WriteLineAsync($"& '{_toolPackage.GHCIPath}'");
+            if (_toolPackage.GHCUPPath == "")
+                await _process.StandardInput.WriteLineAsync($"& ghci");
+            else
+                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_toolPackage.GHCUPPath, "bin/ghci.exe")}'");
             await _process.StandardInput.WriteLineAsync($":load \"{_sourceFileName}\"");
             await _process.StandardInput.WriteLineAsync($"{_selectedText}");
             await _process.StandardInput.WriteLineAsync($":quit");

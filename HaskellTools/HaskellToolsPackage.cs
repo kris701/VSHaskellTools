@@ -18,21 +18,12 @@ namespace HaskellTools
     public sealed class HaskellToolsPackage : AsyncPackage
     {
         #region Settings
-        public string RunHaskellPath
+        public string GHCUPPath
         {
             get
             {
                 OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                return page.RunHaskellPath;
-            }
-        }
-
-        public string GHCIPath
-        {
-            get
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                return page.GHCIPath;
+                return page.GHCUPPath;
             }
         }
 
