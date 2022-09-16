@@ -44,6 +44,15 @@ namespace HaskellTools
                 return page.HaskellFileExecutionTimeout;
             }
         }
+
+        public string DebuggerEntryFunctionName
+        {
+            get
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                return page.DebuggerEntryFunctionName;
+            }
+        }
         #endregion
 
         public const string PackageGuidString = "6eaa553c-a41f-487b-99a1-a8383b6d1f74";

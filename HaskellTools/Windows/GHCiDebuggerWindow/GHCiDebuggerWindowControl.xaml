@@ -70,6 +70,15 @@
                             </Button.ToolTip>
                         </Button>
                         <Separator Width="5" Height="0"/>
+                        <Button x:Name="BackButton" Width="30" IsEnabled="False" Click="BackButton_Click"  Style="{StaticResource StandardButton}">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/HaskellTools;component/Windows/GHCiDebuggerWindow/Resources/back.png" Stretch="Uniform"/>
+                            </Button.Background>
+                            <Button.ToolTip>
+                                Back up from breakpoint
+                            </Button.ToolTip>
+                        </Button>
+                        <Separator Width="5" Height="0"/>
                         <Button x:Name="StepButton" Width="30" IsEnabled="False" Click="StepButton_Click" Style="{StaticResource StandardButton}">
                             <Button.Background>
                                 <ImageBrush ImageSource="/HaskellTools;component/Windows/GHCiDebuggerWindow/Resources/step.png" Stretch="Uniform"/>

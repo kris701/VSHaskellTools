@@ -22,8 +22,8 @@ namespace HaskellTools
 {
     public partial class GHCiDebuggerWindowControl : UserControl
     {
-        private enum ReadState { None, Breakpoint, Tracing, DebugData, EvaluteDebugData }
-        private ReadState _currentReadState = ReadState.Breakpoint;
+        private enum ReadState { None, Waiting, BackStepping, Tracing, DebugData, EvaluteDebugData }
+        private ReadState _currentReadState = ReadState.Waiting;
 
         private DispatcherTimer _debugTimer = new DispatcherTimer();
         private DispatcherTimer _debugEvaluateTimer = new DispatcherTimer();
@@ -35,6 +35,7 @@ namespace HaskellTools
 
         public bool IsDebuggerRunning => _process != null && !_process.HasExited;
         public string GHCiPath { get; set; } = "";
+        public string DebuggerEntryFunctionName { get; set; } = "";
         public bool IsFileLoaded { get; internal set; } = false;
         public string FileLoaded { get; internal set; } = "None";
 
@@ -62,11 +63,23 @@ namespace HaskellTools
         private async void ContinueButton_Click(object sender, RoutedEventArgs e)
         {
             ContinueButton.IsEnabled = false;
+            BackButton.IsEnabled = false;
             ResetBreakpointPanel();
             if (!IsDebuggerRunning)
                 return;
-            _currentReadState = ReadState.Breakpoint;
+            _currentReadState = ReadState.Waiting;
             await _process.StandardInput.WriteLineAsync($":continue");
+        }
+
+        private async void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            ContinueButton.IsEnabled = false;
+            BackButton.IsEnabled = false;
+            ResetBreakpointPanel();
+            if (!IsDebuggerRunning)
+                return;
+            _currentReadState = ReadState.Waiting;
+            await _process.StandardInput.WriteLineAsync($":back");
         }
 
         private void ForceEvaluate_Click(object sender, RoutedEventArgs e)
@@ -80,7 +93,7 @@ namespace HaskellTools
                 return;
 
             ResetBreakpointPanel();
-            _currentReadState = ReadState.Breakpoint;
+            _currentReadState = ReadState.Waiting;
             _process.StandardInput.WriteLine($":step");
         }
 
@@ -161,68 +174,104 @@ namespace HaskellTools
         {
             if (text != null)
             {
-                switch (_currentReadState)
+                try
                 {
-                    case ReadState.Breakpoint:
-                        if (text.Contains("Stopped "))
-                        {
-                            string lineNumber = text.Substring(text.IndexOf("Stopped"));
-                            lineNumber = lineNumber.Substring(lineNumber.IndexOf(':') + 1);
-                            lineNumber = lineNumber.Substring(0, lineNumber.IndexOf(':'));
-                            int number = Int32.Parse(lineNumber);
-                            MarkBreakpoint(number);
-
-                            _debugData.Clear();
-                            HistoryTraceBox.Text = "";
-
-                            _currentReadState = ReadState.DebugData;
-                        }
-                        break;
-                    case ReadState.DebugData:
-                        if (!text.Contains(">"))
-                        {
-                            string name = text.Substring(0, text.IndexOf("::"));
-                            string type = text.Substring(text.IndexOf("::") + 2);
-                            type = type.Substring(0, type.IndexOf("="));
-                            string value = text.Substring(text.IndexOf("=") + 1);
-                            _debugData.Add(new DataItem()
+                    switch (_currentReadState)
+                    {
+                        case ReadState.Waiting:
+                            if (text.Contains("Stopped in <exception thrown>"))
                             {
-                                VariableName = name,
-                                Type = type,
-                                EvaluatedValue = value
-                            });
-                            _debugTimer.Start();
-                        }
-                        break;
-                    case ReadState.EvaluteDebugData:
-                        if (text.Contains("="))
-                        {
-                            string rname = text.Substring(text.IndexOf(">") + 1);
-                            rname = rname.Substring(0, rname.IndexOf("="));
-                            string rvalue = text.Substring(text.IndexOf("=") + 1);
-                            foreach (var item in _debugData)
-                            {
-                                if (item.VariableName.Trim() == rname.Trim())
-                                {
-                                    item.EvaluatedValue = rvalue;
-                                    break;
-                                }
+                                BackButton.IsEnabled = true;
+
+                                _debugData.Clear();
+                                HistoryTraceBox.Text = "";
+
+                                _currentReadState = ReadState.DebugData;
                             }
-                            _debugEvaluateTimer.Start();
-                        }
-                        break;
-                    case ReadState.Tracing:
-                        if (!text.Contains("<end of history>"))
-                        {
-                            if (text.Contains("*Main>"))
-                                text = text.Substring(text.IndexOf("*Main>") + 7);
-                            HistoryTraceBox.Text += $"{text}{Environment.NewLine}";
-                        }
-                        else
-                            _currentReadState = ReadState.Breakpoint;
-                        break;
+                            else
+                            if (text.Contains("breakpoint at "))
+                            {
+                                string lineNumber = text.Substring(text.IndexOf("at"));
+                                lineNumber = lineNumber.Substring(lineNumber.IndexOf(':') + 1);
+                                lineNumber = lineNumber.Substring(0, lineNumber.IndexOf(':'));
+                                int number = Int32.Parse(lineNumber);
+                                MarkBreakpoint(number);
+
+                                _debugData.Clear();
+                                HistoryTraceBox.Text = "";
+
+                                _currentReadState = ReadState.DebugData;
+                            }
+                            else
+                            if (text.Contains("Stopped in "))
+                            {
+                                string lineNumber = text.Substring(text.IndexOf("in"));
+                                lineNumber = lineNumber.Substring(lineNumber.IndexOf(':') + 1);
+                                lineNumber = lineNumber.Substring(0, lineNumber.IndexOf(':'));
+                                int number = Int32.Parse(lineNumber);
+                                MarkBreakpoint(number);
+
+                                _debugData.Clear();
+                                HistoryTraceBox.Text = "";
+
+                                _currentReadState = ReadState.DebugData;
+                            }
+                            break;
+                        case ReadState.DebugData:
+                            if (!text.Contains(">"))
+                            {
+                                string name = text.Substring(0, text.IndexOf("::"));
+                                string type = text.Substring(text.IndexOf("::") + 2);
+                                string value = "";
+                                if (text.Contains("="))
+                                {
+                                    type = type.Substring(0, type.IndexOf("="));
+                                    value = text.Substring(text.IndexOf("=") + 1);
+                                }
+                                _debugData.Add(new DataItem()
+                                {
+                                    VariableName = name,
+                                    Type = type,
+                                    EvaluatedValue = value
+                                });
+                                _debugTimer.Start();
+                            }
+                            break;
+                        case ReadState.EvaluteDebugData:
+                            if (text.Contains("="))
+                            {
+                                string rname = text.Substring(text.IndexOf(">") + 1);
+                                rname = rname.Substring(0, rname.IndexOf("="));
+                                string rvalue = text.Substring(text.IndexOf("=") + 1);
+                                foreach (var item in _debugData)
+                                {
+                                    if (item.VariableName.Trim() == rname.Trim())
+                                    {
+                                        item.EvaluatedValue = rvalue;
+                                        break;
+                                    }
+                                }
+                                _debugEvaluateTimer.Start();
+                            }
+                            break;
+                        case ReadState.Tracing:
+                            if (!text.Contains("<end of history>"))
+                            {
+                                if (text.Contains("*Main>"))
+                                    text = text.Substring(text.IndexOf("*Main>") + 7);
+                                HistoryTraceBox.Text += $"{text}{Environment.NewLine}";
+                            }
+                            else
+                                _currentReadState = ReadState.Waiting;
+                            break;
+                    }
+                    OutputTextbox.AppendText($"{text}{Environment.NewLine}", "#ffffff");
                 }
-                OutputTextbox.AppendText($"{text}{Environment.NewLine}", "#ffffff");
+                catch (Exception e)
+                {
+                    OutputTextbox.AppendText($"Error! Something went wrong while in output evaluation step {_currentReadState}!", "#c20e0e");
+                    OutputTextbox.AppendText($"{e.Message}{Environment.NewLine}", "#c20e0e");
+                }
             }
         }
 
@@ -236,7 +285,7 @@ namespace HaskellTools
         private async void DebugReadOver(object sender, EventArgs e)
         {
             SetLocalsData();
-            _currentReadState = ReadState.Breakpoint;
+            _currentReadState = ReadState.Waiting;
             _debugTimer.Stop();
             if ((bool)ForceValueChecks.IsChecked)
                 await EvaluateDebugDataAsync();
@@ -323,6 +372,7 @@ namespace HaskellTools
                         else
                             line.Background = Brushes.Orange;
                         ContinueButton.IsEnabled = true;
+                        BackButton.IsEnabled = true;
                         StepButton.IsEnabled = true;
                         break;
                     }
@@ -340,10 +390,10 @@ namespace HaskellTools
             await LoadSession();
             if (IsDebuggerRunning)
             {
-                _currentReadState = ReadState.Breakpoint;
+                _currentReadState = ReadState.Waiting;
                 IsDebuggerOnBorder.BorderBrush = Brushes.Red;
                 await InsertBreakPointsAsync();
-                await _process.StandardInput.WriteLineAsync($":trace main");
+                await _process.StandardInput.WriteLineAsync($":trace {DebuggerEntryFunctionName}");
             }
             MainGrid.IsEnabled = true;
         }
@@ -387,9 +437,11 @@ namespace HaskellTools
             {
                 _package = RequestSettingsData.Invoke();
                 GHCiPath = _package.GHCIPath;
+                DebuggerEntryFunctionName = _package.DebuggerEntryFunctionName;
             }
             await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
             await _process.StandardInput.WriteLineAsync($":load \"{FileLoaded}\"");
+            await _process.StandardInput.WriteLineAsync($":set -fbreak-on-exception");
         }
 
         private async Task StopDebugger()
@@ -403,8 +455,9 @@ namespace HaskellTools
             BreakpointPanel.IsEnabled = true;
             ResetBreakpoints.IsEnabled = true;
             ContinueButton.IsEnabled = false;
+            BackButton.IsEnabled = false;
             StepButton.IsEnabled = false;
-            _currentReadState = ReadState.Breakpoint;
+            _currentReadState = ReadState.Waiting;
             DebugDataPanel.Children.Clear();
             OutputTextbox.Document.Blocks.Clear();
             HistoryTraceBox.Text = "";
