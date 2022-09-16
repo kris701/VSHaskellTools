@@ -99,9 +99,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Grammars\Haskell.tmLanguage">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="Resources\GHCiDebuggerWindowCommand.png" />
     <Content Include="Resources\GitHub.png" />
     <Content Include="Resources\HaskellInteractiveWindowCommand.png" />
@@ -116,7 +113,7 @@
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\step.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\stopdebugging.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\startdebugging.png" />
-    <Content Include="Grammars\Haskell.tmTheme">
+    <Content Include="Grammars\Haskell.tmLanguage">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="Key.snk" />
