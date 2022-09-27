@@ -96,19 +96,19 @@ namespace HaskellTools
                 _process.BeginErrorReadLine();
 
                 if (_package == null)
-                {
                     _package = RequestSettingsData.Invoke();
-                }
 
                 await _process.StandardInput.WriteLineAsync($"cd '{DTE2Helper.GetSourcePath()}'");
-                await _process.StandardInput.WriteLineAsync($"& '{GHCiPath}'");
+                if (_package.GHCUPPath == "")
+                    await _process.StandardInput.WriteLineAsync($"& ghci");
+                else
+                    await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin/ghci.exe")}'");
                 string fileName = DTE2Helper.GetSourceFileName();
+                _isLoaded = true;
                 await _process.StandardInput.WriteLineAsync($":load \"{fileName}\"");
-                await Task.Delay(100);
                 LoadedFileNameLabel.Content = $"File Loaded: '{fileName}'";
 
                 InputTextbox.IsEnabled = true;
-                _isLoaded = true;
             }
         }
 
