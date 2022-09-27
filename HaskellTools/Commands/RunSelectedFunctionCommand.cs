@@ -65,6 +65,7 @@ namespace HaskellTools.Commands
                 MessageBox.Show("File must be a '.hs' file!");
                 return;
             }
+            DTE2Helper.SaveActiveDocument();
 
             _sourcePath = DTE2Helper.GetSourcePath();
             _sourceFileName = DTE2Helper.GetSourceFileName();

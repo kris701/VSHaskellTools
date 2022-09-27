@@ -116,7 +116,8 @@ namespace HaskellTools
         {
             InputTextbox.IsEnabled = false;
             OutputTextbox.Document.Blocks.Clear();
-            ProcessHelper.KillProcessAndChildrens(_process.Id);
+            if (_process != null)
+                ProcessHelper.KillProcessAndChildrens(_process.Id);
             LoadedFileNameLabel.Content = $"GHCi Unloaded";
             _previousText.Clear();
             _previousTextIndex = 0;

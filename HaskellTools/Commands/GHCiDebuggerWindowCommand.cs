@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using HaskellTools.Helpers;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
@@ -25,6 +26,7 @@ namespace HaskellTools.Commands
 
         public override void Execute(object sender, EventArgs e)
         {
+            DTE2Helper.SaveActiveDocument();
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
                 ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(GHCiDebuggerWindow), 0, true, this.package.DisposalToken);

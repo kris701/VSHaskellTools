@@ -13,8 +13,8 @@ namespace HaskellTools
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideOptionPage(typeof(OptionPageGrid),
     "Haskell Tools", "Options", 0, 0, true)]
-    [ProvideToolWindow(typeof(HaskellInteractiveWindow))]
-    [ProvideToolWindow(typeof(GHCiDebuggerWindow))]
+    [ProvideToolWindow(typeof(HaskellInteractiveWindow),Transient = true)]
+    [ProvideToolWindow(typeof(GHCiDebuggerWindow), Transient = true)]
     public sealed class HaskellToolsPackage : AsyncPackage
     {
         #region Settings
