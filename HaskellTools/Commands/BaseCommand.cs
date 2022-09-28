@@ -15,7 +15,7 @@ namespace HaskellTools.Commands
     internal abstract class BaseCommand
     {
         public abstract int CommandId { get; }
-        public static readonly Guid CommandSet = new Guid("c8d29eda-f85f-4c3f-8620-6b8c0c6ebd51");
+        public static readonly Guid CommandSet = new Guid(Constants.CommandSetGuid);
         internal readonly AsyncPackage package;
 
         public bool CanBeDisabled { get; } = true;
@@ -29,7 +29,7 @@ namespace HaskellTools.Commands
             var menuCommandID = new CommandID(CommandSet, CommandId);
             var menuItem = new OleMenuCommand(this.Execute, menuCommandID);
             if (CanBeDisabled)
-                menuItem.BeforeQueryStatus += MyQueryStatus;
+                menuItem.BeforeQueryStatus += CheckQueryStatus;
             commandService.AddCommand(menuItem);
         }
 
@@ -42,7 +42,7 @@ namespace HaskellTools.Commands
 
         public abstract void Execute(object sender, EventArgs e);
 
-        private void MyQueryStatus(object sender, EventArgs e)
+        private void CheckQueryStatus(object sender, EventArgs e)
         {
             var button = (MenuCommand)sender;
             button.Enabled = DTE2Helper.IsValidFileOpen();

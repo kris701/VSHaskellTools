@@ -31,11 +31,11 @@ namespace HaskellTools
     [ProvideToolWindow(typeof(HaskellInteractiveWindow),Transient = true)]
     [ProvideToolWindow(typeof(GHCiDebuggerWindow), Transient = true)]
 
-    [ProvideUIContextRule(Constants.UIContextGuid,
-        name: "RightFileTypeOpen",
-        expression: "IsHaskellFile",
-        termNames: new[] { "IsHaskellFile" },
-        termValues: new[] { "HierSingleSelectionName:.hs$" })]
+    //[ProvideUIContextRule(Constants.UIContextGuid,
+    //    name: "RightFileTypeOpen",
+    //    expression: "IsHaskellFile",
+    //    termNames: new[] { "IsHaskellFile" },
+    //    termValues: new[] { "HierSingleSelectionName:.hs$" })]
     public sealed class HaskellToolsPackage : AsyncPackage
     {
         #region Settings
@@ -74,7 +74,7 @@ namespace HaskellTools
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            var commandService = await GetServiceAsync((typeof(IMenuCommandService))) as IMenuCommandService;
+            //var commandService = await GetServiceAsync((typeof(IMenuCommandService))) as IMenuCommandService;
 
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
