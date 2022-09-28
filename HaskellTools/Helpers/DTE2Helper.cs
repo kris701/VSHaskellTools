@@ -25,7 +25,7 @@ namespace HaskellTools.Helpers
             if (uih == null)
                 return false;
             var extension = GetSourceFileExtension();
-            if (extension != ".hs")
+            if (extension != Constants.HaskellExt)
                 return false;
             return true;
         }

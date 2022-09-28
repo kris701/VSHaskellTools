@@ -10,7 +10,7 @@ namespace HaskellTools.Commands
         public override int CommandId { get; } = 258;
         public static GitHubCommand Instance { get; internal set; }
 
-        private GitHubCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
+        private GitHubCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService, false)
         {
         }
 

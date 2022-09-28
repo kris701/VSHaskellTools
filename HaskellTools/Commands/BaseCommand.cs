@@ -1,7 +1,11 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using EnvDTE;
+using EnvDTE80;
+using HaskellTools.Helpers;
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,24 +17,20 @@ namespace HaskellTools.Commands
         public abstract int CommandId { get; }
         public static readonly Guid CommandSet = new Guid("c8d29eda-f85f-4c3f-8620-6b8c0c6ebd51");
         internal readonly AsyncPackage package;
-        internal static OleMenuCommandService _commandService;
 
-        public BaseCommand(AsyncPackage package, OleMenuCommandService commandService)
+        public bool CanBeDisabled { get; } = true;
+
+        public BaseCommand(AsyncPackage package, OleMenuCommandService commandService, bool canBeDisabled = true)
         {
+            CanBeDisabled = canBeDisabled;
             this.package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
             var menuCommandID = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(this.Execute, menuCommandID);
+            var menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+            if (CanBeDisabled)
+                menuItem.BeforeQueryStatus += MyQueryStatus;
             commandService.AddCommand(menuItem);
-        }
-
-        private IAsyncServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.package;
-            }
         }
 
         public static async Task<OleMenuCommandService> InitializeCommandServiceAsync(AsyncPackage package)
@@ -41,5 +41,11 @@ namespace HaskellTools.Commands
         }
 
         public abstract void Execute(object sender, EventArgs e);
+
+        private void MyQueryStatus(object sender, EventArgs e)
+        {
+            var button = (MenuCommand)sender;
+            button.Enabled = DTE2Helper.IsValidFileOpen();
+        }
     }
 }
