@@ -16,7 +16,8 @@ namespace HaskellTools
     [ProvideLanguageService(typeof(HaskellLanguageFactory), Constants.HaskellLanguageName, 0, 
         ShowHotURLs = false, DefaultToNonHotURLs = true, EnableLineNumbers = true, 
         EnableAsyncCompletion = true, EnableCommenting = true, ShowCompletion = true, 
-        AutoOutlining = true, CodeSense = true, RequestStockColors = true, EnableFormatSelection = true
+        AutoOutlining = true, CodeSense = true, RequestStockColors = true, EnableFormatSelection = true,
+        QuickInfo = true
         )]
     [ProvideLanguageExtension(typeof(HaskellLanguageFactory), Constants.HaskellExt)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]

@@ -68,6 +68,9 @@
     <Compile Include="HaskellLanguageFactory.cs" />
     <Compile Include="Helpers\DirHelper.cs" />
     <Compile Include="Helpers\ProcessHelper.cs" />
+    <Compile Include="QuickInfo\HaskellAsyncQuickInfoSource.cs" />
+    <Compile Include="QuickInfo\HaskellAsyncQuickInfoSourceProvider.cs" />
+    <Compile Include="QuickInfo\HaskellInfoStack.cs" />
     <Compile Include="Windows\GHCiDebuggerWindow\DebugData\DataItem.cs" />
     <Compile Include="Windows\GHCiDebuggerWindow\GHCiDebuggerWindow.cs" />
     <Compile Include="Commands\GHCiDebuggerWindowCommand.cs" />
