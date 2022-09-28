@@ -65,12 +65,13 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Events\EventDelegates.cs" />
     <Compile Include="ContentTypeDefinition.cs" />
+    <Compile Include="HaskellInfo\HaskellPreludeInfo.cs" />
+    <Compile Include="HaskellInfo\HaskellPreludeInitializer.cs" />
     <Compile Include="HaskellLanguageFactory.cs" />
     <Compile Include="Helpers\DirHelper.cs" />
     <Compile Include="Helpers\ProcessHelper.cs" />
     <Compile Include="QuickInfo\HaskellAsyncQuickInfoSource.cs" />
     <Compile Include="QuickInfo\HaskellAsyncQuickInfoSourceProvider.cs" />
-    <Compile Include="QuickInfo\HaskellInfoStack.cs" />
     <Compile Include="Windows\GHCiDebuggerWindow\DebugData\DataItem.cs" />
     <Compile Include="Windows\GHCiDebuggerWindow\GHCiDebuggerWindow.cs" />
     <Compile Include="Commands\GHCiDebuggerWindowCommand.cs" />

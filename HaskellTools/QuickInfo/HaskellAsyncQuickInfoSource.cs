@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Drawing;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EnvDTE;
+using HaskellTools.HaskellInfo;
 using Microsoft.VisualStudio.Core.Imaging;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -57,14 +59,14 @@ namespace HaskellTools.QuickInfo
                 TextExtent extent = navigator.GetExtentOfWord(subjectTriggerPoint.Value);
                 string searchText = extent.Span.GetText();
 
-                foreach (string key in HaskellInfoStack._dictionary.Keys)
+                foreach (string key in HaskellPreludeInfo.PreludeContent.Keys.OrderByDescending(x => x.Length))
                 {
                     int foundIdx = searchText.IndexOf(key, StringComparison.CurrentCultureIgnoreCase);
                     if (foundIdx > -1)
                     {
                         ITrackingSpan applicable = currentSnapshot.CreateTrackingSpan(extent.Span.Start + foundIdx, key.Length, SpanTrackingMode.EdgeInclusive);
 
-                        return new QuickInfoItem(applicable, HaskellInfoStack._dictionary[key]);
+                        return new QuickInfoItem(applicable, HaskellPreludeInfo.PreludeContent[key]);
                     }
                 }
                 return new QuickInfoItem(null, "");

@@ -1,4 +1,5 @@
 ﻿using HaskellTools.Commands;
+using HaskellTools.HaskellInfo;
 using HaskellTools.Options;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;
@@ -73,6 +74,9 @@ namespace HaskellTools
             await GitHubCommand.InitializeAsync(this);
             await HaskellInteractiveWindowCommand.InitializeAsync(this);
             await GHCiDebuggerWindowCommand.InitializeAsync(this);
+
+            HaskellPreludeInitializer initializer = new HaskellPreludeInitializer();
+            Task.Run(() => initializer.InitializePreludeContentAsync(GHCUPPath));
         }
 
         #endregion
