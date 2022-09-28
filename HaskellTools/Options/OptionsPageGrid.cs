@@ -13,6 +13,7 @@ namespace HaskellTools.Options
         private string _ghcupPath = "";
         private int _haskellFileExecutionTimeout = 10;
         private string _debuggerEntryFunctionName = "main";
+        private bool _checkForGHCiAtStartup = true;
 
         [Category("Haskell Tools")]
         [DisplayName("Optional GHCUP Path")]
@@ -39,6 +40,15 @@ namespace HaskellTools.Options
         {
             get { return _debuggerEntryFunctionName; }
             set { _debuggerEntryFunctionName = value; }
+        }
+
+        [Category("Haskell Tools")]
+        [DisplayName("Check GHCi At Startup")]
+        [Description("Checks if GHCi is registered in path, if not the user will be asked to provide the path to it instead.")]
+        public bool CheckForGHCiAtStartup
+        {
+            get { return _checkForGHCiAtStartup; }
+            set { _checkForGHCiAtStartup = value; }
         }
     }
 }

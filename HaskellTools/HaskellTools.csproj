@@ -60,14 +60,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Checkers\GHCiChecker.cs" />
     <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Commands\GitHubCommand.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Events\EventDelegates.cs" />
-    <Compile Include="ContentTypeDefinition.cs" />
+    <Compile Include="Language\ContentTypeDefinition.cs" />
     <Compile Include="HaskellInfo\HaskellPreludeInfo.cs" />
     <Compile Include="HaskellInfo\HaskellPreludeInitializer.cs" />
-    <Compile Include="HaskellLanguageFactory.cs" />
+    <Compile Include="Language\HaskellLanguageFactory.cs" />
     <Compile Include="Helpers\DirHelper.cs" />
     <Compile Include="Helpers\ProcessHelper.cs" />
     <Compile Include="QuickInfo\HaskellAsyncQuickInfoSource.cs" />

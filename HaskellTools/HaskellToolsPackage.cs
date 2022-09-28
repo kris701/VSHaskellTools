@@ -1,4 +1,5 @@
 ﻿using EnvDTE;
+using HaskellTools.Checkers;
 using HaskellTools.Commands;
 using HaskellTools.HaskellInfo;
 using HaskellTools.Options;
@@ -41,6 +42,11 @@ namespace HaskellTools
                 OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
                 return page.GHCUPPath;
             }
+            set
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                page.GHCUPPath = value;
+            }
         }
 
         public int HaskellFileExecutionTimeout
@@ -60,6 +66,21 @@ namespace HaskellTools
                 return page.DebuggerEntryFunctionName;
             }
         }
+
+        public bool CheckForGHCiAtStartup
+        {
+            get
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                return page.CheckForGHCiAtStartup;
+            }
+            set
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                page.CheckForGHCiAtStartup = value;
+            }
+        }
+
         #endregion
 
         public const string PackageGuidString = "6eaa553c-a41f-487b-99a1-a8383b6d1f74";
@@ -69,6 +90,12 @@ namespace HaskellTools
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            if (CheckForGHCiAtStartup)
+            {
+                var checker = new GHCiChecker(this);
+                await checker.CheckForGHCi();
+            }
 
             await RunHaskellFileCommand.InitializeAsync(this);
             await RunSelectedFunctionCommand.InitializeAsync(this);
