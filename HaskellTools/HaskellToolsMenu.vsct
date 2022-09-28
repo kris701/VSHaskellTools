@@ -2,20 +2,29 @@
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<Extern href="stdidcmd.h" />
 	<Extern href="vsshlids.h" />
-	
+
 	<Commands package="HaskellPackageGuid">
 		<Groups>
 			<Group guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" priority="0x0600">
-				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenu" />
+				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenu"/>
+			</Group>
+			<Group guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup">
+				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbar"/>
 			</Group>
 		</Groups>
 
 		<Menus>
+			<Menu guid="HaskellCommandSetGuid" id="HaskellToolsToolbar" type="Toolbar">
+				<CommandFlag>DefaultDocked</CommandFlag>
+				<CommandFlag>AlwaysCreate</CommandFlag>
+				<Strings>
+					<ButtonText>Haskell Toolbar</ButtonText>
+				</Strings>
+			</Menu>
 			<Menu guid="HaskellCommandSetGuid" id="HaskellToolsMenu" priority="0x700" type="Menu">
 				<Parent guid="guidSHLMainMenu" id="IDG_VS_MM_FILEEDITVIEW" />
 				<Strings>
 					<ButtonText>Haskell Tools</ButtonText>
-					<CommandName>Haskell Tools</CommandName>
 				</Strings>
 			</Menu>
 		</Menus>
@@ -27,82 +36,116 @@
 			<Bitmap guid="InteractiveHaskellWindowImageGuid" href="Resources\HaskellInteractiveWindowCommand.png" />
 			<Bitmap guid="GHCiDebuggerWindowImageGuid" href="Resources\GHCiDebuggerWindowCommand.png"/>
 		</Bitmaps>
-	  
+
 		<Buttons>
 			<Button guid="HaskellCommandSetGuid" id="RunHaskellFileCommandID" priority="0x0100" type="Button">
-				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 				<Icon guid="RunHaskellFileImageGuid" id="bmpPic1" />
+				<CommandFlag>IconAndText</CommandFlag>
 				<Strings>
-					<ButtonText>Run Haskell File</ButtonText>
+					<ButtonText>Run </ButtonText>
+					<MenuText>Run Haskell File</MenuText>
+					<ToolTipText>Execute currently open Haskell file</ToolTipText>
 				</Strings>
 			</Button>
 			<Button guid="HaskellCommandSetGuid" id="GHCiDebuggerWindowCommandID" priority="0x0101" type="Button">
-				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 				<Icon guid="GHCiDebuggerWindowImageGuid" id="bmpPic1" />
+				<CommandFlag>IconAndText</CommandFlag>
 				<Strings>
-					<ButtonText>Debug Haskell File</ButtonText>
+					<ButtonText>Debug </ButtonText>
+					<MenuText>Debug Haskell File</MenuText>
+					<ToolTipText>Debug the currently open Haskell file</ToolTipText>
 				</Strings>
 			</Button>
 			<Button guid="HaskellCommandSetGuid" id="RunSelectedFunctionCommandID" priority="0x0102" type="Button">
-				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 				<Icon guid="RunSelectedFunctionImageGuid" id="bmpPic1" />
 				<Strings>
 					<ButtonText>Run Selected Function</ButtonText>
+					<ToolTipText>Run the function that you have currently selected in the open Haskell file</ToolTipText>
 				</Strings>
 			</Button>
 			<Button guid="HaskellCommandSetGuid" id="InteractiveHaskellWindowCommandID" priority="0x0103" type="Button">
-				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 				<Icon guid="InteractiveHaskellWindowImageGuid" id="bmpPic1" />
 				<Strings>
 					<ButtonText>Haskell Interactive Window</ButtonText>
+					<ToolTipText>Open a GHCi interactive window with the current file loaded</ToolTipText>
 				</Strings>
 			</Button>
 			<Button guid="HaskellCommandSetGuid" id="GithubCommandID" priority="0x0104" type="Button">
-				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 				<Icon guid="GithubImageGuid" id="bmpPic1" />
 				<Strings>
 					<ButtonText>GitHub</ButtonText>
+					<ToolTipText>Open the GitHub page</ToolTipText>
 				</Strings>
 			</Button>
 		</Buttons>
 	</Commands>
-	
+
+	<CommandPlacements>
+		<CommandPlacement guid="HaskellCommandSetGuid" id="RunHaskellFileCommandID" priority="0x100">
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup"/>
+		</CommandPlacement>
+		<CommandPlacement guid="HaskellCommandSetGuid" id="GHCiDebuggerWindowCommandID" priority="0x101">
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup"/>
+		</CommandPlacement>
+		<CommandPlacement guid="HaskellCommandSetGuid" id="RunSelectedFunctionCommandID" priority="0x102">
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup"/>
+		</CommandPlacement>
+		<CommandPlacement guid="HaskellCommandSetGuid" id="InteractiveHaskellWindowCommandID" priority="0x103">
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup"/>
+		</CommandPlacement>
+		<CommandPlacement guid="HaskellCommandSetGuid" id="GithubCommandID" priority="0x104">
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup"/>
+		</CommandPlacement>
+
+		<CommandPlacement guid="HaskellCommandSetGuid" id="RunHaskellFileCommandID" priority="0x100">
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup"/>
+		</CommandPlacement>
+		<CommandPlacement guid="HaskellCommandSetGuid" id="GHCiDebuggerWindowCommandID" priority="0x101">
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup"/>
+		</CommandPlacement>
+		<CommandPlacement guid="HaskellCommandSetGuid" id="RunSelectedFunctionCommandID" priority="0x102">
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup"/>
+		</CommandPlacement>
+	</CommandPlacements>
+
 	<KeyBindings>
 		<KeyBinding guid="HaskellCommandSetGuid" id="RunHaskellFileCommandID" editor="guidVSStd97" key1="M" mod1="ALT" />
 		<KeyBinding guid="HaskellCommandSetGuid" id="RunSelectedFunctionCommandID" editor="guidVSStd97" key1="J" mod1="ALT" />
 		<KeyBinding guid="HaskellCommandSetGuid" id="InteractiveHaskellWindowCommandID" editor="guidVSStd97" key1="K" mod1="ALT" />
 		<KeyBinding guid="HaskellCommandSetGuid" id="GHCiDebuggerWindowCommandID" editor="guidVSStd97" key1="L" mod1="ALT" />
 	</KeyBindings>
-	
+
 	<Symbols>
 		<GuidSymbol value="{6eaa553c-a41f-487b-99a1-a8383b6d1f74}" name="HaskellPackageGuid" />
 
 		<GuidSymbol value="{c8d29eda-f85f-4c3f-8620-6b8c0c6ebd51}" name="HaskellCommandSetGuid">
 			<IDSymbol name="HaskellToolsMenuGroup" value="0x1020" />
+			<IDSymbol name="HaskellToolsToolbarGroup" value="0x1021" />
 			<IDSymbol name="RunHaskellFileCommandID" value="256" />
 			<IDSymbol name="RunSelectedFunctionCommandID" value="257" />
 			<IDSymbol name="GithubCommandID" value="258" />
 			<IDSymbol name="InteractiveHaskellWindowCommandID" value="259" />
 			<IDSymbol name="GHCiDebuggerWindowCommandID" value="260" />
-			<IDSymbol name="HaskellToolsMenu" value="0x1021" />
+			<IDSymbol name="HaskellToolsMenu" value="0x1022" />
+			<IDSymbol name="HaskellToolsToolbar" value="0x1023" />
 		</GuidSymbol>
 
 		<GuidSymbol value="{bb64ec71-4259-41eb-9775-43fbb84988af}" name="RunHaskellFileImageGuid">
 			<IDSymbol name="bmpPic1" value="1" />
 		</GuidSymbol>
-  
+
 		<GuidSymbol value="{ab93ee69-1eca-4ef3-b557-ed1f4d984735}" name="RunSelectedFunctionImageGuid">
 			<IDSymbol name="bmpPic1" value="1" />
 		</GuidSymbol>
-  
+
 		<GuidSymbol value="{ff48a4e6-0aab-49a4-987a-0a3ed7ff4d23}" name="GithubImageGuid">
 			<IDSymbol name="bmpPic1" value="1" />
 		</GuidSymbol>
-  
+
 		<GuidSymbol value="{a8a14ee9-9eae-4cb0-87a1-40b2244dbd5a}" name="InteractiveHaskellWindowImageGuid">
 			<IDSymbol name="bmpPic1" value="1" />
 		</GuidSymbol>
-  
+
 		<GuidSymbol value="{00f2ca33-0f42-4576-a4f2-255ec77838d8}" name="GHCiDebuggerWindowImageGuid">
 			<IDSymbol name="bmpPic1" value="1" />
 		</GuidSymbol>
