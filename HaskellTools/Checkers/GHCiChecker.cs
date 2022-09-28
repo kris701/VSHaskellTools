@@ -24,6 +24,8 @@ namespace HaskellTools.Checkers
         public async Task CheckForGHCi()
         {
             SetupProcess();
+            _process.Start();
+            _process.BeginErrorReadLine();
             _isStarted = true;
             if (_package.GHCUPPath == "")
                 await _process.StandardInput.WriteLineAsync($"& ghci");
@@ -31,7 +33,7 @@ namespace HaskellTools.Checkers
                 await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin/ghci.exe")}'");
             await Task.Delay(500);
             if (_isGood)
-                _package.CheckForGHCiAtStartup = false;
+                _package.CheckForGHCiAtStartup = true;
             else
             {
                 MessageBox.Show("Not found!");
