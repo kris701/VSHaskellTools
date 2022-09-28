@@ -5,10 +5,30 @@ This extension comes with a set of functions, that can be found under the Extens
 
 ![image](https://user-images.githubusercontent.com/22596587/189736144-2a8d9ea6-538c-4b08-aced-e8aa90d9472e.png)
 
+![image](https://user-images.githubusercontent.com/22596587/192885481-546c56f3-2843-41af-b49b-e21a12280139.png)
+
+![image](https://user-images.githubusercontent.com/22596587/192885524-0a3070b1-82d0-48f3-86e6-5935678beaff.png)
+
+# Features
+This extension comes with a good set of features, some explained or shown in a bit more detail after this list:
+* Syntax Highlighting 
+* Prelude Quick Info
+* Haskell Editor Options
+* Execution of Haskell files
+* Execution of a specific function in Haskell files
+* Light debugger with GHCi
+* GHCi interactive window
+* Quick access toolbar
+
 ## Syntax Highlighting
 This extension includes syntax highlighting of Haskell programs. It is enabled for all files with the '.hs' extension
 
 ![image](https://user-images.githubusercontent.com/22596587/190104879-58d989f1-3cce-463a-aba7-161999b4eec0.png)
+
+## Prelude Quick Info
+When you hover your mouse over a function or operator from the Haskell Prelude module, a quick info will display with type info.
+
+![image](https://user-images.githubusercontent.com/22596587/192885356-ace64318-dcc8-431b-92b3-9f66c01f517c.png)
 
 ## Run Haskell File
 This simply runs the Haskell file thats open, and sends the output to the "output" window.
