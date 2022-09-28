@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace HaskellTools.HaskellInfo
 {
@@ -18,9 +19,12 @@ namespace HaskellTools.HaskellInfo
         private string _currentKey = "";
         private ClassifiedTextElement _currentElements;
         private ClassifiedTextElement _currentCommentElements;
+        private DispatcherTimer _finishTimer = new DispatcherTimer();
 
         public async Task InitializePreludeContentAsync(string ghciPath)
         {
+            _finishTimer.Tick += ParsingDone;
+            _finishTimer.Interval = TimeSpan.FromMilliseconds(500);
             HaskellPreludeInfo.PreludeContent.Clear();
 
             SetupProcess();
@@ -57,45 +61,56 @@ namespace HaskellTools.HaskellInfo
         {
             if (e.Data != null && _isParsing)
             {
+                _finishTimer.Start();
                 string line = $"{e.Data}";
                 if (line.Contains("::") && !line.StartsWith(" "))
                 {
                     if (_currentKey != "")
                     {
-                        ContainerElement newElement = new ContainerElement(
-                            ContainerElementStyle.Stacked,
-                            _currentElements,
-                            _currentCommentElements);
+                        ContainerElement newElement = null;
+                        if (_currentCommentElements != null)
+                            newElement = new ContainerElement(
+                                ContainerElementStyle.Stacked,
+                                _currentElements,
+                                _currentCommentElements);
+                        else
+                            newElement = new ContainerElement(
+                                ContainerElementStyle.Stacked,
+                                _currentElements);
                         HaskellPreludeInfo.PreludeContent.Add(_currentKey, newElement);
                     }
 
+                    string leftSide = line.Replace("::", ":").Split(':')[0];
+                    string rightSide = line.Replace("::", ":").Split(':')[1];
+
                     if (line.StartsWith("type "))
                     {
-                        _currentKey = line.Replace("::", ":").Split(':')[0].Replace("type ","").Trim();
-                        string typeText = line.Replace("::", ":").Split(':')[1].Trim();
+                        _currentKey = leftSide.Replace("type ","").Trim();
+                        string typeText = rightSide.Trim();
 
                         _currentElements = new ClassifiedTextElement(
                                 new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, $"{_currentKey} :: "),
                                 new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, typeText)
                             );
-                        _currentCommentElements = new ClassifiedTextElement();
+                        _currentCommentElements = null;
                     }
                     else
                     {
-                        _currentKey = line.Replace("::", ":").Split(':')[0].Trim().Replace("(","").Replace(")","");
-                        string typeText = line.Replace("::", ":").Split(':')[1].Trim();
+                        _currentKey = leftSide.Trim().Replace("(","").Replace(")","");
+                        string typeText = rightSide.Trim();
 
                         _currentElements = new ClassifiedTextElement(
                                 new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, $"{_currentKey} :: "),
                                 new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, typeText)
                             );
-                        _currentCommentElements = new ClassifiedTextElement();
+                        _currentCommentElements = null;
                     }
                 }
                 else
                 {
-                    if (_currentCommentElements != null)
-                        _currentCommentElements = new ClassifiedTextElement(_currentCommentElements.Runs.ToArray().Append(new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, $"{line}{Environment.NewLine}")));
+                    if (_currentCommentElements == null)
+                        _currentCommentElements = new ClassifiedTextElement();
+                    _currentCommentElements = new ClassifiedTextElement(_currentCommentElements.Runs.ToArray().Append(new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, $"{line}{Environment.NewLine}")));
                 }
             }
         }
@@ -108,11 +123,18 @@ namespace HaskellTools.HaskellInfo
                 await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(ghciPath, "bin/ghci.exe")}'");
             await Task.Delay(1000);
             _isParsing = true;
+            _finishTimer.Start();
             await _process.StandardInput.WriteLineAsync($":browse Prelude");
-            await Task.Delay(100000);
-            _isParsing = false;
+            while (_isParsing)
+                await Task.Delay(500);
             await _process.StandardInput.WriteLineAsync($":quit");
             await _process.StandardInput.WriteLineAsync($"exit");
+        }
+
+        private void ParsingDone(object sender, EventArgs e)
+        {
+            _isParsing = false;
+            _finishTimer.Stop();
         }
     }
 }
