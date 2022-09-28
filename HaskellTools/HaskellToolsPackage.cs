@@ -1,13 +1,26 @@
 ﻿using HaskellTools.Commands;
 using HaskellTools.Options;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
 
 namespace HaskellTools
 {
+    [ProvideService(typeof(HaskellLanguageFactory), ServiceName = nameof(HaskellLanguageFactory))]
+    [ProvideLanguageService(typeof(HaskellLanguageFactory), Constants.HaskellLanguageName, 0, 
+        ShowHotURLs = false, DefaultToNonHotURLs = true, EnableLineNumbers = true, 
+        EnableAsyncCompletion = true, EnableCommenting = true, ShowCompletion = true, 
+        AutoOutlining = true, CodeSense = true, RequestStockColors = true, EnableFormatSelection = true
+        )]
+    [ProvideLanguageExtension(typeof(HaskellLanguageFactory), Constants.HaskellExt)]
+    [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
+
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -53,6 +66,7 @@ namespace HaskellTools
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
             await RunHaskellFileCommand.InitializeAsync(this);
             await RunSelectedFunctionCommand.InitializeAsync(this);
             await GitHubCommand.InitializeAsync(this);

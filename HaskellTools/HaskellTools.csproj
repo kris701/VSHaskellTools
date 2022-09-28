@@ -62,7 +62,10 @@
   <ItemGroup>
     <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Commands\GitHubCommand.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Events\EventDelegates.cs" />
+    <Compile Include="ContentTypeDefinition.cs" />
+    <Compile Include="HaskellLanguageFactory.cs" />
     <Compile Include="Helpers\DirHelper.cs" />
     <Compile Include="Helpers\ProcessHelper.cs" />
     <Compile Include="Windows\GHCiDebuggerWindow\DebugData\DataItem.cs" />
@@ -128,7 +131,9 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
