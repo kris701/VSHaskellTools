@@ -28,14 +28,9 @@ namespace HaskellTools
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideOptionPage(typeof(OptionPageGrid),
     "Haskell Tools", "Options", 0, 0, true)]
-    [ProvideToolWindow(typeof(HaskellInteractiveWindow),Transient = true)]
-    [ProvideToolWindow(typeof(GHCiDebuggerWindow), Transient = true)]
+    [ProvideToolWindow(typeof(HaskellInteractiveWindow),Transient = true, MultiInstances = false, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindMainWindow, Orientation = ToolWindowOrientation.Bottom)]
+    [ProvideToolWindow(typeof(GHCiDebuggerWindow), Transient = true, MultiInstances = false, Style = VsDockStyle.Tabbed)]
 
-    //[ProvideUIContextRule(Constants.UIContextGuid,
-    //    name: "RightFileTypeOpen",
-    //    expression: "IsHaskellFile",
-    //    termNames: new[] { "IsHaskellFile" },
-    //    termValues: new[] { "HierSingleSelectionName:.hs$" })]
     public sealed class HaskellToolsPackage : AsyncPackage
     {
         #region Settings
@@ -67,15 +62,12 @@ namespace HaskellTools
         }
         #endregion
 
-
         public const string PackageGuidString = "6eaa553c-a41f-487b-99a1-a8383b6d1f74";
 
         #region Package Members
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            //var commandService = await GetServiceAsync((typeof(IMenuCommandService))) as IMenuCommandService;
-
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
             await RunHaskellFileCommand.InitializeAsync(this);
