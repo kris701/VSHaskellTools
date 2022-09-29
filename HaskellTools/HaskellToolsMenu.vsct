@@ -6,10 +6,10 @@
 	<Commands package="HaskellPackageGuid">
 		<Groups>
 			<Group guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" priority="0x0600">
-				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenu"/>
+				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenu" />
 			</Group>
 			<Group guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup">
-				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbar"/>
+				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbar" />
 			</Group>
 		</Groups>
 
@@ -34,8 +34,8 @@
 			<Bitmap guid="RunSelectedFunctionImageGuid" href="Resources\RunGHCi.png" />
 			<Bitmap guid="GithubImageGuid" href="Resources\GitHub.png" />
 			<Bitmap guid="InteractiveHaskellWindowImageGuid" href="Resources\HaskellInteractiveWindowCommand.png" />
-			<Bitmap guid="GHCiDebuggerWindowImageGuid" href="Resources\GHCiDebuggerWindowCommand.png"/>
-		</Bitmaps>
+			<Bitmap guid="GHCiDebuggerWindowImageGuid" href="Resources\GHCiDebuggerWindowCommand.png" />
+    </Bitmaps>
 
 		<Buttons>
 			<Button guid="HaskellCommandSetGuid" id="RunHaskellFileCommandID" priority="0x0100" type="Button">
@@ -81,34 +81,34 @@
 					<ToolTipText>Open the GitHub page</ToolTipText>
 				</Strings>
 			</Button>
-		</Buttons>
+    </Buttons>
 	</Commands>
 
 	<CommandPlacements>
 		<CommandPlacement guid="HaskellCommandSetGuid" id="RunHaskellFileCommandID" priority="0x100">
-			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup"/>
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="HaskellCommandSetGuid" id="GHCiDebuggerWindowCommandID" priority="0x101">
-			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup"/>
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="HaskellCommandSetGuid" id="RunSelectedFunctionCommandID" priority="0x102">
-			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup"/>
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="HaskellCommandSetGuid" id="InteractiveHaskellWindowCommandID" priority="0x103">
-			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup"/>
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="HaskellCommandSetGuid" id="GithubCommandID" priority="0x104">
-			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup"/>
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 		</CommandPlacement>
 
 		<CommandPlacement guid="HaskellCommandSetGuid" id="RunHaskellFileCommandID" priority="0x100">
-			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup"/>
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="HaskellCommandSetGuid" id="GHCiDebuggerWindowCommandID" priority="0x101">
-			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup"/>
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="HaskellCommandSetGuid" id="RunSelectedFunctionCommandID" priority="0x102">
-			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup"/>
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup" />
 		</CommandPlacement>
 	</CommandPlacements>
 
@@ -130,6 +130,7 @@
 			<IDSymbol name="GithubCommandID" value="258" />
 			<IDSymbol name="InteractiveHaskellWindowCommandID" value="259" />
 			<IDSymbol name="GHCiDebuggerWindowCommandID" value="260" />
+			<IDSymbol name="InstallGHCiWindowCommandID" value="261" />
 			<IDSymbol name="HaskellToolsMenu" value="0x1022" />
 			<IDSymbol name="HaskellToolsToolbar" value="0x1023" />
 		</GuidSymbol>
@@ -153,5 +154,5 @@
 		<GuidSymbol value="{00f2ca33-0f42-4576-a4f2-255ec77838d8}" name="GHCiDebuggerWindowImageGuid">
 			<IDSymbol name="bmpPic1" value="1" />
 		</GuidSymbol>
-	</Symbols>
+  </Symbols>
 </CommandTable>

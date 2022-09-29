@@ -31,7 +31,7 @@ namespace HaskellTools
     "Haskell Tools", "Options", 0, 0, true)]
     [ProvideToolWindow(typeof(HaskellInteractiveWindow),Transient = true, MultiInstances = false, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindMainWindow, Orientation = ToolWindowOrientation.Bottom)]
     [ProvideToolWindow(typeof(GHCiDebuggerWindow), Transient = true, MultiInstances = false, Style = VsDockStyle.Tabbed)]
-
+    [ProvideToolWindow(typeof(InstallGHCiWindow), Transient = true, MultiInstances = false, Style = VsDockStyle.Tabbed)]
     public sealed class HaskellToolsPackage : AsyncPackage
     {
         #region Settings
@@ -81,6 +81,20 @@ namespace HaskellTools
             }
         }
 
+        internal bool GHCiFound
+        {
+            get
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                return page.GHCiFound;
+            }
+            set
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                page.GHCiFound = value;
+            }
+        }
+
         #endregion
 
         public const string PackageGuidString = "6eaa553c-a41f-487b-99a1-a8383b6d1f74";
@@ -93,18 +107,21 @@ namespace HaskellTools
 
             if (CheckForGHCiAtStartup)
             {
+                await InstallGHCiWindowCommand.InitializeAsync(this);
                 var checker = new GHCiChecker(this);
                 await checker.CheckForGHCi();
             }
+            if (GHCiFound)
+            {
+                await RunHaskellFileCommand.InitializeAsync(this);
+                await RunSelectedFunctionCommand.InitializeAsync(this);
+                await GitHubCommand.InitializeAsync(this);
+                await HaskellInteractiveWindowCommand.InitializeAsync(this);
+                await GHCiDebuggerWindowCommand.InitializeAsync(this);
 
-            await RunHaskellFileCommand.InitializeAsync(this);
-            await RunSelectedFunctionCommand.InitializeAsync(this);
-            await GitHubCommand.InitializeAsync(this);
-            await HaskellInteractiveWindowCommand.InitializeAsync(this);
-            await GHCiDebuggerWindowCommand.InitializeAsync(this);
-
-            HaskellPreludeInitializer initializer = new HaskellPreludeInitializer();
-            Task.Run(() => initializer.InitializePreludeContentAsync(GHCUPPath));
+                HaskellPreludeInitializer initializer = new HaskellPreludeInitializer();
+                Task.Run(() => initializer.InitializePreludeContentAsync(GHCUPPath));
+            }
         }
 
         #endregion

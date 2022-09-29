@@ -65,6 +65,11 @@
     <Compile Include="Commands\GitHubCommand.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Events\EventDelegates.cs" />
+    <Compile Include="Windows\InstallGHCIWindow\InstallGHCiWindow.cs" />
+    <Compile Include="Commands\InstallGHCiWindowCommand.cs" />
+    <Compile Include="Windows\InstallGHCIWindow\InstallGHCiWindowControl.xaml.cs">
+      <DependentUpon>InstallGHCiWindowControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Language\ContentTypeDefinition.cs" />
     <Compile Include="HaskellInfo\HaskellPreludeInfo.cs" />
     <Compile Include="HaskellInfo\HaskellPreludeInitializer.cs" />
@@ -169,6 +174,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Windows\InstallGHCIWindow\InstallGHCiWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\GHCiDebuggerWindow\GHCiDebuggerWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

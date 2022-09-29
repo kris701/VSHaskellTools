@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="HaskellTools.InstallGHCiWindowControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             Background="{DynamicResource {x:Static vsshell:VsBrushes.WindowKey}}"
+             Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Name="HaskellGHCNotFound">
+    <UserControl.Resources>
+        <ResourceDictionary Source="../ResourceDictionary/Styles.xaml"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <StackPanel Margin="20">
+            <Label Content="Glasgow Haskell Compiler not found!" FontSize="20" Foreground="White"/>
+            <TextBlock Foreground="White" TextWrapping="Wrap">
+                You either havent installed GHC or the environment variables for GHC is not set!
+            </TextBlock>
+            <TextBlock Foreground="White" TextWrapping="Wrap">
+                You can <Hyperlink NavigateUri="https://www.haskell.org/downloads/">download GHC from the website here.</Hyperlink>
+            </TextBlock>
+            <TextBlock Foreground="White" TextWrapping="Wrap">
+                If you have downloaded GHC but your environment variables are not set, you can manually define a path to your ghcup installation under:
+            </TextBlock>
+            <TextBlock Foreground="Gray" TextWrapping="Wrap">
+                Tools -> Options -> Haskell Tools -> Optional GHCUP Path
+            </TextBlock>
+            <TextBlock Foreground="White" TextWrapping="Wrap">
+                The path should be pointing directly to the ghcup folder, NOT the bin folder inside of it, e.g.:
+            </TextBlock>
+            <TextBlock Foreground="Gray" TextWrapping="Wrap">
+                C:\Program Files\Haskell\ghcup
+            </TextBlock>
+            <TextBlock Foreground="White" TextWrapping="Wrap">
+                When you have done that, you can restart Visual Studio and this page should not show up.
+            </TextBlock>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -13,9 +13,9 @@ namespace HaskellTools.Helpers
         {
             path = path.Trim();
             file = file.Trim();
-            if (!path.EndsWith("/"))
-                path = $"{path}/";
-            if (!file.StartsWith("/"))
+            if (!path.EndsWith("\\"))
+                path = $"{path}\\";
+            if (file.StartsWith("\\"))
                 file = file.Substring(1);
             return $"{path}{file}";
         }

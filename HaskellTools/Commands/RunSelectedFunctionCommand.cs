@@ -60,7 +60,7 @@ namespace HaskellTools.Commands
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (DTE2Helper.IsValidFileOpen())
+            if (!DTE2Helper.IsValidFileOpen())
             {
                 MessageBox.Show("File must be a '.hs' file!");
                 return;
@@ -142,7 +142,7 @@ namespace HaskellTools.Commands
             if (_toolPackage.GHCUPPath == "")
                 await _process.StandardInput.WriteLineAsync($"& ghci");
             else
-                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_toolPackage.GHCUPPath, "bin/ghci.exe")}'");
+                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_toolPackage.GHCUPPath, "bin\\ghci.exe")}'");
             await _process.StandardInput.WriteLineAsync($":load \"{_sourceFileName}\"");
             await _process.StandardInput.WriteLineAsync($"{_selectedText}");
             await _process.StandardInput.WriteLineAsync($":quit");

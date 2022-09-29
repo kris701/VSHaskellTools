@@ -56,7 +56,7 @@ namespace HaskellTools.Commands
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (DTE2Helper.IsValidFileOpen())
+            if (!DTE2Helper.IsValidFileOpen())
             {
                 MessageBox.Show("File must be a '.hs' file!");
                 return;
@@ -111,7 +111,7 @@ namespace HaskellTools.Commands
             if (_toolPackage.GHCUPPath == "")
                 startInfo.Arguments = $"& 'runhaskell' '{_sourceFilePath}'";
             else
-                startInfo.Arguments = $"& '{DirHelper.CombinePathAndFile(_toolPackage.GHCUPPath, "bin/runhaskell.exe")}' '{_sourceFilePath}'";
+                startInfo.Arguments = $"& '{DirHelper.CombinePathAndFile(_toolPackage.GHCUPPath, "bin\\runhaskell.exe")}' '{_sourceFilePath}'";
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.UseShellExecute = false;

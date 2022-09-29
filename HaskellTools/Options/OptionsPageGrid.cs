@@ -14,6 +14,7 @@ namespace HaskellTools.Options
         private int _haskellFileExecutionTimeout = 10;
         private string _debuggerEntryFunctionName = "main";
         private bool _checkForGHCiAtStartup = true;
+        private bool _GHCiFound = false;
 
         [Category("Haskell Tools")]
         [DisplayName("Optional GHCUP Path")]
@@ -49,6 +50,15 @@ namespace HaskellTools.Options
         {
             get { return _checkForGHCiAtStartup; }
             set { _checkForGHCiAtStartup = value; }
+        }
+
+        [Category("Haskell Tools")]
+        [DisplayName("Is GHCi found?")]
+        [Description("Indication that the extension have found GHC.")]
+        internal bool GHCiFound
+        {
+            get { return _GHCiFound; }
+            set { _GHCiFound = value; }
         }
     }
 }

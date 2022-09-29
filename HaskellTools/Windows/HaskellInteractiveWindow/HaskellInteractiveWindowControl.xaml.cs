@@ -102,7 +102,7 @@ namespace HaskellTools
                 if (_package.GHCUPPath == "")
                     await _process.StandardInput.WriteLineAsync($"& ghci");
                 else
-                    await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin/ghci.exe")}'");
+                    await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin\\ghci.exe")}'");
                 string fileName = DTE2Helper.GetSourceFileName();
                 _isLoaded = true;
                 await _process.StandardInput.WriteLineAsync($":load \"{fileName}\"");

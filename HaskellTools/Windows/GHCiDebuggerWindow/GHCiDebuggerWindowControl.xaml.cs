@@ -438,7 +438,7 @@ namespace HaskellTools
             if (_package.GHCUPPath == "")
                 await _process.StandardInput.WriteLineAsync($"& ghci");
             else
-                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin/ghci.exe")}'");
+                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin\\ghci.exe")}'");
             await _process.StandardInput.WriteLineAsync($":load \"{FileLoaded}\"");
             await _process.StandardInput.WriteLineAsync($":set -fbreak-on-exception");
         }

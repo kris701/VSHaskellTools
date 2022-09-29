@@ -23,6 +23,7 @@ namespace HaskellTools.Checkers
 
         public async Task CheckForGHCi()
         {
+            _package.GHCiFound = false;
             SetupProcess();
             _process.Start();
             _process.BeginErrorReadLine();
@@ -30,14 +31,16 @@ namespace HaskellTools.Checkers
             if (_package.GHCUPPath == "")
                 await _process.StandardInput.WriteLineAsync($"& ghci");
             else
-                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin/ghci.exe")}'");
+                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin\\ghci.exe")}'");
             await Task.Delay(500);
+            ProcessHelper.KillProcessAndChildrens(_process.Id);
             if (_isGood)
-                _package.CheckForGHCiAtStartup = true;
-            else
             {
-                MessageBox.Show("Not found!");
+                _package.CheckForGHCiAtStartup = false;
+                _package.GHCiFound = true;
             }
+            else
+                InstallGHCiWindowCommand.Instance.Execute(null, null);
         }
 
         private void SetupProcess()
@@ -55,7 +58,7 @@ namespace HaskellTools.Checkers
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
-            if (_isStarted)
+          if (_isStarted)
                 _isGood = false;
         }
     }
