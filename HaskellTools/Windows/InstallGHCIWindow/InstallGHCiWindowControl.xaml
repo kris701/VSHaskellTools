@@ -15,12 +15,18 @@
 
     <Grid>
         <StackPanel Margin="20">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="/HaskellTools;component/Resources/HaskellLogo.png" Width="75"/>
+                <Separator Width="20" Height="0"/>
+                <Label Content="Haskell Tools" FontSize="40" Foreground="White" VerticalAlignment="Center"/>
+            </StackPanel>
+            <Separator Height="10" Width="0"/>
             <Label Content="Glasgow Haskell Compiler not found!" FontSize="20" Foreground="White"/>
             <TextBlock Foreground="White" TextWrapping="Wrap">
                 You either havent installed GHC or the environment variables for GHC is not set!
             </TextBlock>
             <TextBlock Foreground="White" TextWrapping="Wrap">
-                You can <Hyperlink NavigateUri="https://www.haskell.org/downloads/">download GHC from the website here.</Hyperlink>
+                You can <Hyperlink NavigateUri="https://www.haskell.org/downloads/" RequestNavigate="Hyperlink_RequestNavigate">download GHC from the website here.</Hyperlink>
             </TextBlock>
             <TextBlock Foreground="White" TextWrapping="Wrap">
                 If you have downloaded GHC but your environment variables are not set, you can manually define a path to your ghcup installation under:

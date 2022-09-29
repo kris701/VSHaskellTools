@@ -31,7 +31,7 @@ namespace HaskellTools
     "Haskell Tools", "Options", 0, 0, true)]
     [ProvideToolWindow(typeof(HaskellInteractiveWindow),Transient = true, MultiInstances = false, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindMainWindow, Orientation = ToolWindowOrientation.Bottom)]
     [ProvideToolWindow(typeof(GHCiDebuggerWindow), Transient = true, MultiInstances = false, Style = VsDockStyle.Tabbed)]
-    [ProvideToolWindow(typeof(InstallGHCiWindow), Transient = true, MultiInstances = false, Style = VsDockStyle.Tabbed)]
+    [ProvideToolWindow(typeof(InstallGHCiWindow), Transient = true, MultiInstances = false, Style = VsDockStyle.MDI, Window = EnvDTE.Constants.vsWindowKindMainWindow)]
     public sealed class HaskellToolsPackage : AsyncPackage
     {
         #region Settings

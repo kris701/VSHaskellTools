@@ -10,7 +10,7 @@ namespace HaskellTools
     {
         public InstallGHCiWindow() : base(null)
         {
-            this.Caption = "Haskell GHC not found!";
+            this.Caption = "Haskell Tools - GHC not found!";
 
             this.Content = new InstallGHCiWindowControl();
         }
