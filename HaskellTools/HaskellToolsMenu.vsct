@@ -131,6 +131,7 @@
 			<IDSymbol name="InteractiveHaskellWindowCommandID" value="259" />
 			<IDSymbol name="GHCiDebuggerWindowCommandID" value="260" />
 			<IDSymbol name="InstallGHCiWindowCommandID" value="261" />
+			<IDSymbol name="WelcomeWindowCommandID" value="262" />
 			<IDSymbol name="HaskellToolsMenu" value="0x1022" />
 			<IDSymbol name="HaskellToolsToolbar" value="0x1023" />
 		</GuidSymbol>

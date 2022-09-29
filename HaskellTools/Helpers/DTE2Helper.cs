@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,6 +29,15 @@ namespace HaskellTools.Helpers
             if (extension != Constants.HaskellExt)
                 return false;
             return true;
+        }
+
+        public static bool IsFullyVSOpen()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            EnvDTE80.DTE2 _applicationObject = GetDTE2();
+            if (_applicationObject == null)
+                return false;
+            return _applicationObject.Solution.IsOpen;
         }
 
         public static string GetSourceFilePath()

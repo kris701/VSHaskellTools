@@ -29,9 +29,10 @@ namespace HaskellTools
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideOptionPage(typeof(OptionPageGrid),
     "Haskell Tools", "Options", 0, 0, true)]
-    [ProvideToolWindow(typeof(HaskellInteractiveWindow),Transient = true, MultiInstances = false, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindMainWindow, Orientation = ToolWindowOrientation.Bottom)]
-    [ProvideToolWindow(typeof(GHCiDebuggerWindow), Transient = true, MultiInstances = false, Style = VsDockStyle.Tabbed)]
-    [ProvideToolWindow(typeof(InstallGHCiWindow), Transient = true, MultiInstances = false, Style = VsDockStyle.MDI, Window = EnvDTE.Constants.vsWindowKindMainWindow)]
+    [ProvideToolWindow(typeof(HaskellInteractiveWindow),Transient = true, Style = VsDockStyle.MDI, Width = 1200, Height = 800, Orientation = ToolWindowOrientation.Bottom)]
+    [ProvideToolWindow(typeof(GHCiDebuggerWindow), Transient = true, Style = VsDockStyle.MDI, Width = 1200, Height = 800)]
+    [ProvideToolWindow(typeof(InstallGHCiWindow), Transient = true, Style = VsDockStyle.MDI, Width = 1200, Height = 800)]
+    [ProvideToolWindow(typeof(WelcomeWindow), Transient = true, Style = VsDockStyle.MDI, Width = 1200, Height = 800)]
     public sealed class HaskellToolsPackage : AsyncPackage
     {
         #region Settings
@@ -95,6 +96,20 @@ namespace HaskellTools
             }
         }
 
+        internal bool IsFirstStart
+        {
+            get
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                return page.IsFirstStart;
+            }
+            set
+            {
+                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+                page.IsFirstStart = value;
+            }
+        }
+
         #endregion
 
         public const string PackageGuidString = "6eaa553c-a41f-487b-99a1-a8383b6d1f74";
@@ -113,6 +128,13 @@ namespace HaskellTools
             }
             if (GHCiFound)
             {
+                if (IsFirstStart)
+                {
+                    await WelcomeWindowCommand.InitializeAsync(this);
+                    WelcomeWindowCommand.Instance.Execute(null, null);
+                    IsFirstStart = false;
+                }
+
                 await RunHaskellFileCommand.InitializeAsync(this);
                 await RunSelectedFunctionCommand.InitializeAsync(this);
                 await GitHubCommand.InitializeAsync(this);

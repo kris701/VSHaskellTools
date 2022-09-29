@@ -15,6 +15,7 @@ namespace HaskellTools.Options
         private string _debuggerEntryFunctionName = "main";
         private bool _checkForGHCiAtStartup = true;
         private bool _GHCiFound = false;
+        private bool _isFirstStart = true;
 
         [Category("Haskell Tools")]
         [DisplayName("Optional GHCUP Path")]
@@ -59,6 +60,15 @@ namespace HaskellTools.Options
         {
             get { return _GHCiFound; }
             set { _GHCiFound = value; }
+        }
+
+        [Category("Haskell Tools")]
+        [DisplayName("Is this the first time the extension starts?")]
+        [Description("Indication that the extention have been installed.")]
+        internal bool IsFirstStart
+        {
+            get { return _isFirstStart; }
+            set { _isFirstStart = value; }
         }
     }
 }

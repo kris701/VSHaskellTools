@@ -65,6 +65,11 @@
     <Compile Include="Commands\GitHubCommand.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Events\EventDelegates.cs" />
+    <Compile Include="Windows\WelcomeWindow\WelcomeWindow.cs" />
+    <Compile Include="Commands\WelcomeWindowCommand.cs" />
+    <Compile Include="Windows\WelcomeWindow\WelcomeWindowControl.xaml.cs">
+      <DependentUpon>WelcomeWindowControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\InstallGHCIWindow\InstallGHCiWindow.cs" />
     <Compile Include="Commands\InstallGHCiWindowCommand.cs" />
     <Compile Include="Windows\InstallGHCIWindow\InstallGHCiWindowControl.xaml.cs">
@@ -154,8 +159,13 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.32112.339" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.3.2093" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.32112.339" ExcludeAssets="runtime">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.3.2093">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="languages.pkgdef">
@@ -175,6 +185,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Windows\WelcomeWindow\WelcomeWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\InstallGHCIWindow\InstallGHCiWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
