@@ -27,7 +27,7 @@ namespace HaskellTools.Commands
 
         public override void Execute(object sender, EventArgs e)
         {
-            if (DTE2Helper.GetSourceFileExtension() != ".hs")
+            if (DTE2Helper.IsValidFileOpen())
             {
                 MessageBox.Show("File must be a '.hs' file!");
                 return;

@@ -60,7 +60,7 @@ namespace HaskellTools.Commands
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (DTE2Helper.GetSourceFileExtension() != ".hs")
+            if (DTE2Helper.IsValidFileOpen())
             {
                 MessageBox.Show("File must be a '.hs' file!");
                 return;

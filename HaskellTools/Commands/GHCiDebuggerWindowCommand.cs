@@ -6,6 +6,7 @@ using System.ComponentModel.Design;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Task = System.Threading.Tasks.Task;
 
 namespace HaskellTools.Commands
@@ -26,6 +27,11 @@ namespace HaskellTools.Commands
 
         public override void Execute(object sender, EventArgs e)
         {
+            if (DTE2Helper.IsValidFileOpen())
+            {
+                MessageBox.Show("File must be a '.hs' file!");
+                return;
+            }
             DTE2Helper.SaveActiveDocument();
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
