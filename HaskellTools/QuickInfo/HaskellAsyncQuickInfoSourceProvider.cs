@@ -8,6 +8,8 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HaskellTools.HaskellInfo;
+using HaskellTools.Options;
 
 namespace HaskellTools.QuickInfo
 {

@@ -10,6 +10,7 @@ namespace HaskellTools.HaskellInfo
 {
     public static class HaskellPreludeInfo
     {
+        public static bool IsLoading = false;
         public static Dictionary<string, ContainerElement> PreludeContent = new Dictionary<string, ContainerElement>();
     }
 }

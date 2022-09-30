@@ -34,14 +34,17 @@ namespace HaskellTools.Checkers
             else
                 await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
             await Task.Delay(500);
-            ProcessHelper.KillProcessAndChildrens(_process.Id);
             if (_isGood)
             {
                 OptionsAccessor.CheckForGHCiAtStartup = false;
                 OptionsAccessor.GHCiFound = true;
             }
             else
+            {
+                await InstallGHCiWindowCommand.InitializeAsync(_package);
                 InstallGHCiWindowCommand.Instance.Execute(null, null);
+            }
+            ProcessHelper.KillProcessAndChildrens(_process.Id);
         }
 
         private void SetupProcess()

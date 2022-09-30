@@ -6,21 +6,20 @@ using System.Threading.Tasks;
 
 namespace HaskellTools.Options
 {
-    internal class OptionsAccessor
+    public static class OptionsAccessor
     {
-        public static HaskellToolsPackage Instance = null;
+        public static OptionPageGrid Instance = null;
 
         public static string GHCUPPath
         {
             get
             {
-                OptionPageGrid page = (OptionPageGrid)Instance.GetDialogPage(typeof(OptionPageGrid));
-                return page.GHCUPPath;
+                return Instance.GHCUPPath;
             }
             set
             {
-                OptionPageGrid page = (OptionPageGrid)Instance.GetDialogPage(typeof(OptionPageGrid));
-                page.GHCUPPath = value;
+                Instance.GHCUPPath = value;
+                Instance.SaveSettingsToStorage();
             }
         }
 
@@ -28,8 +27,12 @@ namespace HaskellTools.Options
         {
             get
             {
-                OptionPageGrid page = (OptionPageGrid)Instance.GetDialogPage(typeof(OptionPageGrid));
-                return page.HaskellFileExecutionTimeout;
+                return Instance.HaskellFileExecutionTimeout;
+            }
+            set 
+            { 
+                Instance.HaskellFileExecutionTimeout = value;
+                Instance.SaveSettingsToStorage();
             }
         }
 
@@ -37,8 +40,12 @@ namespace HaskellTools.Options
         {
             get
             {
-                OptionPageGrid page = (OptionPageGrid)Instance.GetDialogPage(typeof(OptionPageGrid));
-                return page.DebuggerEntryFunctionName;
+                return Instance.DebuggerEntryFunctionName;
+            }
+            set
+            {
+                Instance.DebuggerEntryFunctionName = value;
+                Instance.SaveSettingsToStorage();
             }
         }
 
@@ -46,41 +53,38 @@ namespace HaskellTools.Options
         {
             get
             {
-                OptionPageGrid page = (OptionPageGrid)Instance.GetDialogPage(typeof(OptionPageGrid));
-                return page.CheckForGHCiAtStartup;
+                return Instance.CheckForGHCiAtStartup;
             }
             set
             {
-                OptionPageGrid page = (OptionPageGrid)Instance.GetDialogPage(typeof(OptionPageGrid));
-                page.CheckForGHCiAtStartup = value;
+                Instance.CheckForGHCiAtStartup = value;
+                Instance.SaveSettingsToStorage();
             }
         }
 
-        internal static bool GHCiFound
+        public static bool GHCiFound
         {
             get
             {
-                OptionPageGrid page = (OptionPageGrid)Instance.GetDialogPage(typeof(OptionPageGrid));
-                return page.GHCiFound;
+                return Instance.GHCiFound;
             }
             set
             {
-                OptionPageGrid page = (OptionPageGrid)Instance.GetDialogPage(typeof(OptionPageGrid));
-                page.GHCiFound = value;
+                Instance.GHCiFound = value;
+                Instance.SaveSettingsToStorage();
             }
         }
 
-        internal static bool IsFirstStart
+        public static bool IsFirstStart
         {
             get
             {
-                OptionPageGrid page = (OptionPageGrid)Instance.GetDialogPage(typeof(OptionPageGrid));
-                return page.IsFirstStart;
+                return Instance.IsFirstStart;
             }
             set
             {
-                OptionPageGrid page = (OptionPageGrid)Instance.GetDialogPage(typeof(OptionPageGrid));
-                page.IsFirstStart = value;
+                Instance.IsFirstStart = value;
+                Instance.SaveSettingsToStorage();
             }
         }
     }

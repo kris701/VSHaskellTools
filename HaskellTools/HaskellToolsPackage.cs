@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
+using System.Management.Instrumentation;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
@@ -39,16 +40,16 @@ namespace HaskellTools
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            OptionsAccessor.Instance = this;
-
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+            OptionsAccessor.Instance = page;
 
             await WelcomeWindowCommand.InitializeAsync(this);
             await GitHubCommand.InitializeAsync(this);
 
             if (OptionsAccessor.CheckForGHCiAtStartup || !OptionsAccessor.GHCiFound)
             {
-                await InstallGHCiWindowCommand.InitializeAsync(this);
                 var checker = new GHCiChecker(this);
                 await checker.CheckForGHCi();
             }
@@ -61,9 +62,6 @@ namespace HaskellTools
                 await RunSelectedFunctionCommand.InitializeAsync(this);
                 await HaskellInteractiveWindowCommand.InitializeAsync(this);
                 await GHCiDebuggerWindowCommand.InitializeAsync(this);
-
-                HaskellPreludeInitializer initializer = new HaskellPreludeInitializer();
-                Task.Run(() => initializer.InitializePreludeContentAsync(OptionsAccessor.GHCUPPath));
             }
         }
     }

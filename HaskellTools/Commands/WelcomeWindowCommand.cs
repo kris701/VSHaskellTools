@@ -31,13 +31,17 @@ namespace HaskellTools
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
                 while (!DTE2Helper.IsFullyVSOpen())
+                {
+                    if (this.package.DisposalToken.IsCancellationRequested)
+                        return;
                     await Task.Delay(1000);
+                }
+                OptionsAccessor.IsFirstStart = false;
                 ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(WelcomeWindow), 0, true, this.package.DisposalToken);
                 if ((null == window) || (null == window.Frame))
                 {
                     throw new NotSupportedException("Cannot create tool window");
                 }
-                OptionsAccessor.IsFirstStart = false;
             });
         }
     }
