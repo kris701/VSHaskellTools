@@ -120,7 +120,10 @@ namespace HaskellTools
         {
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-            if (CheckForGHCiAtStartup)
+            await WelcomeWindowCommand.InitializeAsync(this);
+            await GitHubCommand.InitializeAsync(this);
+
+            if (CheckForGHCiAtStartup || !GHCiFound)
             {
                 await InstallGHCiWindowCommand.InitializeAsync(this);
                 var checker = new GHCiChecker(this);
@@ -130,14 +133,12 @@ namespace HaskellTools
             {
                 if (IsFirstStart)
                 {
-                    await WelcomeWindowCommand.InitializeAsync(this);
                     WelcomeWindowCommand.Instance.Execute(null, null);
                     IsFirstStart = false;
                 }
 
                 await RunHaskellFileCommand.InitializeAsync(this);
                 await RunSelectedFunctionCommand.InitializeAsync(this);
-                await GitHubCommand.InitializeAsync(this);
                 await HaskellInteractiveWindowCommand.InitializeAsync(this);
                 await GHCiDebuggerWindowCommand.InitializeAsync(this);
 

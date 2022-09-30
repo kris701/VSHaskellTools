@@ -35,6 +35,7 @@
 			<Bitmap guid="GithubImageGuid" href="Resources\GitHub.png" />
 			<Bitmap guid="InteractiveHaskellWindowImageGuid" href="Resources\HaskellInteractiveWindowCommand.png" />
 			<Bitmap guid="GHCiDebuggerWindowImageGuid" href="Resources\GHCiDebuggerWindowCommand.png" />
+			<Bitmap guid="WelcomeWindowImageGuid" href="Resources\Welcome.png" />
     </Bitmaps>
 
 		<Buttons>
@@ -81,6 +82,13 @@
 					<ToolTipText>Open the GitHub page</ToolTipText>
 				</Strings>
 			</Button>
+			<Button guid="HaskellCommandSetGuid" id="WelcomeWindowCommandID" priority="0x0105" type="Button">
+				<Icon guid="WelcomeWindowImageGuid" id="bmpPic1" />
+				<Strings>
+					<ButtonText>Help</ButtonText>
+					<ToolTipText>Opens the welcome page with info on how to use this extension.</ToolTipText>
+				</Strings>
+			</Button>
     </Buttons>
 	</Commands>
 
@@ -98,6 +106,9 @@
 			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="HaskellCommandSetGuid" id="GithubCommandID" priority="0x104">
+			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
+		</CommandPlacement>
+		<CommandPlacement guid="HaskellCommandSetGuid" id="WelcomeWindowCommandID" priority="0x105">
 			<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" />
 		</CommandPlacement>
 
@@ -153,6 +164,10 @@
 		</GuidSymbol>
 
 		<GuidSymbol value="{00f2ca33-0f42-4576-a4f2-255ec77838d8}" name="GHCiDebuggerWindowImageGuid">
+			<IDSymbol name="bmpPic1" value="1" />
+		</GuidSymbol>
+
+		<GuidSymbol value="{00f2ca33-0f42-4576-a4f2-255ec77838d9}" name="WelcomeWindowImageGuid">
 			<IDSymbol name="bmpPic1" value="1" />
 		</GuidSymbol>
   </Symbols>

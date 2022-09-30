@@ -119,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\GHCiDebuggerWindowCommand.png" />
+    <Content Include="Resources\Welcome.png" />
     <Content Include="Resources\GitHub.png" />
     <Content Include="Resources\HaskellInteractiveWindowCommand.png" />
     <Resource Include="Resources\HaskellLogo.png" />

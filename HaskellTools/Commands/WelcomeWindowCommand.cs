@@ -16,7 +16,7 @@ namespace HaskellTools
         public override int CommandId { get; } = 262;
         public static WelcomeWindowCommand Instance { get; internal set; }
 
-        private WelcomeWindowCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
+        private WelcomeWindowCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService, false)
         {
         }
 
