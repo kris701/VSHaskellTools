@@ -19,16 +19,22 @@ namespace HaskellTools.Helpers
         public static bool IsValidFileOpen()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            EnvDTE80.DTE2 _applicationObject = GetDTE2();
-            if (_applicationObject == null)
+            try
+            {
+                EnvDTE80.DTE2 _applicationObject = GetDTE2();
+                if (_applicationObject == null)
+                    return false;
+                var uih = _applicationObject.ActiveDocument;
+                if (uih == null)
+                    return false;
+                var extension = GetSourceFileExtension();
+                if (extension != Constants.HaskellExt)
+                    return false;
+                return true;
+            } catch
+            {
                 return false;
-            var uih = _applicationObject.ActiveDocument;
-            if (uih == null)
-                return false;
-            var extension = GetSourceFileExtension();
-            if (extension != Constants.HaskellExt)
-                return false;
-            return true;
+            }
         }
 
         public static bool IsFullyVSOpen()
