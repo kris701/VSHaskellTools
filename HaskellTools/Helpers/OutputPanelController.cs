@@ -40,6 +40,7 @@ namespace HaskellTools.Helpers
             }
             if (!found)
                 targetPanel = uih.OutputWindowPanes.Add(OutputPaneName);
+            targetPanel.Activate();
             targetPanel.Clear();
         }
 

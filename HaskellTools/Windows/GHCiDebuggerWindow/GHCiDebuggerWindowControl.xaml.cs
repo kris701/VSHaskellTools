@@ -1,5 +1,5 @@
-﻿using HaskellTools.Events;
-using HaskellTools.Helpers;
+﻿using HaskellTools.Helpers;
+using HaskellTools.Options;
 using HaskellTools.Windows.DebugData;
 using HaskellTools.Windows.GHCiDebuggerWindow.UserControls;
 using HaskellTools.Windows.UserControls;
@@ -36,8 +36,6 @@ namespace HaskellTools
         public bool IsDebuggerRunning => _process != null && !_process.HasExited;
         public bool IsFileLoaded { get; internal set; } = false;
         public string FileLoaded { get; internal set; } = "None";
-
-        public event RequestSettingsDataHandler RequestSettingsData;
 
         public GHCiDebuggerWindowControl()
         {
@@ -391,7 +389,7 @@ namespace HaskellTools
                 _currentReadState = ReadState.Waiting;
                 IsDebuggerOnBorder.BorderBrush = Brushes.Red;
                 await InsertBreakPointsAsync();
-                await _process.StandardInput.WriteLineAsync($":trace {_package.DebuggerEntryFunctionName}");
+                await _process.StandardInput.WriteLineAsync($":trace {OptionsAccessor.DebuggerEntryFunctionName}");
             }
             MainGrid.IsEnabled = true;
         }
@@ -431,14 +429,10 @@ namespace HaskellTools
         private async Task RunStartingCommandsAsync()
         {
             await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
-            if (_package == null)
-            {
-                _package = RequestSettingsData.Invoke();
-            }
-            if (_package.GHCUPPath == "")
+            if (OptionsAccessor.GHCUPPath == "")
                 await _process.StandardInput.WriteLineAsync($"& ghci");
             else
-                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin\\ghci.exe")}'");
+                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
             await _process.StandardInput.WriteLineAsync($":load \"{FileLoaded}\"");
             await _process.StandardInput.WriteLineAsync($":set -fbreak-on-exception");
         }

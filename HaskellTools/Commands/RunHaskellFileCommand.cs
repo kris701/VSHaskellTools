@@ -1,5 +1,6 @@
 ﻿using HaskellTools.Commands;
 using HaskellTools.Helpers;
+using HaskellTools.Options;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -25,14 +26,12 @@ namespace HaskellTools.Commands
         public static RunHaskellFileCommand Instance { get; internal set; }
         private DispatcherTimer _loopTimer = new DispatcherTimer();
         private Process _process;
-        private HaskellToolsPackage _toolPackage;
 
         private string _sourceFilePath = "";
         private bool _enableReading = true;
 
         private RunHaskellFileCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
         {
-            _toolPackage = this.package as HaskellToolsPackage;
             _loopTimer.Tick += ForceKillProcess;
         }
 
@@ -71,7 +70,7 @@ namespace HaskellTools.Commands
                 OutputPanel.Initialize();
                 OutputPanel.ClearOutput();
                 OutputPanel.WriteLineInvoke("Executing Haskell File");
-                _loopTimer.Interval = TimeSpan.FromSeconds(_toolPackage.HaskellFileExecutionTimeout);
+                _loopTimer.Interval = TimeSpan.FromSeconds(OptionsAccessor.HaskellFileExecutionTimeout);
                 await RunAsync();
             });
         }
@@ -108,10 +107,10 @@ namespace HaskellTools.Commands
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = @"powershell.exe";
-            if (_toolPackage.GHCUPPath == "")
+            if (OptionsAccessor.GHCUPPath == "")
                 startInfo.Arguments = $"& 'runhaskell' '{_sourceFilePath}'";
             else
-                startInfo.Arguments = $"& '{DirHelper.CombinePathAndFile(_toolPackage.GHCUPPath, "bin\\runhaskell.exe")}' '{_sourceFilePath}'";
+                startInfo.Arguments = $"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\runhaskell.exe")}' '{_sourceFilePath}'";
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.UseShellExecute = false;

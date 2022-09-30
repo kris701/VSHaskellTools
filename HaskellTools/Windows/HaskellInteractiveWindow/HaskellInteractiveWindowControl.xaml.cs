@@ -1,5 +1,5 @@
-﻿using HaskellTools.Events;
-using HaskellTools.Helpers;
+﻿using HaskellTools.Helpers;
+using HaskellTools.Options;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
@@ -19,10 +19,6 @@ namespace HaskellTools
     /// </summary>
     public partial class HaskellInteractiveWindowControl : UserControl
     {
-        public event RequestSettingsDataHandler RequestSettingsData;
-
-        public string GHCiPath { get; set; } = "";
-
         private Process _process;
         private bool _isLoaded = false;
         private HaskellToolsPackage _package;
@@ -95,14 +91,11 @@ namespace HaskellTools
                 _process.BeginOutputReadLine();
                 _process.BeginErrorReadLine();
 
-                if (_package == null)
-                    _package = RequestSettingsData.Invoke();
-
                 await _process.StandardInput.WriteLineAsync($"cd '{DTE2Helper.GetSourcePath()}'");
-                if (_package.GHCUPPath == "")
+                if (OptionsAccessor.GHCUPPath == "")
                     await _process.StandardInput.WriteLineAsync($"& ghci");
                 else
-                    await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin\\ghci.exe")}'");
+                    await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
                 string fileName = DTE2Helper.GetSourceFileName();
                 _isLoaded = true;
                 await _process.StandardInput.WriteLineAsync($":load \"{fileName}\"");

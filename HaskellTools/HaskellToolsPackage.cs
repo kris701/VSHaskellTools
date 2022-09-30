@@ -35,106 +35,29 @@ namespace HaskellTools
     [ProvideToolWindow(typeof(WelcomeWindow), Transient = true, Style = VsDockStyle.MDI, Width = 1200, Height = 800)]
     public sealed class HaskellToolsPackage : AsyncPackage
     {
-        #region Settings
-        public string GHCUPPath
-        {
-            get
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                return page.GHCUPPath;
-            }
-            set
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                page.GHCUPPath = value;
-            }
-        }
-
-        public int HaskellFileExecutionTimeout
-        {
-            get
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                return page.HaskellFileExecutionTimeout;
-            }
-        }
-
-        public string DebuggerEntryFunctionName
-        {
-            get
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                return page.DebuggerEntryFunctionName;
-            }
-        }
-
-        public bool CheckForGHCiAtStartup
-        {
-            get
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                return page.CheckForGHCiAtStartup;
-            }
-            set
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                page.CheckForGHCiAtStartup = value;
-            }
-        }
-
-        internal bool GHCiFound
-        {
-            get
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                return page.GHCiFound;
-            }
-            set
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                page.GHCiFound = value;
-            }
-        }
-
-        internal bool IsFirstStart
-        {
-            get
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                return page.IsFirstStart;
-            }
-            set
-            {
-                OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
-                page.IsFirstStart = value;
-            }
-        }
-
-        #endregion
-
         public const string PackageGuidString = "6eaa553c-a41f-487b-99a1-a8383b6d1f74";
-
-        #region Package Members
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+            OptionsAccessor.Instance = this;
+
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
             await WelcomeWindowCommand.InitializeAsync(this);
             await GitHubCommand.InitializeAsync(this);
 
-            if (CheckForGHCiAtStartup || !GHCiFound)
+            if (OptionsAccessor.CheckForGHCiAtStartup || !OptionsAccessor.GHCiFound)
             {
                 await InstallGHCiWindowCommand.InitializeAsync(this);
                 var checker = new GHCiChecker(this);
                 await checker.CheckForGHCi();
             }
-            if (GHCiFound)
+            if (OptionsAccessor.GHCiFound)
             {
-                if (IsFirstStart)
+                if (OptionsAccessor.IsFirstStart)
                 {
                     WelcomeWindowCommand.Instance.Execute(null, null);
-                    IsFirstStart = false;
+                    OptionsAccessor.IsFirstStart = false;
                 }
 
                 await RunHaskellFileCommand.InitializeAsync(this);
@@ -143,10 +66,8 @@ namespace HaskellTools
                 await GHCiDebuggerWindowCommand.InitializeAsync(this);
 
                 HaskellPreludeInitializer initializer = new HaskellPreludeInitializer();
-                Task.Run(() => initializer.InitializePreludeContentAsync(GHCUPPath));
+                Task.Run(() => initializer.InitializePreludeContentAsync(OptionsAccessor.GHCUPPath));
             }
         }
-
-        #endregion
     }
 }

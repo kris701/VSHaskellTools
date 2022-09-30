@@ -1,5 +1,6 @@
 ﻿using HaskellTools.Commands;
 using HaskellTools.Helpers;
+using HaskellTools.Options;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
@@ -26,7 +27,6 @@ namespace HaskellTools.Commands
         public override int CommandId { get; } = 257;
         public static RunSelectedFunctionCommand Instance { get; internal set; }
         private Process _process;
-        private HaskellToolsPackage _toolPackage;
 
         private string _sourcePath = "";
         private string _sourceFileName = "";
@@ -36,7 +36,6 @@ namespace HaskellTools.Commands
 
         private RunSelectedFunctionCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
         {
-            _toolPackage = this.package as HaskellToolsPackage;
             _loopTimer.Tick += ForceKillProcess;
         }
 
@@ -77,7 +76,7 @@ namespace HaskellTools.Commands
                 OutputPanel.Initialize();
                 OutputPanel.ClearOutput();
                 OutputPanel.WriteLineInvoke("Running Function with GHCi...");
-                _loopTimer.Interval = TimeSpan.FromSeconds(_toolPackage.HaskellFileExecutionTimeout);
+                _loopTimer.Interval = TimeSpan.FromSeconds(OptionsAccessor.HaskellFileExecutionTimeout);
                 _isReading = false;
                 await RunAsync();
             });
@@ -139,10 +138,10 @@ namespace HaskellTools.Commands
         private async Task RunSetupCommandsAsync()
         {
             await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
-            if (_toolPackage.GHCUPPath == "")
+            if (OptionsAccessor.GHCUPPath == "")
                 await _process.StandardInput.WriteLineAsync($"& ghci");
             else
-                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_toolPackage.GHCUPPath, "bin\\ghci.exe")}'");
+                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
             await _process.StandardInput.WriteLineAsync($":load \"{_sourceFileName}\"");
             await _process.StandardInput.WriteLineAsync($"{_selectedText}");
             await _process.StandardInput.WriteLineAsync($":quit");

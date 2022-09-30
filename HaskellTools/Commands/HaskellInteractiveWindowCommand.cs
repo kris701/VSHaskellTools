@@ -37,8 +37,6 @@ namespace HaskellTools.Commands
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
                 ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(HaskellInteractiveWindow), 0, true, this.package.DisposalToken);
-                HaskellToolsPackage myToolsOptionsPackage = this.package as HaskellToolsPackage;
-                (window as HaskellInteractiveWindow).RequestSettingsData += () => { return myToolsOptionsPackage; };
                 if ((null == window) || (null == window.Frame))
                 {
                     throw new NotSupportedException("Cannot create tool window");

@@ -1,4 +1,5 @@
 ﻿using HaskellTools.Helpers;
+using HaskellTools.Options;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
@@ -23,21 +24,21 @@ namespace HaskellTools.Checkers
 
         public async Task CheckForGHCi()
         {
-            _package.GHCiFound = false;
+            OptionsAccessor.GHCiFound = false;
             SetupProcess();
             _process.Start();
             _process.BeginErrorReadLine();
             _isStarted = true;
-            if (_package.GHCUPPath == "")
+            if (OptionsAccessor.GHCUPPath == "")
                 await _process.StandardInput.WriteLineAsync($"& ghci");
             else
-                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(_package.GHCUPPath, "bin\\ghci.exe")}'");
+                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
             await Task.Delay(500);
             ProcessHelper.KillProcessAndChildrens(_process.Id);
             if (_isGood)
             {
-                _package.CheckForGHCiAtStartup = false;
-                _package.GHCiFound = true;
+                OptionsAccessor.CheckForGHCiAtStartup = false;
+                OptionsAccessor.GHCiFound = true;
             }
             else
                 InstallGHCiWindowCommand.Instance.Execute(null, null);

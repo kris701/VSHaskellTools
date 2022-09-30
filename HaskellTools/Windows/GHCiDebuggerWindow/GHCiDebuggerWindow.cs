@@ -1,5 +1,4 @@
-﻿using HaskellTools.Events;
-using HaskellTools.Helpers;
+﻿using HaskellTools.Helpers;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -10,13 +9,10 @@ namespace HaskellTools
     [Guid("39870e3c-4df7-484e-a548-274d6d694954")]
     public class GHCiDebuggerWindow : ToolWindowPane, IVsWindowFrameNotify3
     {
-        public event RequestSettingsDataHandler RequestSettingsData;
-
         public GHCiDebuggerWindow() : base(null)
         {
             this.Caption = "GHCi Debugger";
             this.Content = new GHCiDebuggerWindowControl();
-            (this.Content as GHCiDebuggerWindowControl).RequestSettingsData += () => { return RequestSettingsData.Invoke(); };
         }
 
         public int OnClose(ref uint pgrfSaveOptions)
