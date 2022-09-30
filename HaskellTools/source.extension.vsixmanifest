@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="HaskellRunner.6eaa553c-a41f-487b-99a1-a8383b6d1f74" Version="1.24.19" Language="en-US" Publisher="Kristian Skov Johansen" />
+        <Identity Id="HaskellRunner.6eaa553c-a41f-487b-99a1-a8383b6d1f74" Version="1.24.20" Language="en-US" Publisher="Kristian Skov Johansen" />
         <DisplayName>Haskell Tools</DisplayName>
         <Description xml:space="preserve">A set of tools to run and do some light debugging of Haskell programs using GHCi</Description>
         <MoreInfo>https://github.com/kris701/HaskellRunner</MoreInfo>
@@ -25,6 +25,6 @@
         <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="HaskellTools" Path="|HaskellTools|" />
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="HaskellTools" Path="|HaskellTools;PkgdefProjectOutputGroup|" />
         <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="HaskellFileTemplate" d:TargetPath="|HaskellFileTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
-        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="HaskellProjectTemplate" d:TargetPath="|HaskellProjectTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+        <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="HaskellMainFileTemplate" d:TargetPath="|HaskellMainFileTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
     </Assets>
 </PackageManifest>

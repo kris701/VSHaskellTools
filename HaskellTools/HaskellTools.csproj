@@ -218,9 +218,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Templates\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\HaskellFileTemplate\HaskellFileTemplate.csproj">
       <Project>{A8C76246-587D-4A17-9473-05AC62B3044E}</Project>
@@ -229,10 +227,10 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>
-    <ProjectReference Include="..\HaskellProjectTemplate\HaskellProjectTemplate.csproj">
-      <Project>{AB4AC7D9-31AB-4FFD-BCA7-0E0F3FBFB35C}</Project>
-      <Name>HaskellProjectTemplate</Name>
-      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+    <ProjectReference Include="..\HaskellMainFileTemplate\HaskellMainFileTemplate.csproj">
+      <Project>{F4BD8E0B-D6A6-4B3C-BE06-9BCDEDD46DDC}</Project>
+      <Name>HaskellMainFileTemplate</Name>
+      <VSIXSubPath>ItemTemplates</VSIXSubPath>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>

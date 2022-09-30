@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HaskellProjectTemplate")]
+[assembly: AssemblyTitle("HaskellMainFileTemplate")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kristian Skov Johansen")]
-[assembly: AssemblyProduct("HaskellProjectTemplate")]
+[assembly: AssemblyProduct("HaskellMainFileTemplate")]
 [assembly: AssemblyCopyright("Copyright © Kristian Skov Johansen 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ab4ac7d9-31ab-4ffd-bca7-0e0f3fbfb35c")]
+[assembly: Guid("f4bd8e0b-d6a6-4b3c-be06-9bcdedd46ddc")]
 
 // Version information for an assembly consists of the following four values:
 //

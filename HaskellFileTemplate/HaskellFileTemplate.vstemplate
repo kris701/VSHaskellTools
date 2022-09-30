@@ -1,14 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
   <TemplateData>
-    <Name>Empty File</Name>
+    <Name>Empty Haskell File</Name>
     <Description>An empty Haskell file</Description>
     <Icon>HaskellFileTemplate.ico</Icon>
     <TemplateID>dcd2b5a2-de76-4719-b332-f486dc1015df</TemplateID>
-    <ProjectType>CSharp</ProjectType>
+    <ProjectType>General</ProjectType>
+	<TemplateGroupID>Haskell</TemplateGroupID>
     <DefaultName>File.hs</DefaultName>
+	<EnableEditOfLocationField>true</EnableEditOfLocationField>
+	<ProvideDefaultName>true</ProvideDefaultName>
   </TemplateData>
   <TemplateContent>
-    <ProjectItem ReplaceParameters="true">File.hs</ProjectItem>
+    <ProjectItem ReplaceParameters="true" TargetFileName="$safeitemname$.hs" OpenInEditor="true">File.hs</ProjectItem>
   </TemplateContent>
 </VSTemplate>

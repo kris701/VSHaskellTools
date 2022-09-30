@@ -1,1 +1,1 @@
-﻿-- $safeitemrootname$
+﻿-- $safeitemname$
