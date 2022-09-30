@@ -21,7 +21,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
-                <Image Source="/HaskellTools;component/Resources/HaskellLogo.png" Width="75"/>
+                <Image Source="/HaskellTools;component/Windows/WelcomeWindow/Resources/HaskellLogo.png" Width="75"/>
                 <Separator Width="20" Height="0"/>
                 <Label Content="Haskell Tools" FontSize="40" Foreground="White" VerticalAlignment="Center"/>
             </StackPanel>

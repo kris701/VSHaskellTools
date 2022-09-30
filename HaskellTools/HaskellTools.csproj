@@ -120,11 +120,12 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Windows\InstallGHCIWindow\Resources\HaskellLogo.png" />
     <Content Include="Resources\GHCiDebuggerWindowCommand.png" />
     <Content Include="Resources\Welcome.png" />
     <Content Include="Resources\GitHub.png" />
     <Content Include="Resources\HaskellInteractiveWindowCommand.png" />
-    <Resource Include="Resources\HaskellLogo.png" />
+    <Resource Include="Windows\WelcomeWindow\Resources\HaskellLogo.png" />
     <Content Include="Resources\RunGHCi.png" />
     <Content Include="Resources\RunHaskellFile.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\continue.png" />
