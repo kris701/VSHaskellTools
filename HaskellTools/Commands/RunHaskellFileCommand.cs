@@ -1,4 +1,5 @@
 ﻿using HaskellTools.Commands;
+using HaskellTools.Editor;
 using HaskellTools.Helpers;
 using HaskellTools.Options;
 using Microsoft.VisualStudio;
@@ -28,6 +29,7 @@ namespace HaskellTools.Commands
         private Process _process;
 
         private string _sourceFilePath = "";
+        private string _sourceFileName = "";
         private bool _enableReading = true;
 
         private RunHaskellFileCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
@@ -43,6 +45,7 @@ namespace HaskellTools.Commands
             {
                 ProcessHelper.KillProcessAndChildrens(_process.Id);
                 OutputPanel.WriteLine($"ERROR! Function ran for longer than {_loopTimer.Interval}! Killing process...");
+                HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Failed, $"Execution of '{_sourceFileName}' failed!");
             }
         }
 
@@ -63,7 +66,10 @@ namespace HaskellTools.Commands
             DTE2Helper.SaveActiveDocument();
 
             _sourceFilePath = DTE2Helper.GetSourceFilePath();
+            _sourceFileName = DTE2Helper.GetSourceFileName();
             _enableReading = true;
+
+            HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Running, $"Executing '{_sourceFileName}'");
 
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
@@ -72,6 +78,7 @@ namespace HaskellTools.Commands
                 OutputPanel.WriteLineInvoke("Executing Haskell File");
                 _loopTimer.Interval = TimeSpan.FromSeconds(OptionsAccessor.HaskellFileExecutionTimeout);
                 await RunAsync();
+                HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Finished, $"Successfully ran the file '{_sourceFileName}'");
             });
         }
 

@@ -64,8 +64,8 @@
     <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Commands\GitHubCommand.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Language\HaskellEditorMargin.cs" />
-    <Compile Include="Language\HaskellEditorMarginFactory.cs" />
+    <Compile Include="Editor\HaskellEditorMargin.cs" />
+    <Compile Include="Editor\HaskellEditorMarginFactory.cs" />
     <Compile Include="Options\OptionsAccessor.cs" />
     <Compile Include="Windows\WelcomeWindow\WelcomeWindow.cs" />
     <Compile Include="Commands\WelcomeWindowCommand.cs" />

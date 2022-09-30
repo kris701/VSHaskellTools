@@ -55,10 +55,7 @@ namespace HaskellTools
             if (OptionsAccessor.GHCiFound)
             {
                 if (OptionsAccessor.IsFirstStart)
-                {
                     WelcomeWindowCommand.Instance.Execute(null, null);
-                    OptionsAccessor.IsFirstStart = false;
-                }
 
                 await RunHaskellFileCommand.InitializeAsync(this);
                 await RunSelectedFunctionCommand.InitializeAsync(this);

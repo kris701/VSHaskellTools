@@ -1,5 +1,6 @@
 ﻿using HaskellTools.Commands;
 using HaskellTools.Helpers;
+using HaskellTools.Options;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -36,6 +37,7 @@ namespace HaskellTools
                 {
                     throw new NotSupportedException("Cannot create tool window");
                 }
+                OptionsAccessor.IsFirstStart = false;
             });
         }
     }
