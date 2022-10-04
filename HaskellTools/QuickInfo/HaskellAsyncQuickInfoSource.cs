@@ -45,51 +45,50 @@ namespace HaskellTools.QuickInfo
 
         public Task<QuickInfoItem> GetQuickInfoItemAsync(IAsyncQuickInfoSession session, CancellationToken cancellationToken)
         {
-            if (HaskellPreludeInfo.IsLoading)
+            Task<QuickInfoItem> t = new Task<QuickInfoItem>(() =>
             {
-                var info = new QuickInfoItem(null, "Prelude is loading...");
-                return Task.Run(() => info);
-            }
-            else if (HaskellPreludeInfo.PreludeContent.Count == 0)
-            {
-                HaskellPreludeInfo.IsLoading = true;
-                HaskellPreludeInitializer initializer = new HaskellPreludeInitializer();
-                Task.Run(() => initializer.InitializePreludeContentAsync(OptionsAccessor.GHCUPPath));
-                var info = new QuickInfoItem(null, "Prelude is loading...");
-                return Task.Run(() => info);
-            }
-            else
-            {
-                Task<QuickInfoItem> t = new Task<QuickInfoItem>(() =>
+                SnapshotPoint? subjectTriggerPoint = session.GetTriggerPoint(_textBuffer.CurrentSnapshot);
+                ITextSnapshot currentSnapshot = subjectTriggerPoint.Value.Snapshot;
+                SnapshotSpan querySpan = new SnapshotSpan(subjectTriggerPoint.Value, 0);
+
+                ITextStructureNavigator navigator = _toolTipProvider.NavigatorService.GetTextStructureNavigator(_textBuffer);
+                TextExtent extent = navigator.GetExtentOfWord(subjectTriggerPoint.Value);
+                string searchText = extent.Span.GetText();
+
+                if (!subjectTriggerPoint.HasValue)
                 {
-                    SnapshotPoint? subjectTriggerPoint = session.GetTriggerPoint(_textBuffer.CurrentSnapshot);
-                    if (!subjectTriggerPoint.HasValue)
-                    {
-                        return new QuickInfoItem(null, "");
-                    }
+                    return new QuickInfoItem(null, "");
+                }
 
-                    ITextSnapshot currentSnapshot = subjectTriggerPoint.Value.Snapshot;
-                    SnapshotSpan querySpan = new SnapshotSpan(subjectTriggerPoint.Value, 0);
-
-                    ITextStructureNavigator navigator = _toolTipProvider.NavigatorService.GetTextStructureNavigator(_textBuffer);
-                    TextExtent extent = navigator.GetExtentOfWord(subjectTriggerPoint.Value);
-                    string searchText = extent.Span.GetText();
-
+                if (HaskellPreludeInfo.IsLoading)
+                {
+                    ITrackingSpan applicable = currentSnapshot.CreateTrackingSpan(extent.Span, SpanTrackingMode.EdgeInclusive);
+                    return new QuickInfoItem(applicable, "Prelude is loading...");
+                }
+                else if (HaskellPreludeInfo.PreludeContent.Count == 0)
+                {
+                    HaskellPreludeInfo.IsLoading = true;
+                    HaskellPreludeInitializer initializer = new HaskellPreludeInitializer();
+                    Task.Run(async () => await initializer.InitializePreludeContentAsync(OptionsAccessor.GHCUPPath));
+                    ITrackingSpan applicable = currentSnapshot.CreateTrackingSpan(extent.Span, SpanTrackingMode.EdgeInclusive);
+                    return new QuickInfoItem(applicable, "Prelude is loading...");
+                }
+                else
+                {
                     foreach (string key in HaskellPreludeInfo.PreludeContent.Keys.OrderByDescending(x => x.Length))
                     {
                         int foundIdx = searchText.IndexOf(key, StringComparison.CurrentCultureIgnoreCase);
                         if (foundIdx > -1)
                         {
                             ITrackingSpan applicable = currentSnapshot.CreateTrackingSpan(extent.Span.Start + foundIdx, key.Length, SpanTrackingMode.EdgeInclusive);
-
                             return new QuickInfoItem(applicable, HaskellPreludeInfo.PreludeContent[key]);
                         }
                     }
                     return new QuickInfoItem(null, "");
-                });
-                t.Start();
-                return t;
-            }
+                }
+            });
+            t.Start();
+            return t;
         }
     }
 }

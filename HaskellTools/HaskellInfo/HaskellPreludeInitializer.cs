@@ -19,12 +19,11 @@ namespace HaskellTools.HaskellInfo
         private string _currentKey = "";
         private ClassifiedTextElement _currentElements;
         private ClassifiedTextElement _currentCommentElements;
-        private DispatcherTimer _finishTimer = new DispatcherTimer();
+        private int _parseCounter = 0;
 
         public async Task InitializePreludeContentAsync(string ghciPath)
         {
-            _finishTimer.Tick += ParsingDone;
-            _finishTimer.Interval = TimeSpan.FromMilliseconds(500);
+            _parseCounter = 0;
             HaskellPreludeInfo.PreludeContent.Clear();
 
             SetupProcess();
@@ -35,6 +34,8 @@ namespace HaskellTools.HaskellInfo
             await RunSetupCommandsAsync(ghciPath);
 
             await _process.WaitForExitAsync();
+
+            HaskellPreludeInfo.IsLoading = false;
         }
 
         private void SetupProcess()
@@ -61,7 +62,7 @@ namespace HaskellTools.HaskellInfo
         {
             if (e.Data != null && _isParsing)
             {
-                _finishTimer.Start();
+                _parseCounter = 0;
                 string line = $"{e.Data}";
                 if (line.Contains("::") && !line.StartsWith(" "))
                 {
@@ -123,18 +124,16 @@ namespace HaskellTools.HaskellInfo
                 await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(ghciPath, "bin/ghci.exe")}'");
             await Task.Delay(1000);
             _isParsing = true;
-            _finishTimer.Start();
             await _process.StandardInput.WriteLineAsync($":browse Prelude");
             while (_isParsing)
+            {
                 await Task.Delay(500);
+                _parseCounter++;
+                if (_parseCounter > 4)
+                    break;
+            }
             await _process.StandardInput.WriteLineAsync($":quit");
             await _process.StandardInput.WriteLineAsync($"exit");
-        }
-
-        private void ParsingDone(object sender, EventArgs e)
-        {
-            _isParsing = false;
-            _finishTimer.Stop();
         }
     }
 }
