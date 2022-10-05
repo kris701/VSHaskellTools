@@ -85,6 +85,15 @@ namespace HaskellTools.Helpers
                 uih.Save();
         }
 
+        public static void FocusActiveDocument()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            EnvDTE80.DTE2 _applicationObject = GetDTE2();
+            var uih = _applicationObject.ActiveDocument;
+            if (uih != null)
+                uih.Activate();
+        }
+
         public static string GetSelectedText()
         {
             ThreadHelper.ThrowIfNotOnUIThread();

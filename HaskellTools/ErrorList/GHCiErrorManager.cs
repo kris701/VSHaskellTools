@@ -1,8 +1,10 @@
-﻿using HaskellTools.Helpers;
+﻿using HaskellTools.Editor;
+using HaskellTools.Helpers;
 using HaskellTools.Options;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Management.Instrumentation;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -20,13 +23,13 @@ namespace HaskellTools.ErrorList
     {
         public static GHCiErrorManager Instance;
         public string FileName { get; set; }
-        public string SourcePath { get; set; }
+        public bool IsStarted { get; set; }
+        public ITextView TextField { get; set; }
 
         private HaskellToolsPackage _package;
         private ErrorListProvider _errorProvider;
         private List<TaskListItem> _currentErrors;
         private Process _process;
-        private bool _isReading = false;
         private int _readCounter = 0;
 
         private string _buffer;
@@ -47,6 +50,35 @@ namespace HaskellTools.ErrorList
             docEvent.DocumentSaved += CheckGHCi;
         }
 
+        public void Initialize(ITextView textField)
+        {
+            if (_process != null && !_process.HasExited)
+                Stop();
+            TextField = textField;
+
+            SetupProcess();
+            _process.Start();
+            _process.BeginErrorReadLine();
+            RunSetupCommands(OptionsAccessor.GHCUPPath);
+            IsStarted = true;
+            CheckGHCi(null);
+        }
+
+        public void Stop()
+        {
+            if (_process != null && !_process.HasExited)
+            {
+                _process.StandardInput.WriteLine($":quit");
+                _process.StandardInput.WriteLine($"exit");
+                _process.WaitForExit();
+                _process = null;
+            }
+            foreach(var item in _currentErrors)
+                _errorProvider.Tasks.Remove(item);
+            _currentErrors.Clear();
+            IsStarted = false;
+        }
+
         private void SetupProcess()
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
@@ -60,29 +92,12 @@ namespace HaskellTools.ErrorList
             _process.ErrorDataReceived += RecieveErrorData;
         }
 
-        private async Task RunSetupCommandsAsync(string ghcPath, string readFile)
+        private void RunSetupCommands(string ghcPath)
         {
-            await _process.StandardInput.WriteLineAsync($"cd '{SourcePath}'");
             if (ghcPath == "")
-                await _process.StandardInput.WriteLineAsync($"& ghci");
+                _process.StandardInput.WriteLine($"& ghci");
             else
-                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(ghcPath, "bin/ghci.exe")}'");
-            await Task.Delay(1000);
-            _isReading = true;
-            _foundAny = false;
-            _buffer = "";
-            await _process.StandardInput.WriteLineAsync($":load \"{readFile}\"");
-            while (_isReading)
-            {
-                await Task.Delay(200);
-                _readCounter++;
-                if (_readCounter > 4)
-                    break;
-            }
-            if (_foundAny)
-                AddErrorFromBuffer();
-            await _process.StandardInput.WriteLineAsync($":quit");
-            await _process.StandardInput.WriteLineAsync($"exit");
+                _process.StandardInput.WriteLine($"& '{DirHelper.CombinePathAndFile(ghcPath, "bin/ghci.exe")}'");
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
@@ -103,34 +118,72 @@ namespace HaskellTools.ErrorList
 
         private void AddErrorFromBuffer()
         {
-            var errorLines = _buffer.Split('|');
-
-            TaskListItem newError = new TaskListItem();
-            newError.Category = TaskCategory.BuildCompile;
-            newError.Text = errorLines[0];
-            newError.Line = Convert.ToInt32(errorLines[1]) - 1;
+            if (_buffer.Contains("|"))
+            {
+                var errorLines = _buffer.Split('|');
+                if (errorLines.Length > 2)
+                {
+                    ErrorTask newError = new ErrorTask();
+                    newError.ErrorCategory = TaskErrorCategory.Error;
+                    newError.Text = errorLines[0];
+                    newError.Line = Convert.ToInt32(errorLines[1]) - 1;
+                    newError.Navigate += JumpToError;
+                    newError.Document = errorLines[2].Replace("\n", "").Replace("\r", "").Trim();
+                    newError.Priority = TaskPriority.High;
+                    _currentErrors.Add(newError);
+                }
+            }
             _buffer = "";
-            _currentErrors.Add(newError);
+        }
+
+        private async void JumpToError(object sender, EventArgs e)
+        {
+            if (sender is ErrorTask item) {
+                foreach(var line in TextField.TextViewLines)
+                {
+                    var lineText = line.Extent.GetText().Trim();
+                    if (lineText == item.Document)
+                    {
+                        var newSpan = new Microsoft.VisualStudio.Text.SnapshotSpan(line.Extent.Snapshot, line.Extent.Span);
+                        TextField.Selection.Select(newSpan, false);
+                        DTE2Helper.FocusActiveDocument();
+                        break;
+                    }
+                }
+            }
         }
 
         private async void CheckGHCi(EnvDTE.Document document)
         {
-            if (DTE2Helper.IsValidFileOpen() && _process == null)
+            if (IsStarted)
             {
-                FileName = DTE2Helper.GetSourceFileName();
-                SourcePath = DTE2Helper.GetSourcePath();
-                _currentErrors.Clear();
-                SetupProcess();
-                _process.Start();
-                _process.BeginErrorReadLine();
-                await RunSetupCommandsAsync(OptionsAccessor.GHCUPPath, FileName);
-                await _process.WaitForExitAsync();
-                _process = null;
-                _errorProvider.Tasks.Clear();
-                foreach (var error in _currentErrors)
-                    _errorProvider.Tasks.Add(error);
-                if (_currentErrors.Count > 0)
-                    _errorProvider.Show();
+                if (DTE2Helper.IsValidFileOpen())
+                {
+                    FileName = DTE2Helper.GetSourceFilePath();
+
+                    HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Checking, $"Checking '{FileName}'...");
+
+                    _currentErrors.Clear();
+                    _foundAny = false;
+                    _buffer = "";
+                    _readCounter = 0;
+
+                    _process.StandardInput.WriteLine($":load \"{FileName.Replace("\\","/")}\"");
+                    while(_readCounter < 5)
+                    {
+                        await Task.Delay(100);
+                        _readCounter++;
+                    }
+                    if (_foundAny)
+                        AddErrorFromBuffer();
+                    _errorProvider.Tasks.Clear();
+                    foreach (var error in _currentErrors)
+                        _errorProvider.Tasks.Add(error);
+                    if (_currentErrors.Count > 0)
+                        _errorProvider.Show();
+
+                    HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.None, "Waiting for execution...");
+                }
             }
         }
     }

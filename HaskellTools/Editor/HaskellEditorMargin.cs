@@ -10,7 +10,7 @@ using System.Windows.Threading;
 
 namespace HaskellTools.Editor
 {
-    public enum GHCiRunningState { None, Running, Finished, Failed };
+    public enum GHCiRunningState { None, Running, Finished, Failed, Checking };
     
     public class HaskellEditorMargin : StackPanel, IWpfTextViewMargin
     {
@@ -98,6 +98,12 @@ namespace HaskellTools.Editor
                     _statusLabel.Content = "Run Finished!";
                     _messageLabel.Content = message;
                     this.Background = new SolidColorBrush(Colors.Gray);
+                    break;
+                case GHCiRunningState.Checking:
+                    _loadingLabel.Visibility = Visibility.Visible;
+                    _statusLabel.Content = "Checking document...";
+                    _messageLabel.Content = message;
+                    this.Background = new SolidColorBrush(Colors.BlueViolet);
                     break;
             }
         }
