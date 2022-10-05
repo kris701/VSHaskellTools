@@ -1,6 +1,7 @@
 ﻿using EnvDTE;
 using HaskellTools.Checkers;
 using HaskellTools.Commands;
+using HaskellTools.ErrorList;
 using HaskellTools.HaskellInfo;
 using HaskellTools.Options;
 using Microsoft.VisualStudio;
@@ -9,6 +10,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
+using System.IO.Packaging;
 using System.Management.Instrumentation;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -62,6 +64,7 @@ namespace HaskellTools
                 await RunSelectedFunctionCommand.InitializeAsync(this);
                 await HaskellInteractiveWindowCommand.InitializeAsync(this);
                 await GHCiDebuggerWindowCommand.InitializeAsync(this);
+                new GHCiErrorManager(this);
             }
         }
     }

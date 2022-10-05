@@ -12,7 +12,6 @@ namespace HaskellTools.Editor
 {
     public enum GHCiRunningState { None, Running, Finished, Failed };
     
-
     public class HaskellEditorMargin : StackPanel, IWpfTextViewMargin
     {
         private delegate void ChangeRunningStatusHandler(GHCiRunningState toStatus, string message);
