@@ -66,6 +66,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="EditorMargins\HaskellEditorMargin.cs" />
     <Compile Include="EditorMargins\HaskellEditorMarginFactory.cs" />
+    <Compile Include="EditorMargins\MarginPanel.cs" />
     <Compile Include="EditorMargins\StatusColors.cs" />
     <Compile Include="ErrorList\GHCiErrorManager.cs" />
     <Compile Include="ErrorList\GHCiErrorManagerConnectionListener.cs" />
