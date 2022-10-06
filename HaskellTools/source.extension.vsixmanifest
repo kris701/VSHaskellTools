@@ -4,7 +4,7 @@
         <Identity Id="HaskellRunner.6eaa553c-a41f-487b-99a1-a8383b6d1f74" Version="1.26" Language="en-US" Publisher="Kristian Skov Johansen" />
         <DisplayName>Haskell Tools</DisplayName>
         <Description xml:space="preserve">A set of tools to run and do some light debugging of Haskell programs using GHCi</Description>
-        <MoreInfo>https://github.com/kris701/HaskellRunner</MoreInfo>
+        <MoreInfo>https://github.com/kris701/VSHaskellTools</MoreInfo>
         <Icon>Icon.png</Icon>
         <PreviewImage>Icon.png</PreviewImage>
     </Metadata>
