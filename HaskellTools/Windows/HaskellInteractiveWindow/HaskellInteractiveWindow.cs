@@ -16,7 +16,7 @@ namespace HaskellTools
 
         public int OnClose(ref uint pgrfSaveOptions)
         {
-            (this.Content as HaskellInteractiveWindowControl).Unload();
+            (this.Content as HaskellInteractiveWindowControl).UnloadAsync();
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
     }

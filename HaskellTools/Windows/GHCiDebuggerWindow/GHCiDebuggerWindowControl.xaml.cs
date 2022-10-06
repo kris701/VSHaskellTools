@@ -28,17 +28,18 @@ namespace HaskellTools
         private DispatcherTimer _debugTimer = new DispatcherTimer();
         private DispatcherTimer _debugEvaluateTimer = new DispatcherTimer();
 
-        private HaskellToolsPackage _package;
-        private Process _process;
+        private PowershellProcess _process;
         private string _sourcePath = "";
         private List<DataItem> _debugData = new List<DataItem>();
 
-        public bool IsDebuggerRunning => _process != null && !_process.HasExited;
         public bool IsFileLoaded { get; internal set; } = false;
         public string FileLoaded { get; internal set; } = "None";
 
         public GHCiDebuggerWindowControl()
         {
+            _process = new PowershellProcess();
+            _process.ErrorDataRecieved += RecieveErrorData;
+            _process.OutputDataRecieved += RecieveNormalData;
             this.InitializeComponent();
             _debugTimer.Interval = TimeSpan.FromMilliseconds(100);
             _debugTimer.Tick += DebugReadOver;
@@ -61,10 +62,10 @@ namespace HaskellTools
             ContinueButton.IsEnabled = false;
             BackButton.IsEnabled = false;
             ResetBreakpointPanel();
-            if (!IsDebuggerRunning)
+            if (!_process.IsRunning)
                 return;
             _currentReadState = ReadState.Waiting;
-            await _process.StandardInput.WriteLineAsync($":continue");
+            await _process.WriteLineAsync($":continue");
         }
 
         private async void BackButton_Click(object sender, RoutedEventArgs e)
@@ -72,30 +73,30 @@ namespace HaskellTools
             ContinueButton.IsEnabled = false;
             BackButton.IsEnabled = false;
             ResetBreakpointPanel();
-            if (!IsDebuggerRunning)
+            if (!_process.IsRunning)
                 return;
             _currentReadState = ReadState.Waiting;
-            await _process.StandardInput.WriteLineAsync($":back");
+            await _process.WriteLineAsync($":back");
         }
 
-        private void ForceEvaluate_Click(object sender, RoutedEventArgs e)
+        private async void ForceEvaluate_Click(object sender, RoutedEventArgs e)
         {
-            EvaluateDebugDataAsync();
+            await EvaluateDebugDataAsync();
         }
 
         private void StepButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!IsDebuggerRunning)
+            if (!_process.IsRunning)
                 return;
 
             ResetBreakpointPanel();
             _currentReadState = ReadState.Waiting;
-            _process.StandardInput.WriteLine($":step");
+            _process.WriteLine($":step");
         }
 
         private void ResetBreakpoints_Click(object sender, RoutedEventArgs e)
         {
-            if (IsDebuggerRunning)
+            if (_process.IsRunning)
                 return;
             foreach (var item in BreakpointPanel.Children)
                 if (item is DebuggerLine line)
@@ -120,7 +121,7 @@ namespace HaskellTools
         public void Load()
         {
             if (DTE2Helper.IsValidFileOpen()) {
-                if (!IsDebuggerRunning)
+                if (!_process.IsRunning)
                 {
                     var newName = DTE2Helper.GetSourceFileName();
                     if (FileLoaded != newName)
@@ -288,7 +289,7 @@ namespace HaskellTools
             else
             {
                 _currentReadState = ReadState.Tracing;
-                await _process.StandardInput.WriteLineAsync($":hist");
+                await _process.WriteLineAsync($":hist");
             }
         }
 
@@ -299,19 +300,19 @@ namespace HaskellTools
             if ((bool)ForceValueChecks.IsChecked)
             {
                 _currentReadState = ReadState.Tracing;
-                await _process.StandardInput.WriteLineAsync($":hist");
+                await _process.WriteLineAsync($":hist");
             }
         }
 
         private async Task EvaluateDebugDataAsync()
         {
-            if (!IsDebuggerRunning)
+            if (!_process.IsRunning)
                 return;
 
             _currentReadState = ReadState.EvaluteDebugData;
             foreach (var item in _debugData)
             {
-                await _process.StandardInput.WriteLineAsync($":force {item.VariableName}");
+                await _process.WriteLineAsync($":force {item.VariableName}");
             }
         }
 
@@ -330,30 +331,20 @@ namespace HaskellTools
 
         private async Task InsertBreakPointsAsync()
         {
-            if (!IsDebuggerRunning)
+            if (!_process.IsRunning)
                 return;
 
             foreach (var control in BreakpointPanel.Children)
-            {
                 if (control is DebuggerLine line)
-                {
                     if (line.DoBreak)
-                    {
-                        await _process.StandardInput.WriteLineAsync($":break {line.LineNumber}");
-                    }
-                }
-            }
+                        await _process.WriteLineAsync($":break {line.LineNumber}");
         }
 
         private void ResetBreakpointPanel()
         {
             foreach (var control in BreakpointPanel.Children)
-            {
                 if (control is DebuggerLine line)
-                {
                     line.Background = Brushes.Transparent;
-                }
-            }
         }
         private void MarkBreakpoint(int lineNumber)
         {
@@ -384,57 +375,37 @@ namespace HaskellTools
             BreakpointPanel.IsEnabled = false;
             ResetBreakpoints.IsEnabled = false;
             await LoadSession();
-            if (IsDebuggerRunning)
+            if (_process.IsRunning)
             {
                 _currentReadState = ReadState.Waiting;
                 IsDebuggerOnBorder.BorderBrush = Brushes.Red;
                 await InsertBreakPointsAsync();
-                await _process.StandardInput.WriteLineAsync($":trace {OptionsAccessor.DebuggerEntryFunctionName}");
+                await _process.WriteLineAsync($":trace {OptionsAccessor.DebuggerEntryFunctionName}");
             }
             MainGrid.IsEnabled = true;
         }
 
         private async Task LoadSession()
         {
-            if (IsDebuggerRunning)
+            if (_process.IsRunning)
                 await StopDebugger();
 
-            SetupProcess();
-
-            _process.Start();
-            _process.BeginOutputReadLine();
-            _process.BeginErrorReadLine();
+            await _process.StartProcessAsync();
 
             OutputTextbox.AppendText($"Starting GHCi...{Environment.NewLine}", "#787878");
             await RunStartingCommandsAsync();
             OutputTextbox.AppendText($"GHCI started and '{FileLoaded}' loaded!{Environment.NewLine}", "#787878");
         }
 
-        private void SetupProcess()
-        {
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"powershell.exe";
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardInput = true;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            _process = new Process();
-            _process.StartInfo = startInfo;
-
-            _process.ErrorDataReceived += RecieveErrorData;
-            _process.OutputDataReceived += RecieveNormalData;
-        }
-
         private async Task RunStartingCommandsAsync()
         {
-            await _process.StandardInput.WriteLineAsync($"cd '{_sourcePath}'");
+            await _process.WriteLineAsync($"cd '{_sourcePath}'");
             if (OptionsAccessor.GHCUPPath == "")
-                await _process.StandardInput.WriteLineAsync($"& ghci");
+                await _process.WriteLineAsync($"& ghci");
             else
-                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
-            await _process.StandardInput.WriteLineAsync($":load \"{FileLoaded}\"");
-            await _process.StandardInput.WriteLineAsync($":set -fbreak-on-exception");
+                await _process.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
+            await _process.WriteLineAsync($":load \"{FileLoaded}\"");
+            await _process.WriteLineAsync($":set -fbreak-on-exception");
         }
 
         private async Task StopDebugger()
@@ -442,8 +413,8 @@ namespace HaskellTools
             MainGrid.IsEnabled = false;
             StartDebuggingButton.IsEnabled = true;
             StopDebuggingButton.IsEnabled = false;
-            if (IsDebuggerRunning)
-                ProcessHelper.KillProcessAndChildrens(_process.Id);
+            if (_process.IsRunning)
+                await _process.StopProcessAsync();
             IsDebuggerOnBorder.BorderBrush = Brushes.Transparent;
             BreakpointPanel.IsEnabled = true;
             ResetBreakpoints.IsEnabled = true;
@@ -455,7 +426,6 @@ namespace HaskellTools
             OutputTextbox.Document.Blocks.Clear();
             HistoryTraceBox.Text = "";
             ResetBreakpointPanel();
-            _process = null;
             MainGrid.IsEnabled = true;
         }
     }

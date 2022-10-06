@@ -14,14 +14,10 @@ using System.Windows.Media;
 
 namespace HaskellTools
 {
-    /// <summary>
-    /// Interaction logic for HaskellInteractiveWindowControl.
-    /// </summary>
     public partial class HaskellInteractiveWindowControl : UserControl
     {
-        private Process _process;
+        private PowershellProcess _process;
         private bool _isLoaded = false;
-        private HaskellToolsPackage _package;
         private List<string> _previousText = new List<string>();
         private int _previousTextIndex = 0;
 
@@ -32,11 +28,11 @@ namespace HaskellTools
 
         private async void InputTextbox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (_isLoaded && !_process.HasExited)
+            if (_isLoaded && _process.IsRunning)
             {
                 if (e.Key == System.Windows.Input.Key.Enter)
                 {
-                    await _process.StandardInput.WriteLineAsync(InputTextbox.Text);
+                    await _process.WriteLineAsync(InputTextbox.Text);
                     OutputTextbox.AppendText($"> {InputTextbox.Text}{Environment.NewLine}", "#4e6fb5");
                     if (_previousText.Count == 0)
                         _previousText.Insert(0, InputTextbox.Text);
@@ -69,48 +65,46 @@ namespace HaskellTools
 
         private async void ReloadButton_Click(object sender, RoutedEventArgs e)
         {
-            await Unload();
-            await Load();
+            await UnloadAsync();
+            await LoadAsync();
         }
 
         private async void HaskellInteractiveWindow_Loaded(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1000);
-            await Load();
+            await LoadAsync();
         }
 
-        public async Task Load()
+        public async Task LoadAsync()
         {
             if (!_isLoaded)
             {
                 LoadedFileNameLabel.Content = $"Starting...";
-                SetupProcess();
+                _process = new PowershellProcess();
+                _process.ErrorDataRecieved += RecieveErrorData;
+                _process.OutputDataRecieved += RecieveOutputData;
+                await _process.StartProcessAsync();
 
-                _process.Start();
-
-                _process.BeginOutputReadLine();
-                _process.BeginErrorReadLine();
-
-                await _process.StandardInput.WriteLineAsync($"cd '{DTE2Helper.GetSourcePath()}'");
+                await _process.WriteLineAsync($"cd '{DTE2Helper.GetSourcePath()}'");
                 if (OptionsAccessor.GHCUPPath == "")
-                    await _process.StandardInput.WriteLineAsync($"& ghci");
+                    await _process.WriteLineAsync($"& ghci");
                 else
-                    await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
+                    await _process.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
                 string fileName = DTE2Helper.GetSourceFileName();
                 _isLoaded = true;
-                await _process.StandardInput.WriteLineAsync($":load \"{fileName}\"");
+                await _process.WriteLineAsync($":load \"{fileName}\"");
                 LoadedFileNameLabel.Content = $"File Loaded: '{fileName}'";
 
                 InputTextbox.IsEnabled = true;
             }
         }
 
-        public async Task Unload()
+        public async Task UnloadAsync()
         {
             InputTextbox.IsEnabled = false;
             OutputTextbox.Document.Blocks.Clear();
             if (_process != null)
-                ProcessHelper.KillProcessAndChildrens(_process.Id);
+                await _process.StopProcessAsync();
             LoadedFileNameLabel.Content = $"GHCi Unloaded";
             _previousText.Clear();
             _previousTextIndex = 0;
@@ -119,30 +113,13 @@ namespace HaskellTools
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
-            if (e.Data != null && _isLoaded)
-                OutputTextbox.AppendTextInvoke($"{e.Data.Replace("*Main>", "")}{Environment.NewLine}", "#ba4141");
+            OutputTextbox.AppendTextInvoke($"{e.Data.Replace("*Main>", "")}{Environment.NewLine}", "#ba4141");
         }
 
         private void RecieveOutputData(object sender, DataReceivedEventArgs e)
         {
-            if (e.Data != null && _isLoaded)
+            if (_isLoaded)
                 OutputTextbox.AppendTextInvoke($"{e.Data.Replace("*Main>", "")}{Environment.NewLine}", "#ffffff");
-        }
-
-        private void SetupProcess()
-        {
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"powershell.exe";
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardInput = true;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            _process = new Process();
-            _process.StartInfo = startInfo;
-
-            _process.ErrorDataReceived += RecieveErrorData;
-            _process.OutputDataReceived += RecieveOutputData;
         }
     }
 }
