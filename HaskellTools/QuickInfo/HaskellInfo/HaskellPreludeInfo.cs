@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HaskellTools.HaskellInfo
+namespace HaskellTools.QuickInfo.HaskellInfo
 {
     public static class HaskellPreludeInfo
     {

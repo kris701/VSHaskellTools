@@ -11,8 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
-namespace HaskellTools.HaskellInfo
+namespace HaskellTools.QuickInfo.HaskellInfo
 {
     public class HaskellPreludeInitializer
     {
@@ -25,8 +26,14 @@ namespace HaskellTools.HaskellInfo
 
         public async Task InitializePreludeContentAsync(string ghciPath)
         {
-            var panelID = HaskellEditorMargin.SubscribePanel();
-            HaskellEditorMargin.UpdatePanel(panelID, $"Loading quickinfo from Prelude...", new SolidColorBrush(Colors.Gray), true);
+            // Little delay to let VS start fully
+            await Task.Delay(5000);
+            Guid panelID = Guid.Empty;
+            System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                panelID = HaskellEditorMargin.SubscribePanel();
+                HaskellEditorMargin.UpdatePanel(panelID, $"Loading QuickInfo from Prelude...", new SolidColorBrush(Colors.Gray), true);
+            }));
             _parseCounter = 0;
             HaskellPreludeInfo.PreludeContent.Clear();
             _process = new PowershellProcess();
@@ -36,7 +43,12 @@ namespace HaskellTools.HaskellInfo
             await RunSetupCommandsAsync(ghciPath);
 
             await _process.WaitForExitAsync();
-            HaskellEditorMargin.UpdatePanel(panelID, $"Quickinfo from Prelude loaded!", new SolidColorBrush(Colors.LightGreen), false);
+
+            System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                HaskellEditorMargin.UpdatePanel(panelID, $"QuickInfo from Prelude loaded!", new SolidColorBrush(Colors.LightGreen), false);
+            }));
+
             HaskellPreludeInfo.IsLoading = false;
         }
 

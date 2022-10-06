@@ -2,7 +2,6 @@
 using HaskellTools.Checkers;
 using HaskellTools.Commands;
 using HaskellTools.ErrorList;
-using HaskellTools.HaskellInfo;
 using HaskellTools.Options;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;

@@ -1,5 +1,5 @@
-﻿using HaskellTools.HaskellInfo;
-using HaskellTools.Options;
+﻿using HaskellTools.Options;
+using HaskellTools.QuickInfo.HaskellInfo;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
