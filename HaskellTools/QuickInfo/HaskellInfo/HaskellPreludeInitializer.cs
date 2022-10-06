@@ -1,4 +1,4 @@
-﻿using HaskellTools.Editor;
+﻿using HaskellTools.EditorMargins;
 using HaskellTools.Helpers;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text.Adornments;

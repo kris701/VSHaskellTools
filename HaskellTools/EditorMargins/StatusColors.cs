@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace HaskellTools.Editor
+namespace HaskellTools.EditorMargins
 {
     internal static class StatusColors
     {

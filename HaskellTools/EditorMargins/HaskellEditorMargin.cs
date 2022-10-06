@@ -13,7 +13,7 @@ using static System.Net.Mime.MediaTypeNames;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.PlatformUI;
 
-namespace HaskellTools.Editor
+namespace HaskellTools.EditorMargins
 {
     public class HaskellEditorMargin : StackPanel, IWpfTextViewMargin
     {

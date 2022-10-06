@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
 
-namespace HaskellTools.Editor
+namespace HaskellTools.EditorMargins
 {
     [Export(typeof(IWpfTextViewMarginProvider))]
     [Name(HaskellEditorMargin.MarginName)]

@@ -64,9 +64,9 @@
     <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Commands\GitHubCommand.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Editor\HaskellEditorMargin.cs" />
-    <Compile Include="Editor\HaskellEditorMarginFactory.cs" />
-    <Compile Include="Editor\StatusColors.cs" />
+    <Compile Include="EditorMargins\HaskellEditorMargin.cs" />
+    <Compile Include="EditorMargins\HaskellEditorMarginFactory.cs" />
+    <Compile Include="EditorMargins\StatusColors.cs" />
     <Compile Include="ErrorList\GHCiErrorManager.cs" />
     <Compile Include="ErrorList\GHCiErrorManagerConnectionListener.cs" />
     <Compile Include="Helpers\PowershellProcess.cs" />

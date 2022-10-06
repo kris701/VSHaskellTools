@@ -1,5 +1,5 @@
 ﻿using HaskellTools.Commands;
-using HaskellTools.Editor;
+using HaskellTools.EditorMargins;
 using HaskellTools.Helpers;
 using HaskellTools.Options;
 using Microsoft.VisualStudio;
