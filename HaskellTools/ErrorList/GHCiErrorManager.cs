@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Management.Instrumentation;
 using System.Text;
@@ -26,6 +27,8 @@ namespace HaskellTools.ErrorList
         public string FileName { get; set; }
         public bool IsStarted { get; set; }
         public ITextView TextField { get; set; }
+
+        private string _previousDocument = "";
 
         private HaskellToolsPackage _package;
         private ErrorListProvider _errorProvider;
@@ -139,34 +142,39 @@ namespace HaskellTools.ErrorList
                 if (DTE2Helper.IsValidFileOpen())
                 {
                     FileName = DTE2Helper.GetSourceFilePath();
-
-                    Guid statusPanelGuid = HaskellEditorMargin.SubscribePanel();
-                    HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Checking file...", StatusColors.StatusItemNormalBackground(), true);
-
-                    _currentErrors.Clear();
-                    _foundAny = false;
-                    _buffer = "";
-                    _readCounter = 0;
-
-                    _process.WriteLine($":load \"{FileName.Replace("\\","/")}\"");
-                    while(_readCounter < 5)
+                    var newBuffer = File.ReadAllText(FileName);
+                    if (newBuffer != _previousDocument)
                     {
-                        await Task.Delay(100);
-                        _readCounter++;
-                    }
-                    if (_foundAny)
-                        AddErrorFromBuffer();
-                    _errorProvider.Tasks.Clear();
-                    foreach (var error in _currentErrors)
-                        _errorProvider.Tasks.Add(error);
-                    if (_currentErrors.Count > 0)
-                    {
-                        _errorProvider.Show();
-                        HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Compile Errors: {_currentErrors.Count}", StatusColors.StatusItemBadBackground(), false);
-                    }
-                    else
-                    {
-                        HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"No compile errors found!", StatusColors.StatusItemGoodBackground(), false);
+                        _previousDocument = newBuffer;
+
+                        Guid statusPanelGuid = HaskellEditorMargin.SubscribePanel();
+                        HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Checking file...", StatusColors.StatusItemNormalBackground(), true);
+
+                        _currentErrors.Clear();
+                        _foundAny = false;
+                        _buffer = "";
+                        _readCounter = 0;
+
+                        _process.WriteLine($":load \"{FileName.Replace("\\", "/")}\"");
+                        while (_readCounter < 5)
+                        {
+                            await Task.Delay(100);
+                            _readCounter++;
+                        }
+                        if (_foundAny)
+                            AddErrorFromBuffer();
+                        _errorProvider.Tasks.Clear();
+                        foreach (var error in _currentErrors)
+                            _errorProvider.Tasks.Add(error);
+                        if (_currentErrors.Count > 0)
+                        {
+                            _errorProvider.Show();
+                            HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Compile Errors: {_currentErrors.Count}", StatusColors.StatusItemBadBackground(), false);
+                        }
+                        else
+                        {
+                            HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"No compile errors found!", StatusColors.StatusItemGoodBackground(), false);
+                        }
                     }
                 }
             }

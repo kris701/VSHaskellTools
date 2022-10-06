@@ -79,11 +79,13 @@ namespace HaskellTools.EditorMargins
             if (UpdatePanelEvent != null)
                 UpdatePanelEvent.Invoke(panelGuid, text, backgroundColor, showLoading);
         }
-        private void UpdatePanel_Event(Guid panelGuid, string text, SolidColorBrush backgroundColor, bool showLoading = false)
+        private async void UpdatePanel_Event(Guid panelGuid, string text, SolidColorBrush backgroundColor, bool showLoading = false)
         {
             if (_panels.ContainsKey(panelGuid))
             {
                 var panel = _panels[panelGuid];
+                while (!panel.IsLoaded)
+                    await Task.Delay(100);
                 panel.UpdatePanel(text, backgroundColor, showLoading);
             }
         }

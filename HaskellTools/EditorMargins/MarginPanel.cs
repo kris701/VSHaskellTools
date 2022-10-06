@@ -27,6 +27,14 @@ namespace HaskellTools.EditorMargins
         {
             _panels = panels;
 
+            PanelID = Guid.NewGuid();
+
+            this.Loaded += MarginPanel_Loaded;
+            this.Opacity = 0;
+        }
+
+        private async void MarginPanel_Loaded(object sender, EventArgs e)
+        {
             _clearTimer = new DispatcherTimer();
             _clearTimer.Interval = TimeSpan.FromSeconds(5);
             _clearTimer.Tick += RemoveFromParent;
@@ -35,13 +43,14 @@ namespace HaskellTools.EditorMargins
             _loadingTimer.Interval = TimeSpan.FromMilliseconds(100);
             _loadingTimer.Tick += LoadingLabel_Tick;
 
-            base.CornerRadius = new CornerRadius(10);
-            base.BorderThickness = new Thickness(2);
-            base.BorderBrush = new SolidColorBrush(Colors.Black);
+            this.CornerRadius = new CornerRadius(10);
+            this.BorderThickness = new Thickness(2);
+            this.BorderBrush = new SolidColorBrush(Colors.Black);
 
             MainPanel = new StackPanel();
             MainPanel.Orientation = Orientation.Horizontal;
             MainPanel.Margin = new Thickness(2);
+            MainPanel.Background = StatusColors.StatusItemNormalBackground();
             LoadingLabel = new Label()
             {
                 Content = "/",
@@ -59,16 +68,9 @@ namespace HaskellTools.EditorMargins
             };
             MainPanel.Children.Add(StatusLabel);
 
-            this.Child = MainPanel;
-            PanelID = Guid.NewGuid();
-
+            base.Child = MainPanel;
             _clearTimer.Start();
-            this.Loaded += FadeIn;
-            this.Opacity = 0;
-        }
 
-        private async void FadeIn(object sender, EventArgs e)
-        {
             for (double i = 0; i <= 1; i += 0.1)
             {
                 await Task.Delay(15);
