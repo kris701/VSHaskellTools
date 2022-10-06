@@ -15,6 +15,7 @@ namespace HaskellTools.Helpers
         public event DataReceivedEventHandler ErrorDataRecieved;
         public event DataReceivedEventHandler OutputDataRecieved;
         public bool IsRunning { get; private set; }
+        public bool StopOnError { get; set; } = false;
         public TimeSpan OutputTimeout { get; set; } = TimeSpan.Zero;
 
         private Process _process;
@@ -93,6 +94,8 @@ namespace HaskellTools.Helpers
                 _timer.Tick += ForceKillTimer;
                 _timer.Start();
                 await WaitForExitAsync();
+                if (_didForceKill)
+                    return ProcessCompleteReson.ForceKilled;
                 return ProcessCompleteReson.RanToCompletion;
             }
             else return ProcessCompleteReson.ProcessNotRunning;
@@ -105,6 +108,8 @@ namespace HaskellTools.Helpers
             if (IsRunning)
             {
                 await _process.WaitForExitAsync();
+                if (_didForceKill)
+                    return ProcessCompleteReson.ForceKilled;
                 return ProcessCompleteReson.RanToCompletion;
             }
             else
@@ -156,6 +161,11 @@ namespace HaskellTools.Helpers
         {
             if (e.Data != null && e.Data != "")
             {
+                if (StopOnError)
+                {
+                    _didForceKill = true;
+                    StopProcess();
+                }
                 if (OutputTimeout > TimeSpan.Zero)
                     _OutputTimer.Start();
                 if (ErrorDataRecieved != null)

@@ -60,7 +60,7 @@ namespace HaskellTools.Commands
             _selectedText = DTE2Helper.GetSelectedText();
 
             _statusPanelGuid = HaskellEditorMargin.SubscribePanel();
-            HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", new SolidColorBrush(Colors.Gray), true);
+            HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemNormalBackground(), true);
 
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
@@ -80,6 +80,7 @@ namespace HaskellTools.Commands
             _process.ErrorDataRecieved += RecieveErrorData;
             _process.OutputDataRecieved += RecieveOutputData;
             _process.OutputTimeout = timeoutSpan;
+            _process.StopOnError = true;
             await _process.StartProcessAsync();
 
             await RunSetupCommandsAsync();
@@ -88,13 +89,13 @@ namespace HaskellTools.Commands
             if (res == ProcessCompleteReson.ForceKilled)
             {
                 OutputPanel.WriteLine($"ERROR! Function ran for longer than {timeoutSpan}! Killing process...");
-                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!", new SolidColorBrush(Colors.LightPink), false);
+                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!", StatusColors.StatusItemBadBackground(), false);
             }
             else
             {
                 OutputPanel.WriteLineInvoke("Function ran to completion!");
                 OutputPanel.ActivateOutputWindow();
-                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}' and function '{_selectedText}'", new SolidColorBrush(Colors.LightGreen), false);
+                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemGoodBackground(), false);
             }
         }
 

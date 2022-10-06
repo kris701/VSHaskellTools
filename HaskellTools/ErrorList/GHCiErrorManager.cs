@@ -141,7 +141,7 @@ namespace HaskellTools.ErrorList
                     FileName = DTE2Helper.GetSourceFilePath();
 
                     Guid statusPanelGuid = HaskellEditorMargin.SubscribePanel();
-                    HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Checking file...", new SolidColorBrush(Colors.BlueViolet), true);
+                    HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Checking file...", StatusColors.StatusItemNormalBackground(), true);
 
                     _currentErrors.Clear();
                     _foundAny = false;
@@ -162,11 +162,11 @@ namespace HaskellTools.ErrorList
                     if (_currentErrors.Count > 0)
                     {
                         _errorProvider.Show();
-                        HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Compile Errors: {_currentErrors.Count}", new SolidColorBrush(Colors.LightPink), false);
+                        HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Compile Errors: {_currentErrors.Count}", StatusColors.StatusItemBadBackground(), false);
                     }
                     else
                     {
-                        HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"No compile errors found!", new SolidColorBrush(Colors.LightGreen), false);
+                        HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"No compile errors found!", StatusColors.StatusItemGoodBackground(), false);
                     }
                 }
             }

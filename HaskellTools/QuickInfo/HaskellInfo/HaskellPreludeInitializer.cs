@@ -32,7 +32,7 @@ namespace HaskellTools.QuickInfo.HaskellInfo
             System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 panelID = HaskellEditorMargin.SubscribePanel();
-                HaskellEditorMargin.UpdatePanel(panelID, $"Loading QuickInfo from Prelude...", new SolidColorBrush(Colors.Gray), true);
+                HaskellEditorMargin.UpdatePanel(panelID, $"Loading QuickInfo from Prelude...", StatusColors.StatusItemNormalBackground(), true);
             }));
             _parseCounter = 0;
             HaskellPreludeInfo.PreludeContent.Clear();
@@ -46,7 +46,7 @@ namespace HaskellTools.QuickInfo.HaskellInfo
 
             System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                HaskellEditorMargin.UpdatePanel(panelID, $"QuickInfo from Prelude loaded!", new SolidColorBrush(Colors.LightGreen), false);
+                HaskellEditorMargin.UpdatePanel(panelID, $"QuickInfo from Prelude loaded!", StatusColors.StatusItemGoodBackground(), false);
             }));
 
             HaskellPreludeInfo.IsLoading = false;

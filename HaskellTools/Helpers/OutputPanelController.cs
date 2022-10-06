@@ -26,7 +26,7 @@ namespace HaskellTools.Helpers
             if (targetPanel != null)
                 return;
 
-            EnvDTE80.DTE2 _applicationObject = GetDTE2();
+            EnvDTE80.DTE2 _applicationObject = DTE2Helper.GetDTE2();
             var uih = _applicationObject.ToolWindows.OutputWindow;
             bool found = false;
             foreach (OutputWindowPane pane in uih.OutputWindowPanes)
@@ -76,15 +76,15 @@ namespace HaskellTools.Helpers
             }));
         }
 
-        private static EnvDTE80.DTE2 GetDTE2()
-        {
-            return Package.GetGlobalService(typeof(DTE)) as EnvDTE80.DTE2;
-        }
-
         public void ActivateOutputWindow()
         {
             if (targetPanel != null)
+            {
+                DTE dte = DTE2Helper.GetDTE2();
+                var window = dte.Windows.Item(EnvDTE.Constants.vsWindowKindOutput);
+                window.Activate();
                 targetPanel.Activate();
+            }
         }
     }
 }

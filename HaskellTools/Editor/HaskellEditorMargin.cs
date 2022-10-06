@@ -10,12 +10,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Linq;
 using static System.Net.Mime.MediaTypeNames;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.PlatformUI;
 
 namespace HaskellTools.Editor
 {
-    public enum GHCiRunningState { None, Running, Finished, Failed };
-    public enum GHCiCheckingState { None, Checking, Finished, Failed };
-
     public class HaskellEditorMargin : StackPanel, IWpfTextViewMargin
     {
         private Dictionary<Guid, Border> _panels;
@@ -48,9 +47,8 @@ namespace HaskellTools.Editor
 
             this.Height = 35;
             this.ClipToBounds = true;
-            this.Background = new SolidColorBrush(Colors.Gray);
+            this.Background = StatusColors.StatusBarBackground();
             this.Orientation = Orientation.Horizontal;
-
             _loadingTimer.Interval = TimeSpan.FromMilliseconds(100);
             _loadingTimer.Tick += LoadingLabel_Cycle;
             _loadingTimer.Stop();

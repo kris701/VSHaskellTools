@@ -56,7 +56,7 @@ namespace HaskellTools.Commands
             _sourceFileName = DTE2Helper.GetSourceFileName();
 
             _statusPanelGuid = HaskellEditorMargin.SubscribePanel();
-            HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}'", new SolidColorBrush(Colors.LightGreen), true);
+            HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}'", StatusColors.StatusItemNormalBackground(), true);
 
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
@@ -72,6 +72,7 @@ namespace HaskellTools.Commands
             _process = new PowershellProcess();
             _process.ErrorDataRecieved += RecieveErrorData;
             _process.OutputDataRecieved += RecieveOutputData;
+            _process.StopOnError = true;
             if (OptionsAccessor.GHCUPPath == "")
                 await _process.StartProcessAsync($"& 'runhaskell' '{_sourceFilePath}'");
             else
@@ -82,12 +83,13 @@ namespace HaskellTools.Commands
             if (res == ProcessCompleteReson.ForceKilled)
             {
                 OutputPanel.WriteLine($"ERROR! Function ran for longer than {timeoutSpan}! Killing process...");
-                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' failed!", new SolidColorBrush(Colors.LightPink), false);
+                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' failed!", StatusColors.StatusItemBadBackground(), false);
             }
             else
             {
                 OutputPanel.WriteLineInvoke("Function ran to completion!");
-                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}'", new SolidColorBrush(Colors.LightGreen), false);
+                OutputPanel.ActivateOutputWindow();
+                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}'", StatusColors.StatusItemGoodBackground(), false);
             }
         }
 
