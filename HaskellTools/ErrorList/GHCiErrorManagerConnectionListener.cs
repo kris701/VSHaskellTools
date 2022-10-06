@@ -13,7 +13,7 @@ namespace HaskellTools.ErrorList
     [Export(typeof(ITextViewConnectionListener))]
     [ContentType("haskell")]
     [TextViewRole(PredefinedTextViewRoles.Interactive)]
-    internal class GHCiErrorManagerStarter : ITextViewConnectionListener
+    internal class GHCiErrorManagerConnectionListener : ITextViewConnectionListener
     {
         public void SubjectBuffersConnected(ITextView textView, ConnectionReason reason, IReadOnlyCollection<ITextBuffer> subjectBuffers)
         {

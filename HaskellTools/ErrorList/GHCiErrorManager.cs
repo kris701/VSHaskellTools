@@ -29,7 +29,7 @@ namespace HaskellTools.ErrorList
         private HaskellToolsPackage _package;
         private ErrorListProvider _errorProvider;
         private List<TaskListItem> _currentErrors;
-        private Process _process;
+        private PowershellProcess _process;
         private int _readCounter = 0;
 
         private string _buffer;
@@ -43,6 +43,7 @@ namespace HaskellTools.ErrorList
             _package = package;
             _errorProvider = new ErrorListProvider(package);
             _currentErrors = new List<TaskListItem>();
+            _process = new PowershellProcess();
 
             var dte2 = DTE2Helper.GetDTE2();
             var docEvent = dte2.Events.DocumentEvents;
@@ -52,13 +53,12 @@ namespace HaskellTools.ErrorList
 
         public void Initialize(ITextView textField)
         {
-            if (_process != null && !_process.HasExited)
-                Stop();
+            if (_process.IsRunning)
+                _process.StopProcess();
             TextField = textField;
 
-            SetupProcess();
-            _process.Start();
-            _process.BeginErrorReadLine();
+            _process.StartProcess();
+            _process.ErrorDataRecieved += RecieveErrorData;
             RunSetupCommands(OptionsAccessor.GHCUPPath);
             IsStarted = true;
             CheckGHCi(null);
@@ -66,54 +66,32 @@ namespace HaskellTools.ErrorList
 
         public void Stop()
         {
-            if (_process != null && !_process.HasExited)
-            {
-                _process.StandardInput.WriteLine($":quit");
-                _process.StandardInput.WriteLine($"exit");
-                _process.WaitForExit();
-                _process = null;
-            }
+            _process.StopProcess();
             foreach(var item in _currentErrors)
                 _errorProvider.Tasks.Remove(item);
             _currentErrors.Clear();
             IsStarted = false;
         }
 
-        private void SetupProcess()
-        {
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"powershell.exe";
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardInput = true;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            _process = new Process();
-            _process.StartInfo = startInfo;
-            _process.ErrorDataReceived += RecieveErrorData;
-        }
-
         private void RunSetupCommands(string ghcPath)
         {
             if (ghcPath == "")
-                _process.StandardInput.WriteLine($"& ghci");
+                _process.WriteInput($"& ghci");
             else
-                _process.StandardInput.WriteLine($"& '{DirHelper.CombinePathAndFile(ghcPath, "bin/ghci.exe")}'");
+                _process.WriteInput($"& '{DirHelper.CombinePathAndFile(ghcPath, "bin/ghci.exe")}'");
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
-            if (e.Data != null && e.Data != "")
+            _foundAny = true;
+            if (e.Data.StartsWith(FileName))
             {
-                _foundAny = true;
-                if (e.Data.StartsWith(FileName))
-                {
-                    if (_buffer != "")
-                        AddErrorFromBuffer();
-                }
-                else
-                    _buffer += e.Data + Environment.NewLine;
-                _readCounter = 0;
+                if (_buffer != "")
+                    AddErrorFromBuffer();
             }
+            else
+                _buffer += e.Data + Environment.NewLine;
+            _readCounter = 0;
         }
 
         private void AddErrorFromBuffer()
@@ -136,7 +114,7 @@ namespace HaskellTools.ErrorList
             _buffer = "";
         }
 
-        private async void JumpToError(object sender, EventArgs e)
+        private void JumpToError(object sender, EventArgs e)
         {
             if (sender is ErrorTask item) {
                 foreach(var line in TextField.TextViewLines)
@@ -168,7 +146,7 @@ namespace HaskellTools.ErrorList
                     _buffer = "";
                     _readCounter = 0;
 
-                    _process.StandardInput.WriteLine($":load \"{FileName.Replace("\\","/")}\"");
+                    _process.WriteInput($":load \"{FileName.Replace("\\","/")}\"");
                     while(_readCounter < 5)
                     {
                         await Task.Delay(100);

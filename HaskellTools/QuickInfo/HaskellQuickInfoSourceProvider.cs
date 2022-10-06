@@ -17,14 +17,14 @@ namespace HaskellTools.QuickInfo
     [Name("Haskell QuickInfo Source")]
     [ContentType("haskell")]
     [Order]
-    internal class HaskellAsyncQuickInfoSourceProvider : IAsyncQuickInfoSourceProvider
+    internal class HaskellQuickInfoSourceProvider : IAsyncQuickInfoSourceProvider
     {
         [Import]
         internal ITextStructureNavigatorSelectorService NavigatorService { get; set; }
 
         public IAsyncQuickInfoSource TryCreateQuickInfoSource(ITextBuffer textBuffer)
         {
-            return textBuffer.Properties.GetOrCreateSingletonProperty(() => new HaskellAsyncQuickInfoSource(textBuffer, this));
+            return textBuffer.Properties.GetOrCreateSingletonProperty(() => new HaskellQuickInfoSource(textBuffer, this));
         }
     }
 }

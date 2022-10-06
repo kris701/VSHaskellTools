@@ -22,12 +22,12 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace HaskellTools.QuickInfo
 {
-    internal class HaskellAsyncQuickInfoSource : IAsyncQuickInfoSource
+    internal class HaskellQuickInfoSource : IAsyncQuickInfoSource
     {
         private ITextBuffer _textBuffer;
-        private HaskellAsyncQuickInfoSourceProvider _toolTipProvider;
+        private HaskellQuickInfoSourceProvider _toolTipProvider;
 
-        public HaskellAsyncQuickInfoSource(ITextBuffer subjectBuffer, HaskellAsyncQuickInfoSourceProvider toolTipProvider)
+        public HaskellQuickInfoSource(ITextBuffer subjectBuffer, HaskellQuickInfoSourceProvider toolTipProvider)
         {
             _textBuffer = subjectBuffer;
             _toolTipProvider = toolTipProvider;
@@ -62,14 +62,6 @@ namespace HaskellTools.QuickInfo
 
                 if (HaskellPreludeInfo.IsLoading)
                 {
-                    ITrackingSpan applicable = currentSnapshot.CreateTrackingSpan(extent.Span, SpanTrackingMode.EdgeInclusive);
-                    return new QuickInfoItem(applicable, "Prelude is loading...");
-                }
-                else if (HaskellPreludeInfo.PreludeContent.Count == 0)
-                {
-                    HaskellPreludeInfo.IsLoading = true;
-                    HaskellPreludeInitializer initializer = new HaskellPreludeInitializer();
-                    Task.Run(async () => await initializer.InitializePreludeContentAsync(OptionsAccessor.GHCUPPath));
                     ITrackingSpan applicable = currentSnapshot.CreateTrackingSpan(extent.Span, SpanTrackingMode.EdgeInclusive);
                     return new QuickInfoItem(applicable, "Prelude is loading...");
                 }
