@@ -30,12 +30,12 @@
 		</Menus>
 
 		<Bitmaps>
-			<Bitmap guid="RunHaskellFileImageGuid" href="Resources\RunHaskellFile.png" />
-			<Bitmap guid="RunSelectedFunctionImageGuid" href="Resources\RunGHCi.png" />
-			<Bitmap guid="GithubImageGuid" href="Resources\GitHub.png" />
-			<Bitmap guid="InteractiveHaskellWindowImageGuid" href="Resources\HaskellInteractiveWindowCommand.png" />
-			<Bitmap guid="GHCiDebuggerWindowImageGuid" href="Resources\GHCiDebuggerWindowCommand.png" />
-			<Bitmap guid="WelcomeWindowImageGuid" href="Resources\Welcome.png" />
+			<Bitmap guid="RunHaskellFileImageGuid" href="Commands\Resources\RunHaskellFile.png" />
+			<Bitmap guid="RunSelectedFunctionImageGuid" href="Commands\Resources\RunGHCi.png" />
+			<Bitmap guid="GithubImageGuid" href="Commands\Resources\GitHub.png" />
+			<Bitmap guid="InteractiveHaskellWindowImageGuid" href="Commands\Resources\HaskellInteractiveWindowCommand.png" />
+			<Bitmap guid="GHCiDebuggerWindowImageGuid" href="Commands\Resources\GHCiDebuggerWindowCommand.png" />
+			<Bitmap guid="WelcomeWindowImageGuid" href="Commands\Resources\Welcome.png" />
     </Bitmaps>
 
 		<Buttons>

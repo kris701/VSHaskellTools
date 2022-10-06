@@ -126,13 +126,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Windows\InstallGHCIWindow\Resources\HaskellLogo.png" />
-    <Content Include="Resources\GHCiDebuggerWindowCommand.png" />
-    <Content Include="Resources\Welcome.png" />
-    <Content Include="Resources\GitHub.png" />
-    <Content Include="Resources\HaskellInteractiveWindowCommand.png" />
+    <Content Include="Commands\Resources\GHCiDebuggerWindowCommand.png" />
+    <Content Include="Commands\Resources\Welcome.png" />
+    <Content Include="Commands\Resources\GitHub.png" />
+    <Content Include="Commands\Resources\HaskellInteractiveWindowCommand.png" />
     <Resource Include="Windows\WelcomeWindow\Resources\HaskellLogo.png" />
-    <Content Include="Resources\RunGHCi.png" />
-    <Content Include="Resources\RunHaskellFile.png" />
+    <Content Include="Commands\Resources\RunGHCi.png" />
+    <Content Include="Commands\Resources\RunHaskellFile.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\continue.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\back.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\UserControls\Resources\breakpointOption.png" />
@@ -181,7 +181,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\Icon.png">
+    <Content Include="Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
