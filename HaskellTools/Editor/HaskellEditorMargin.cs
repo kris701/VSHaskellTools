@@ -18,7 +18,7 @@ namespace HaskellTools.Editor
 
     public class HaskellEditorMargin : StackPanel, IWpfTextViewMargin
     {
-        private Dictionary<Guid, StackPanel> _panels;
+        private Dictionary<Guid, Border> _panels;
         private Dictionary<Guid, DispatcherTimer> _panelTimers;
         private List<Label> _loadingLabels;
         private string _loadingChar = "/";
@@ -39,14 +39,14 @@ namespace HaskellTools.Editor
 
         public HaskellEditorMargin(IWpfTextView textView)
         {
-            _panels = new Dictionary<Guid, StackPanel>();
+            _panels = new Dictionary<Guid, Border>();
             _panelTimers = new Dictionary<Guid, DispatcherTimer>();
             _loadingLabels = new List<Label>();
             UpdatePanelEvent += UpdatePanel_Event;
             SubscribePanelEvent += SubscribePanel_Event;
             UnsubscribePanelEvent += UnsubscribePanel_Event;
 
-            this.Height = 30;
+            this.Height = 35;
             this.ClipToBounds = true;
             this.Background = new SolidColorBrush(Colors.Gray);
             this.Orientation = Orientation.Horizontal;
@@ -64,6 +64,11 @@ namespace HaskellTools.Editor
         }
         private Guid SubscribePanel_Event()
         {
+            var newBorder = new Border();
+            newBorder.CornerRadius = new CornerRadius(10);
+            newBorder.BorderThickness = new Thickness(2);
+            newBorder.BorderBrush = new SolidColorBrush(Colors.Black);
+
             var newPanel = new StackPanel();
             newPanel.Orientation = Orientation.Horizontal;
             newPanel.Margin = new Thickness(2);
@@ -88,15 +93,18 @@ namespace HaskellTools.Editor
                 Name = "StatusLabel"
             };
             newPanel.Children.Add(statusLabel);
+
+            newBorder.Child = newPanel;
+
             var newGuid = Guid.NewGuid();
-            _panels.Add(newGuid, newPanel);
+            _panels.Add(newGuid, newBorder);
             var newTimer = new DispatcherTimer();
             newTimer.Tag = newGuid;
             newTimer.Tick += RemovePanelEvent;
             newTimer.Interval = TimeSpan.FromSeconds(10);
             newTimer.Start();
             _panelTimers.Add(newGuid, newTimer);
-            this.Children.Add(newPanel);
+            this.Children.Add(newBorder);
             return newGuid;
         }
 
@@ -111,7 +119,7 @@ namespace HaskellTools.Editor
             _panelTimers.Remove(panelGuid);
 
             var panel = _panels[panelGuid];
-            foreach (UIElement child in panel.Children)
+            foreach (UIElement child in (panel.Child as StackPanel).Children)
             {
                 if (child is Label label)
                 {
@@ -141,7 +149,7 @@ namespace HaskellTools.Editor
                     _panelTimers[panelGuid].Start();
                 var panel = _panels[panelGuid];
                 panel.Background = backgroundColor;
-                foreach (UIElement child in panel.Children)
+                foreach (UIElement child in (panel.Child as StackPanel).Children)
                 {
                     if (child is Label label)
                     {

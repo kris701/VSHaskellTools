@@ -60,7 +60,7 @@ namespace HaskellTools.Commands
             _selectedText = DTE2Helper.GetSelectedText();
 
             _statusPanelGuid = HaskellEditorMargin.SubscribePanel();
-            HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", new SolidColorBrush(Colors.LightGreen), true);
+            HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", new SolidColorBrush(Colors.Gray), true);
 
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
@@ -74,13 +74,16 @@ namespace HaskellTools.Commands
 
         private async Task RunAsync()
         {
+            var timeoutSpan = TimeSpan.FromSeconds(OptionsAccessor.HaskellFileExecutionTimeout);
+
             _process = new PowershellProcess();
             _process.ErrorDataRecieved += RecieveErrorData;
             _process.OutputDataRecieved += RecieveOutputData;
+            _process.OutputTimeout = timeoutSpan;
+            await _process.StartProcessAsync();
 
             await RunSetupCommandsAsync();
 
-            var timeoutSpan = TimeSpan.FromSeconds(OptionsAccessor.HaskellFileExecutionTimeout);
             var res = await _process.WaitForExitAsync(timeoutSpan);
             if (res == ProcessCompleteReson.ForceKilled)
             {
@@ -93,8 +96,6 @@ namespace HaskellTools.Commands
                 OutputPanel.ActivateOutputWindow();
                 HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}' and function '{_selectedText}'", new SolidColorBrush(Colors.LightGreen), false);
             }
-
-            OutputPanel.WriteLineInvoke("Function ran to completion!");
         }
 
 

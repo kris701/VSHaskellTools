@@ -15,21 +15,35 @@ namespace HaskellTools.Helpers
         public event DataReceivedEventHandler ErrorDataRecieved;
         public event DataReceivedEventHandler OutputDataRecieved;
         public bool IsRunning { get; private set; }
+        public TimeSpan OutputTimeout { get; set; } = TimeSpan.Zero;
 
         private Process _process;
         DispatcherTimer _timer;
+        DispatcherTimer _OutputTimer;
         private bool _didForceKill = false;
 
         public async Task WriteLineAsync(string input)
         {
             if (IsRunning)
-                await _process.StandardInput.WriteLineAsync(input);
+            {
+                try
+                {
+                    await _process.StandardInput.WriteLineAsync(input);
+                }
+                catch { }
+            }
         }
 
         public void WriteLine(string input)
         {
             if (IsRunning)
-                _process.StandardInput.WriteLine(input);
+            {
+                try
+                {
+                    _process.StandardInput.WriteLine(input);
+                }
+                catch { }
+            }
         }
 
         public async Task StartProcessAsync(string args = "")
@@ -37,9 +51,6 @@ namespace HaskellTools.Helpers
             if (IsRunning)
                 await StopProcessAsync();
             SetupProcess(args);
-            _process.Start();
-            _process.BeginErrorReadLine();
-            _process.BeginOutputReadLine();
             IsRunning = true;
         }
 
@@ -48,9 +59,6 @@ namespace HaskellTools.Helpers
             if (IsRunning)
                 StopProcess();
             SetupProcess(args);
-            _process.Start();
-            _process.BeginErrorReadLine();
-            _process.BeginOutputReadLine();
             IsRunning = true;
         }
 
@@ -76,24 +84,24 @@ namespace HaskellTools.Helpers
 
         public async Task<ProcessCompleteReson> WaitForExitAsync(TimeSpan timeout)
         {
+            if (_didForceKill)
+                return ProcessCompleteReson.ForceKilled;
             if (IsRunning)
             {
-                _didForceKill = false;
                 _timer = new DispatcherTimer();
                 _timer.Interval = timeout;
                 _timer.Tick += ForceKillTimer;
                 _timer.Start();
                 await WaitForExitAsync();
-                if (_didForceKill)
-                    return ProcessCompleteReson.ForceKilled;
-                else
-                    return ProcessCompleteReson.RanToCompletion;
+                return ProcessCompleteReson.RanToCompletion;
             }
             else return ProcessCompleteReson.ProcessNotRunning;
         }
 
         public async Task<ProcessCompleteReson> WaitForExitAsync()
         {
+            if (_didForceKill)
+                return ProcessCompleteReson.ForceKilled;
             if (IsRunning)
             {
                 await _process.WaitForExitAsync();
@@ -105,8 +113,13 @@ namespace HaskellTools.Helpers
 
         private void ForceKillTimer(object sender, EventArgs e)
         {
-            _didForceKill = true;
-            ProcessHelper.KillProcessAndChildrens(_process.Id);
+            if (sender is DispatcherTimer timer)
+            {
+                timer.Stop();
+                _didForceKill = true;
+                ProcessHelper.KillProcessAndChildrens(_process.Id);
+                IsRunning = false;
+            }
         }
 
         private void SetupProcess(string args = "")
@@ -123,12 +136,28 @@ namespace HaskellTools.Helpers
             _process.StartInfo = startInfo;
             _process.ErrorDataReceived += RecieveErrorData;
             _process.OutputDataReceived += RecieveOutputData;
+
+            if (OutputTimeout > TimeSpan.Zero)
+            {
+                _OutputTimer = new DispatcherTimer();
+                _OutputTimer.Interval = OutputTimeout;
+                _OutputTimer.Tick += ForceKillTimer;
+            }
+
+            _process.Start();
+            _process.BeginErrorReadLine();
+            _process.BeginOutputReadLine();
+            if (OutputTimeout > TimeSpan.Zero)
+                _OutputTimer.Start();
+            _didForceKill = false;
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
             if (e.Data != null && e.Data != "")
             {
+                if (OutputTimeout > TimeSpan.Zero)
+                    _OutputTimer.Start();
                 if (ErrorDataRecieved != null)
                     ErrorDataRecieved.Invoke(sender, e);
             }
@@ -138,6 +167,8 @@ namespace HaskellTools.Helpers
         {
             if (e.Data != null && e.Data != "")
             {
+                if (OutputTimeout > TimeSpan.Zero)
+                    _OutputTimer.Start();
                 if (OutputDataRecieved != null)
                     OutputDataRecieved.Invoke(sender, e);
             }
