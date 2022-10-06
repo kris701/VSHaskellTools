@@ -76,9 +76,9 @@ namespace HaskellTools.ErrorList
         private void RunSetupCommands(string ghcPath)
         {
             if (ghcPath == "")
-                _process.WriteInput($"& ghci");
+                _process.WriteLine($"& ghci");
             else
-                _process.WriteInput($"& '{DirHelper.CombinePathAndFile(ghcPath, "bin/ghci.exe")}'");
+                _process.WriteLine($"& '{DirHelper.CombinePathAndFile(ghcPath, "bin/ghci.exe")}'");
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
@@ -139,14 +139,14 @@ namespace HaskellTools.ErrorList
                 {
                     FileName = DTE2Helper.GetSourceFilePath();
 
-                    HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Checking, $"Checking '{FileName}'...");
+                    HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Checking, 0);
 
                     _currentErrors.Clear();
                     _foundAny = false;
                     _buffer = "";
                     _readCounter = 0;
 
-                    _process.WriteInput($":load \"{FileName.Replace("\\","/")}\"");
+                    _process.WriteLine($":load \"{FileName.Replace("\\","/")}\"");
                     while(_readCounter < 5)
                     {
                         await Task.Delay(100);
@@ -158,9 +158,14 @@ namespace HaskellTools.ErrorList
                     foreach (var error in _currentErrors)
                         _errorProvider.Tasks.Add(error);
                     if (_currentErrors.Count > 0)
+                    {
                         _errorProvider.Show();
-
-                    HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.None, "Waiting for execution...");
+                        HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Failed, _currentErrors.Count);
+                    }
+                    else
+                    {
+                        HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Finished, 0);
+                    }
                 }
             }
         }

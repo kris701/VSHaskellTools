@@ -28,7 +28,7 @@ namespace HaskellTools
     [ProvideLanguageExtension(typeof(HaskellLanguageFactory), Constants.HaskellExt)]
 
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [Guid(PackageGuidString)]
+    [Guid(Constants.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideOptionPage(typeof(OptionPageGrid),
     "Haskell Tools", "Options", 0, 0, true)]
@@ -38,8 +38,6 @@ namespace HaskellTools
     [ProvideToolWindow(typeof(WelcomeWindow), Transient = true, Style = VsDockStyle.MDI, Width = 1200, Height = 800)]
     public sealed class HaskellToolsPackage : AsyncPackage
     {
-        public const string PackageGuidString = "6eaa553c-a41f-487b-99a1-a8383b6d1f74";
-
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
@@ -53,7 +51,7 @@ namespace HaskellTools
             if (OptionsAccessor.CheckForGHCiAtStartup || !OptionsAccessor.GHCiFound)
             {
                 var checker = new GHCiChecker(this);
-                await checker.CheckForGHCi();
+                await checker.CheckForGHCiAsync();
             }
             if (OptionsAccessor.GHCiFound)
             {

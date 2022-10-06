@@ -25,8 +25,7 @@ namespace HaskellTools.Commands
         private static OutputPanelController OutputPanel = new OutputPanelController("Haskell");
         public override int CommandId { get; } = 256;
         public static RunHaskellFileCommand Instance { get; internal set; }
-        private DispatcherTimer _loopTimer = new DispatcherTimer();
-        private Process _process;
+        private PowershellProcess _process;
 
         private string _sourceFilePath = "";
         private string _sourceFileName = "";
@@ -34,19 +33,6 @@ namespace HaskellTools.Commands
 
         private RunHaskellFileCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
         {
-            _loopTimer.Tick += ForceKillProcess;
-        }
-
-        private void ForceKillProcess(object sender, EventArgs e)
-        {
-            _enableReading = false;
-            _loopTimer.Stop();
-            if (!_process.HasExited)
-            {
-                ProcessHelper.KillProcessAndChildrens(_process.Id);
-                OutputPanel.WriteLine($"ERROR! Function ran for longer than {_loopTimer.Interval}! Killing process...");
-                HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Failed, $"Execution of '{_sourceFileName}' failed!");
-            }
         }
 
         public static async Task InitializeAsync(AsyncPackage package)
@@ -76,26 +62,32 @@ namespace HaskellTools.Commands
                 OutputPanel.Initialize();
                 OutputPanel.ClearOutput();
                 OutputPanel.WriteLineInvoke("Executing Haskell File");
-                _loopTimer.Interval = TimeSpan.FromSeconds(OptionsAccessor.HaskellFileExecutionTimeout);
                 await RunAsync();
-                HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Finished, $"Successfully ran the file '{_sourceFileName}'");
             });
         }
 
         private async Task RunAsync()
         {
-            _loopTimer.Start();
+            _process = new PowershellProcess();
+            _process.ErrorDataRecieved += RecieveErrorData;
+            _process.OutputDataRecieved += RecieveOutputData;
+            if (OptionsAccessor.GHCUPPath == "")
+                await _process.StartProcessAsync($"& 'runhaskell' '{_sourceFilePath}'");
+            else
+                await _process.StartProcessAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\runhaskell.exe")}' '{_sourceFilePath}'");
 
-            SetupProcess();
-            _process.Start();
-            _process.BeginErrorReadLine();
-            _process.BeginOutputReadLine();
-
-            await _process.WaitForExitAsync();
-
-            OutputPanel.WriteLineInvoke("Function ran to completion!");
-
-            _loopTimer.Stop();
+            var timeoutSpan = TimeSpan.FromSeconds(OptionsAccessor.HaskellFileExecutionTimeout);
+            var res = await _process.WaitForExitAsync(timeoutSpan);
+            if (res == ProcessCompleteReson.ForceKilled)
+            {
+                OutputPanel.WriteLine($"ERROR! Function ran for longer than {timeoutSpan}! Killing process...");
+                HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Failed, $"Execution of '{_sourceFileName}' failed!");
+            }
+            else
+            {
+                OutputPanel.WriteLineInvoke("Function ran to completion!");
+                HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Finished, $"Successfully ran the file '{_sourceFileName}'");
+            }
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
@@ -108,24 +100,6 @@ namespace HaskellTools.Commands
         {
             if (e.Data != null && _enableReading)
                 OutputPanel.WriteLineInvoke($"{e.Data}");
-        }
-
-        private void SetupProcess()
-        {
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"powershell.exe";
-            if (OptionsAccessor.GHCUPPath == "")
-                startInfo.Arguments = $"& 'runhaskell' '{_sourceFilePath}'";
-            else
-                startInfo.Arguments = $"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\runhaskell.exe")}' '{_sourceFilePath}'";
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            _process = new Process();
-            _process.StartInfo = startInfo;
-            _process.OutputDataReceived += RecieveOutputData;
-            _process.ErrorDataReceived += RecieveErrorData;
         }
     }
 }

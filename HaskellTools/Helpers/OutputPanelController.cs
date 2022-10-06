@@ -62,7 +62,10 @@ namespace HaskellTools.Helpers
                 throw new ArgumentNullException("Panel not initialized!");
 
             targetPanel.Activate();
-            targetPanel.OutputString($"{text}{Environment.NewLine}");
+            if (text.Length > 1024)
+                targetPanel.OutputString($"{text.Substring(0,1024)} ... (Output too long to show here!){Environment.NewLine}");
+            else
+                targetPanel.OutputString($"{text}{Environment.NewLine}");
         }
 
         public void WriteLineInvoke(string text)

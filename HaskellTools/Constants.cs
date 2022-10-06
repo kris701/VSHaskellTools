@@ -8,6 +8,7 @@ namespace HaskellTools
 {
     internal class Constants
     {
+        public const string PackageGuidString = "6eaa553c-a41f-487b-99a1-a8383b6d1f74";
         public const string HaskellLanguageName = "Haskell";
         public const string HaskellExt = ".hs";
         public const string HaskellBaselanguageName = "CSharp";

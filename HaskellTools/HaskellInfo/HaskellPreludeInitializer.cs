@@ -14,7 +14,7 @@ namespace HaskellTools.HaskellInfo
 {
     public class HaskellPreludeInitializer
     {
-        private Process _process;
+        private PowershellProcess _process;
         private bool _isParsing = false;
         private string _currentKey = "";
         private ClassifiedTextElement _currentElements;
@@ -25,11 +25,9 @@ namespace HaskellTools.HaskellInfo
         {
             _parseCounter = 0;
             HaskellPreludeInfo.PreludeContent.Clear();
-
-            SetupProcess();
-            _process.Start();
-            _process.BeginErrorReadLine();
-            _process.BeginOutputReadLine();
+            _process = new PowershellProcess();
+            _process.OutputDataRecieved += RecieveOutputData;
+            await _process.StartProcessAsync();
 
             await RunSetupCommandsAsync(ghciPath);
 
@@ -38,93 +36,70 @@ namespace HaskellTools.HaskellInfo
             HaskellPreludeInfo.IsLoading = false;
         }
 
-        private void SetupProcess()
-        {
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"powershell.exe";
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardInput = true;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            _process = new Process();
-            _process.StartInfo = startInfo;
-            _process.OutputDataReceived += RecieveOutputData;
-            _process.ErrorDataReceived += RecieveErrorData;
-        }
-
-        private void RecieveErrorData(object sender, DataReceivedEventArgs e)
-        {
-            
-        }
-
         private void RecieveOutputData(object sender, DataReceivedEventArgs e)
         {
-            if (e.Data != null && _isParsing)
+            _parseCounter = 0;
+            string line = $"{e.Data}";
+            if (line.Contains("::") && !line.StartsWith(" "))
             {
-                _parseCounter = 0;
-                string line = $"{e.Data}";
-                if (line.Contains("::") && !line.StartsWith(" "))
+                if (_currentKey != "")
                 {
-                    if (_currentKey != "")
-                    {
-                        ContainerElement newElement = null;
-                        if (_currentCommentElements != null)
-                            newElement = new ContainerElement(
-                                ContainerElementStyle.Stacked,
-                                _currentElements,
-                                _currentCommentElements);
-                        else
-                            newElement = new ContainerElement(
-                                ContainerElementStyle.Stacked,
-                                _currentElements);
-                        HaskellPreludeInfo.PreludeContent.Add(_currentKey, newElement);
-                    }
-
-                    string leftSide = line.Replace("::", ":").Split(':')[0];
-                    string rightSide = line.Replace("::", ":").Split(':')[1];
-
-                    if (line.StartsWith("type "))
-                    {
-                        _currentKey = leftSide.Replace("type ","").Trim();
-                        string typeText = rightSide.Trim();
-
-                        _currentElements = new ClassifiedTextElement(
-                                new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, $"{_currentKey} :: "),
-                                new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, typeText)
-                            );
-                        _currentCommentElements = null;
-                    }
+                    ContainerElement newElement = null;
+                    if (_currentCommentElements != null)
+                        newElement = new ContainerElement(
+                            ContainerElementStyle.Stacked,
+                            _currentElements,
+                            _currentCommentElements);
                     else
-                    {
-                        _currentKey = leftSide.Trim().Replace("(","").Replace(")","");
-                        string typeText = rightSide.Trim();
+                        newElement = new ContainerElement(
+                            ContainerElementStyle.Stacked,
+                            _currentElements);
+                    HaskellPreludeInfo.PreludeContent.Add(_currentKey, newElement);
+                }
 
-                        _currentElements = new ClassifiedTextElement(
-                                new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, $"{_currentKey} :: "),
-                                new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, typeText)
-                            );
-                        _currentCommentElements = null;
-                    }
+                string leftSide = line.Replace("::", ":").Split(':')[0];
+                string rightSide = line.Replace("::", ":").Split(':')[1];
+
+                if (line.StartsWith("type "))
+                {
+                    _currentKey = leftSide.Replace("type ","").Trim();
+                    string typeText = rightSide.Trim();
+
+                    _currentElements = new ClassifiedTextElement(
+                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, $"{_currentKey} :: "),
+                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, typeText)
+                        );
+                    _currentCommentElements = null;
                 }
                 else
                 {
-                    if (_currentCommentElements == null)
-                        _currentCommentElements = new ClassifiedTextElement();
-                    _currentCommentElements = new ClassifiedTextElement(_currentCommentElements.Runs.ToArray().Append(new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, $"{line}{Environment.NewLine}")));
+                    _currentKey = leftSide.Trim().Replace("(","").Replace(")","");
+                    string typeText = rightSide.Trim();
+
+                    _currentElements = new ClassifiedTextElement(
+                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, $"{_currentKey} :: "),
+                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, typeText)
+                        );
+                    _currentCommentElements = null;
                 }
+            }
+            else
+            {
+                if (_currentCommentElements == null)
+                    _currentCommentElements = new ClassifiedTextElement();
+                _currentCommentElements = new ClassifiedTextElement(_currentCommentElements.Runs.ToArray().Append(new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, $"{line}{Environment.NewLine}")));
             }
         }
 
         private async Task RunSetupCommandsAsync(string ghciPath)
         {
             if (ghciPath == "")
-                await _process.StandardInput.WriteLineAsync($"& ghci");
+                await _process.WriteLineAsync($"& ghci");
             else
-                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(ghciPath, "bin/ghci.exe")}'");
+                await _process.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(ghciPath, "bin/ghci.exe")}'");
             await Task.Delay(1000);
             _isParsing = true;
-            await _process.StandardInput.WriteLineAsync($":browse Prelude");
+            await _process.WriteLineAsync($":browse Prelude");
             while (_isParsing)
             {
                 await Task.Delay(500);
@@ -132,8 +107,8 @@ namespace HaskellTools.HaskellInfo
                 if (_parseCounter > 4)
                     break;
             }
-            await _process.StandardInput.WriteLineAsync($":quit");
-            await _process.StandardInput.WriteLineAsync($"exit");
+            await _process.WriteLineAsync($":quit");
+            await _process.WriteLineAsync($"exit");
         }
     }
 }

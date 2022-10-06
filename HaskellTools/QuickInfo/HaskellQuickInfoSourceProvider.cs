@@ -15,7 +15,7 @@ namespace HaskellTools.QuickInfo
 {
     [Export(typeof(IAsyncQuickInfoSourceProvider))]
     [Name("Haskell QuickInfo Source")]
-    [ContentType("haskell")]
+    [ContentType(Constants.HaskellLanguageName)]
     [Order]
     internal class HaskellQuickInfoSourceProvider : IAsyncQuickInfoSourceProvider
     {

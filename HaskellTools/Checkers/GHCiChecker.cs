@@ -14,7 +14,7 @@ namespace HaskellTools.Checkers
     public class GHCiChecker
     {
         private HaskellToolsPackage _package;
-        private Process _process;
+        private PowershellProcess _process;
         private bool _isStarted = false;
         private bool _isGood = true;
         public GHCiChecker(HaskellToolsPackage package)
@@ -22,17 +22,17 @@ namespace HaskellTools.Checkers
             _package = package;
         }
 
-        public async Task CheckForGHCi()
+        public async Task CheckForGHCiAsync()
         {
             OptionsAccessor.GHCiFound = false;
-            SetupProcess();
-            _process.Start();
-            _process.BeginErrorReadLine();
+            _process = new PowershellProcess();
+            _process.ErrorDataRecieved += RecieveErrorData;
+            await _process.StartProcessAsync();
             _isStarted = true;
             if (OptionsAccessor.GHCUPPath == "")
-                await _process.StandardInput.WriteLineAsync($"& ghci");
+                await _process.WriteLineAsync($"& ghci");
             else
-                await _process.StandardInput.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
+                await _process.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
             await Task.Delay(500);
             if (_isGood)
             {
@@ -44,20 +44,7 @@ namespace HaskellTools.Checkers
                 await InstallGHCiWindowCommand.InitializeAsync(_package);
                 InstallGHCiWindowCommand.Instance.Execute(null, null);
             }
-            ProcessHelper.KillProcessAndChildrens(_process.Id);
-        }
-
-        private void SetupProcess()
-        {
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"powershell.exe";
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardInput = true;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            _process = new Process();
-            _process.StartInfo = startInfo;
-            _process.ErrorDataReceived += RecieveErrorData;
+            await _process.StopProcessAsync();
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)

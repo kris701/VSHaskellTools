@@ -8,7 +8,7 @@ namespace HaskellTools.Editor
     [Name(HaskellEditorMargin.MarginName)]
     [Order(After = PredefinedMarginNames.HorizontalScrollBar)]
     [MarginContainer(PredefinedMarginNames.Bottom)]
-    [ContentType("haskell")]
+    [ContentType(Constants.HaskellLanguageName)]
     [TextViewRole(PredefinedTextViewRoles.Interactive)]
     internal sealed class HaskellEditorMarginFactory : IWpfTextViewMarginProvider
     {

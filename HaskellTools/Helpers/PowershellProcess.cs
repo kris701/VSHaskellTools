@@ -5,9 +5,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace HaskellTools.Helpers
 {
+    public enum ProcessCompleteReson { None, ProcessNotRunning, RanToCompletion, ForceKilled }
     public class PowershellProcess
     {
         public event DataReceivedEventHandler ErrorDataRecieved;
@@ -15,35 +17,37 @@ namespace HaskellTools.Helpers
         public bool IsRunning { get; private set; }
 
         private Process _process;
+        DispatcherTimer _timer;
+        private bool _didForceKill = false;
 
-        public async Task WriteInputAsync(string input)
+        public async Task WriteLineAsync(string input)
         {
             if (IsRunning)
                 await _process.StandardInput.WriteLineAsync(input);
         }
 
-        public void WriteInput(string input)
+        public void WriteLine(string input)
         {
             if (IsRunning)
                 _process.StandardInput.WriteLine(input);
         }
 
-        public async Task StartProcessAsync()
+        public async Task StartProcessAsync(string args = "")
         {
             if (IsRunning)
                 await StopProcessAsync();
-            SetupProcess();
+            SetupProcess(args);
             _process.Start();
             _process.BeginErrorReadLine();
             _process.BeginOutputReadLine();
             IsRunning = true;
         }
 
-        public void StartProcess()
+        public void StartProcess(string args = "")
         {
             if (IsRunning)
                 StopProcess();
-            SetupProcess();
+            SetupProcess(args);
             _process.Start();
             _process.BeginErrorReadLine();
             _process.BeginOutputReadLine();
@@ -70,10 +74,46 @@ namespace HaskellTools.Helpers
             IsRunning = false;
         }
 
-        private void SetupProcess()
+        public async Task<ProcessCompleteReson> WaitForExitAsync(TimeSpan timeout)
+        {
+            if (IsRunning)
+            {
+                _didForceKill = false;
+                _timer = new DispatcherTimer();
+                _timer.Interval = timeout;
+                _timer.Tick += ForceKillTimer;
+                _timer.Start();
+                await WaitForExitAsync();
+                if (_didForceKill)
+                    return ProcessCompleteReson.ForceKilled;
+                else
+                    return ProcessCompleteReson.RanToCompletion;
+            }
+            else return ProcessCompleteReson.ProcessNotRunning;
+        }
+
+        public async Task<ProcessCompleteReson> WaitForExitAsync()
+        {
+            if (IsRunning)
+            {
+                await _process.WaitForExitAsync();
+                return ProcessCompleteReson.RanToCompletion;
+            }
+            else
+                return ProcessCompleteReson.ProcessNotRunning;
+        }
+
+        private void ForceKillTimer(object sender, EventArgs e)
+        {
+            _didForceKill = true;
+            ProcessHelper.KillProcessAndChildrens(_process.Id);
+        }
+
+        private void SetupProcess(string args = "")
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = @"powershell.exe";
+            startInfo.Arguments = args;
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardInput = true;

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace HaskellTools.ErrorList
 {
     [Export(typeof(ITextViewConnectionListener))]
-    [ContentType("haskell")]
+    [ContentType(Constants.HaskellLanguageName)]
     [TextViewRole(PredefinedTextViewRoles.Interactive)]
     internal class HaskellQuickInfoSourceConnectionListener : ITextViewConnectionListener
     {
