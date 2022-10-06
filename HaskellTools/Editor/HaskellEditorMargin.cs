@@ -2,11 +2,14 @@
 using HaskellTools.Options;
 using Microsoft.VisualStudio.Text.Editor;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace HaskellTools.Editor
 {
@@ -15,171 +18,168 @@ namespace HaskellTools.Editor
 
     public class HaskellEditorMargin : StackPanel, IWpfTextViewMargin
     {
-        private delegate void ChangeRunningStatusHandler(GHCiRunningState toStatus, string message);
-        private delegate void ChangeCheckingStatusHandler(GHCiCheckingState toStatus, int errorCount);
-        private static event ChangeRunningStatusHandler ChangeRunningStatusEvent;
-        private static event ChangeCheckingStatusHandler ChangeCheckingStatusEvent;
+        private Dictionary<Guid, StackPanel> _panels;
+        private Dictionary<Guid, DispatcherTimer> _panelTimers;
+        private List<Label> _loadingLabels;
+        private string _loadingChar = "/";
+        private DispatcherTimer _loadingTimer = new DispatcherTimer();
+
+        private delegate Guid SubscribePanelEventHandler();
+        private static event SubscribePanelEventHandler SubscribePanelEvent;
+
+        private delegate void UnsubscribePanelEventHandler(Guid panelGuid);
+        private static event UnsubscribePanelEventHandler UnsubscribePanelEvent;
+
+        private delegate void UpdatePanelEventHandler(Guid panelGuid, string text, SolidColorBrush backgroundColor, bool showLoading = false);
+        private static event UpdatePanelEventHandler UpdatePanelEvent;
 
         public const string MarginName = "Haskell Editor Margin";
 
         private bool isDisposed;
 
-        private StackPanel _checkerStatusPanel;
-        private StackPanel _statusPanel;
-
-        private Label _statusLabel;
-        private Label _checkerStatusLabel;
-        private Label _messageLabel;
-        private Label _loadingLabel;
-        private Label _checkerLoadingLabel;
-        private DispatcherTimer _loadingTimer = new DispatcherTimer();
-
         public HaskellEditorMargin(IWpfTextView textView)
         {
-            ChangeRunningStatusEvent += ChangeRunningStatus_Event;
-            ChangeCheckingStatusEvent += ChangeCheckingStatus_Event;
-
-            _loadingTimer.Interval = TimeSpan.FromMilliseconds(100);
-            _loadingTimer.Tick += LoadingLabel_Cycle;
-            _loadingTimer.Stop();
+            _panels = new Dictionary<Guid, StackPanel>();
+            _panelTimers = new Dictionary<Guid, DispatcherTimer>();
+            _loadingLabels = new List<Label>();
+            UpdatePanelEvent += UpdatePanel_Event;
+            SubscribePanelEvent += SubscribePanel_Event;
+            UnsubscribePanelEvent += UnsubscribePanel_Event;
 
             this.Height = 30;
             this.ClipToBounds = true;
             this.Background = new SolidColorBrush(Colors.Gray);
+            this.Orientation = Orientation.Horizontal;
 
-            _statusPanel = new StackPanel();
-            _statusPanel.Margin = new Thickness(2);
-            _statusPanel.Orientation = Orientation.Horizontal;
+            _loadingTimer.Interval = TimeSpan.FromMilliseconds(100);
+            _loadingTimer.Tick += LoadingLabel_Cycle;
+            _loadingTimer.Stop();
+        }
 
-            _loadingLabel = new Label()
+        public static Guid SubscribePanel()
+        {
+            if (SubscribePanelEvent != null)
+                return SubscribePanelEvent.Invoke();
+            return Guid.Empty;
+        }
+        private Guid SubscribePanel_Event()
+        {
+            var newPanel = new StackPanel();
+            newPanel.Orientation = Orientation.Horizontal;
+            newPanel.Margin = new Thickness(2);
+
+            var loadingLabel = new Label()
             {
-                Content = "/",
+                Content = _loadingChar,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Width = 30,
-                Visibility = Visibility.Hidden
+                Visibility = Visibility.Hidden,
+                Name = "LoadingLabel"
             };
-            _loadingLabel.IsVisibleChanged += LoadingLabel_IsVisibileChanged;
-            _statusPanel.Children.Add(_loadingLabel);
-            _statusPanel.Children.Add(new Separator()
-            {
-                Width = 30,
-                Height = 0,
-                HorizontalAlignment = HorizontalAlignment.Center
-            });
-            _statusLabel = new Label
+            loadingLabel.IsVisibleChanged += LoadingLabel_IsVisibileChanged;
+            newPanel.Children.Add(loadingLabel);
+            _loadingLabels.Add(loadingLabel);
+
+            var statusLabel = new Label()
             {
                 Content = "",
                 HorizontalAlignment = HorizontalAlignment.Center,
-                FontWeight = FontWeights.Bold
+                FontWeight = FontWeights.Bold,
+                Name = "StatusLabel"
             };
-            _statusPanel.Children.Add(_statusLabel);
-            _messageLabel = new Label
-            {
-                Content = "Waiting for execution...",
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-            _statusPanel.Children.Add(_messageLabel);
-
-            this.Children.Add(_statusPanel);
-
-
-            _checkerStatusPanel = new StackPanel();
-            _checkerStatusPanel.Margin = new Thickness(2);
-            _checkerStatusPanel.Orientation = Orientation.Horizontal;
-
-            _checkerLoadingLabel = new Label()
-            {
-                Content = "/",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Width = 30,
-                Visibility = Visibility.Hidden
-            };
-            _checkerStatusLabel = new Label
-            {
-                Content = "",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                FontWeight = FontWeights.Bold
-            };
-            _checkerStatusPanel.Children.Add(_checkerStatusLabel);
-            _checkerLoadingLabel.IsVisibleChanged += LoadingLabel_IsVisibileChanged;
-            _checkerStatusPanel.Children.Add(_checkerLoadingLabel);
-
-            this.Children.Add(_checkerStatusPanel);
+            newPanel.Children.Add(statusLabel);
+            var newGuid = Guid.NewGuid();
+            _panels.Add(newGuid, newPanel);
+            var newTimer = new DispatcherTimer();
+            newTimer.Tag = newGuid;
+            newTimer.Tick += RemovePanelEvent;
+            newTimer.Interval = TimeSpan.FromSeconds(10);
+            newTimer.Start();
+            _panelTimers.Add(newGuid, newTimer);
+            this.Children.Add(newPanel);
+            return newGuid;
         }
 
-        public static void ChangeRunningStatus(GHCiRunningState toStatus, string message)
+        public static void UnsubscribePanel(Guid panelGuid)
         {
-            if (ChangeRunningStatusEvent != null)
-                ChangeRunningStatusEvent.Invoke(toStatus, message);
+            if (UnsubscribePanelEvent != null)
+                UnsubscribePanelEvent.Invoke(panelGuid);
         }
-
-        public static void ChangeCheckingStatus(GHCiCheckingState toStatus, int errorCount)
+        private void UnsubscribePanel_Event(Guid panelGuid)
         {
-            if (ChangeCheckingStatusEvent != null)
-                ChangeCheckingStatusEvent.Invoke(toStatus, errorCount);
-        }
+            _panelTimers[panelGuid].Stop();
+            _panelTimers.Remove(panelGuid);
 
-        private void ChangeRunningStatus_Event(GHCiRunningState toStatus, string message)
-        {
-            switch (toStatus)
+            var panel = _panels[panelGuid];
+            foreach (UIElement child in panel.Children)
             {
-                case GHCiRunningState.None:
-                    _loadingLabel.Visibility = Visibility.Hidden;
-                    _statusLabel.Content = "";
-                    _messageLabel.Content = message;
-                    _statusPanel.Background = new SolidColorBrush(Colors.Gray);
-                    break;
-                case GHCiRunningState.Running:
-                    _loadingLabel.Visibility = Visibility.Visible;
-                    _statusLabel.Content = "Running...";
-                    _messageLabel.Content = message;
-                    _statusPanel.Background = new SolidColorBrush(Colors.LightGreen);
-                    break;
-                case GHCiRunningState.Failed:
-                    _loadingLabel.Visibility = Visibility.Hidden;
-                    _statusLabel.Content = "Run aborted!";
-                    _messageLabel.Content = message;
-                    _statusPanel.Background = new SolidColorBrush(Colors.LightPink);
-                    break;
-                case GHCiRunningState.Finished:
-                    _loadingLabel.Visibility = Visibility.Hidden;
-                    _statusLabel.Content = "Run Finished!";
-                    _messageLabel.Content = message;
-                    _statusPanel.Background = new SolidColorBrush(Colors.Gray);
-                    break;
+                if (child is Label label)
+                {
+                    if (label.Name == "LoadingLabel")
+                    {
+                        _loadingLabels.Remove(label);
+                        break;
+                    }
+                }
+            }
+            this.Children.Remove(panel);
+            _panels.Remove(panelGuid);
+        }
+
+        public static void UpdatePanel(Guid panelGuid, string text, SolidColorBrush backgroundColor, bool showLoading = false)
+        {
+            if (UpdatePanelEvent != null)
+                UpdatePanelEvent.Invoke(panelGuid, text, backgroundColor, showLoading);
+        }
+        private void UpdatePanel_Event(Guid panelGuid, string text, SolidColorBrush backgroundColor, bool showLoading = false)
+        {
+            if (_panels.ContainsKey(panelGuid))
+            {
+                if (showLoading)
+                    _panelTimers[panelGuid].Stop();
+                else
+                    _panelTimers[panelGuid].Start();
+                var panel = _panels[panelGuid];
+                panel.Background = backgroundColor;
+                foreach (UIElement child in panel.Children)
+                {
+                    if (child is Label label)
+                    {
+                        if (label.Name == "LoadingLabel")
+                        {
+                            if (showLoading)
+                                label.Visibility = Visibility.Visible;
+                            else
+                                label.Visibility = Visibility.Hidden;
+                        }
+                        else if (label.Name == "StatusLabel")
+                        {
+                            label.Content = text;
+                        }
+                    }
+                }
             }
         }
 
-        private void ChangeCheckingStatus_Event(GHCiCheckingState toStatus, int errorCount)
+        private void RemovePanelEvent(object sender, EventArgs e)
         {
-            switch (toStatus)
-            {
-                case GHCiCheckingState.None:
-                    _checkerLoadingLabel.Visibility = Visibility.Hidden;
-                    _checkerStatusLabel.Content = "";
-                    _checkerStatusPanel.Background = new SolidColorBrush(Colors.Gray);
-                    break;
-                case GHCiCheckingState.Checking:
-                    _checkerLoadingLabel.Visibility = Visibility.Visible;
-                    _checkerStatusLabel.Content = "Checking document...";
-                    _checkerStatusPanel.Background = new SolidColorBrush(Colors.BlueViolet);
-                    break;
-                case GHCiCheckingState.Failed:
-                    _checkerLoadingLabel.Visibility = Visibility.Hidden;
-                    _checkerStatusLabel.Content = $"Compile Errors: {errorCount}";
-                    _checkerStatusPanel.Background = new SolidColorBrush(Colors.LightPink);
-                    break;
-                case GHCiCheckingState.Finished:
-                    _checkerLoadingLabel.Visibility = Visibility.Hidden;
-                    _checkerStatusLabel.Content = "Compile Errors: None";
-                    _checkerStatusPanel.Background = new SolidColorBrush(Colors.Gray);
-                    break;
-            }
+            if (sender is DispatcherTimer timer)
+                if (timer.Tag is Guid id)
+                    UnsubscribePanel_Event(id);
         }
 
         private void LoadingLabel_IsVisibileChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (_loadingLabel.IsVisible || _checkerLoadingLabel.IsVisible)
+            bool isAnyVisible = false;
+            foreach(var label in _loadingLabels)
+            {
+                if (label.Visibility == Visibility.Visible)
+                {
+                    isAnyVisible = true;
+                    break;
+                }
+            }
+            if (isAnyVisible)
                 _loadingTimer.Start();
             else
                 _loadingTimer.Stop();
@@ -187,24 +187,27 @@ namespace HaskellTools.Editor
 
         private void LoadingLabel_Cycle(object sender, EventArgs e)
         {
-            switch (_loadingLabel.Content)
+            switch (_loadingChar)
             {
                 case "/":
-                    _loadingLabel.Content = "-";
-                    _checkerLoadingLabel.Content = "-";
+                    _loadingChar = "-";
                     break;
                 case "-":
-                    _loadingLabel.Content = "\\";
-                    _checkerLoadingLabel.Content = "\\";
+                    _loadingChar = "\\";
                     break;
                 case "\\":
-                    _loadingLabel.Content = "|";
-                    _checkerLoadingLabel.Content = "|";
+                    _loadingChar = "|";
                     break;
                 case "|":
-                    _loadingLabel.Content = "/";
-                    _checkerLoadingLabel.Content = "/";
+                    _loadingChar = "/";
                     break;
+            }
+            foreach (var label in _loadingLabels)
+            {
+                if (label.Visibility == Visibility.Visible)
+                {
+                    label.Content = _loadingChar;
+                }
             }
         }
 

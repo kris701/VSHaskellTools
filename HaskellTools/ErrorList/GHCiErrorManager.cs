@@ -139,7 +139,7 @@ namespace HaskellTools.ErrorList
                 {
                     FileName = DTE2Helper.GetSourceFilePath();
 
-                    HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Checking, 0);
+                    //HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Checking, 0);
 
                     _currentErrors.Clear();
                     _foundAny = false;
@@ -160,11 +160,11 @@ namespace HaskellTools.ErrorList
                     if (_currentErrors.Count > 0)
                     {
                         _errorProvider.Show();
-                        HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Failed, _currentErrors.Count);
+                        //HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Failed, _currentErrors.Count);
                     }
                     else
                     {
-                        HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Finished, 0);
+                        //HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Finished, 0);
                     }
                 }
             }

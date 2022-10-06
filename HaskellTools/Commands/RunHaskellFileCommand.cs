@@ -15,6 +15,7 @@ using System.IO.Packaging;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Task = System.Threading.Tasks.Task;
 
@@ -29,7 +30,7 @@ namespace HaskellTools.Commands
 
         private string _sourceFilePath = "";
         private string _sourceFileName = "";
-        private bool _enableReading = true;
+        private Guid _statusPanelGuid;
 
         private RunHaskellFileCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
         {
@@ -53,9 +54,9 @@ namespace HaskellTools.Commands
 
             _sourceFilePath = DTE2Helper.GetSourceFilePath();
             _sourceFileName = DTE2Helper.GetSourceFileName();
-            _enableReading = true;
 
-            HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Running, $"Executing '{_sourceFileName}'");
+            _statusPanelGuid = HaskellEditorMargin.SubscribePanel();
+            HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}'", new SolidColorBrush(Colors.LightGreen), true);
 
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
@@ -81,25 +82,23 @@ namespace HaskellTools.Commands
             if (res == ProcessCompleteReson.ForceKilled)
             {
                 OutputPanel.WriteLine($"ERROR! Function ran for longer than {timeoutSpan}! Killing process...");
-                HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Failed, $"Execution of '{_sourceFileName}' failed!");
+                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' failed!", new SolidColorBrush(Colors.LightPink), false);
             }
             else
             {
                 OutputPanel.WriteLineInvoke("Function ran to completion!");
-                HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Finished, $"Successfully ran the file '{_sourceFileName}'");
+                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}'", new SolidColorBrush(Colors.Gray), false);
             }
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
-            if (e.Data != null && _enableReading)
-                OutputPanel.WriteLineInvoke($"ERROR! {e.Data}");
+            OutputPanel.WriteLineInvoke($"ERROR! {e.Data}");
         }
 
         private void RecieveOutputData(object sender, DataReceivedEventArgs e)
         {
-            if (e.Data != null && _enableReading)
-                OutputPanel.WriteLineInvoke($"{e.Data}");
+            OutputPanel.WriteLineInvoke($"{e.Data}");
         }
     }
 }

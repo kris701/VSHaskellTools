@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
 
@@ -34,6 +35,7 @@ namespace HaskellTools.Commands
         private string _selectedText = "";
         private bool _isReading = false;
         private bool _enableReading = true;
+        private Guid _statusPanelGuid;
 
         private RunSelectedFunctionCommand(AsyncPackage package, OleMenuCommandService commandService) : base(package, commandService)
         {
@@ -48,7 +50,7 @@ namespace HaskellTools.Commands
             {
                 ProcessHelper.KillProcessAndChildrens(_process.Id);
                 OutputPanel.WriteLine($"ERROR! Function ran for longer than {_loopTimer.Interval}! Killing process...");
-                HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Failed, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!");
+                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!", new SolidColorBrush(Colors.LightPink), false);
             }
         }
 
@@ -73,7 +75,8 @@ namespace HaskellTools.Commands
             _selectedText = DTE2Helper.GetSelectedText();
             _enableReading = true;
 
-            HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Running, $"Executing '{_sourceFileName}' and function '{_selectedText}'");
+            _statusPanelGuid = HaskellEditorMargin.SubscribePanel();
+            HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", new SolidColorBrush(Colors.LightGreen), true);
 
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
@@ -83,7 +86,7 @@ namespace HaskellTools.Commands
                 _loopTimer.Interval = TimeSpan.FromSeconds(OptionsAccessor.HaskellFileExecutionTimeout);
                 _isReading = false;
                 await RunAsync();
-                HaskellEditorMargin.ChangeRunningStatus(GHCiRunningState.Finished, $"Successfully ran the file '{_sourceFileName}' and function '{_selectedText}'");
+                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}' and function '{_selectedText}'", new SolidColorBrush(Colors.Gray), false);
             });
         }
 
