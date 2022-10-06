@@ -29,7 +29,7 @@ namespace HaskellTools.Helpers
             try
             {
                 Process proc = Process.GetProcessById(pid);
-                if (!proc.HasExited) proc.Kill();
+                if (proc != null && !proc.HasExited) proc.Kill();
             }
             catch (ArgumentException)
             {

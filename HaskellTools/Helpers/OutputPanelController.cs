@@ -80,5 +80,11 @@ namespace HaskellTools.Helpers
         {
             return Package.GetGlobalService(typeof(DTE)) as EnvDTE80.DTE2;
         }
+
+        public void ActivateOutputWindow()
+        {
+            if (targetPanel != null)
+                targetPanel.Activate();
+        }
     }
 }

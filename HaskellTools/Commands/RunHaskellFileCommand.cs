@@ -87,7 +87,7 @@ namespace HaskellTools.Commands
             else
             {
                 OutputPanel.WriteLineInvoke("Function ran to completion!");
-                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}'", new SolidColorBrush(Colors.Gray), false);
+                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}'", new SolidColorBrush(Colors.LightGreen), false);
             }
         }
 

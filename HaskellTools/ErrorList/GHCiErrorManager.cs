@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace HaskellTools.ErrorList
@@ -139,7 +140,8 @@ namespace HaskellTools.ErrorList
                 {
                     FileName = DTE2Helper.GetSourceFilePath();
 
-                    //HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Checking, 0);
+                    Guid statusPanelGuid = HaskellEditorMargin.SubscribePanel();
+                    HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Checking file...", new SolidColorBrush(Colors.BlueViolet), true);
 
                     _currentErrors.Clear();
                     _foundAny = false;
@@ -160,11 +162,11 @@ namespace HaskellTools.ErrorList
                     if (_currentErrors.Count > 0)
                     {
                         _errorProvider.Show();
-                        //HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Failed, _currentErrors.Count);
+                        HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Compile Errors: {_currentErrors.Count}", new SolidColorBrush(Colors.LightPink), false);
                     }
                     else
                     {
-                        //HaskellEditorMargin.ChangeCheckingStatus(GHCiCheckingState.Finished, 0);
+                        HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"No compile errors found!", new SolidColorBrush(Colors.LightGreen), false);
                     }
                 }
             }
