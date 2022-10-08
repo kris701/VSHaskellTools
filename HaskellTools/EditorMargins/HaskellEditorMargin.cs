@@ -18,27 +18,14 @@ namespace HaskellTools.EditorMargins
 {
     public class HaskellEditorMargin : StackPanel, IWpfTextViewMargin
     {
-        private Dictionary<Guid,MarginPanel> _panels;
-
-        private delegate Guid SubscribePanelEventHandler();
-        private static event SubscribePanelEventHandler SubscribePanelEvent;
-
-        private delegate void UnsubscribePanelEventHandler(Guid panelGuid);
-        private static event UnsubscribePanelEventHandler UnsubscribePanelEvent;
-
-        private delegate void UpdatePanelEventHandler(Guid panelGuid, string text, SolidColorBrush backgroundColor, bool showLoading = false);
-        private static event UpdatePanelEventHandler UpdatePanelEvent;
-
         public const string MarginName = "Haskell Editor Margin";
 
+        private Dictionary<Guid, MarginPanel> _panels;
         private bool isDisposed;
 
         public HaskellEditorMargin(IWpfTextView textView)
         {
             _panels = new Dictionary<Guid, MarginPanel>();
-            UpdatePanelEvent += UpdatePanel_Event;
-            SubscribePanelEvent += SubscribePanel_Event;
-            UnsubscribePanelEvent += UnsubscribePanel_Event;
 
             this.Height = 35;
             this.ClipToBounds = true;
@@ -46,26 +33,17 @@ namespace HaskellTools.EditorMargins
             this.Orientation = Orientation.Horizontal;
         }
 
-        public static Guid SubscribePanel()
+        public void SubscribePanel_Event(Guid newGuid)
         {
-            if (SubscribePanelEvent != null)
-                return SubscribePanelEvent.Invoke();
-            return Guid.Empty;
-        }
-        private Guid SubscribePanel_Event()
-        {
-            var newPanel = new MarginPanel(_panels);
-            this.Children.Add(newPanel);
-            _panels.Add(newPanel.PanelID, newPanel);
-            return newPanel.PanelID;
+            if (this.IsVisible)
+            {
+                var newPanel = new MarginPanel(_panels, newGuid);
+                this.Children.Add(newPanel);
+                _panels.Add(newPanel.PanelID, newPanel);
+            }
         }
 
-        public static void UnsubscribePanel(Guid panelGuid)
-        {
-            if (UnsubscribePanelEvent != null)
-                UnsubscribePanelEvent.Invoke(panelGuid);
-        }
-        private async void UnsubscribePanel_Event(Guid panelGuid)
+        public async void UnsubscribePanel_Event(Guid panelGuid)
         {
             if (_panels.ContainsKey(panelGuid))
             {
@@ -74,27 +52,16 @@ namespace HaskellTools.EditorMargins
             }
         }
 
-        public static void UpdatePanel(Guid panelGuid, string text, SolidColorBrush backgroundColor, bool showLoading = false)
+        public void UpdatePanel_Event(Guid panelGuid, string text, SolidColorBrush backgroundColor, bool showLoading = false)
         {
-            if (UpdatePanelEvent != null)
-                UpdatePanelEvent.Invoke(panelGuid, text, backgroundColor, showLoading);
-        }
-        private async void UpdatePanel_Event(Guid panelGuid, string text, SolidColorBrush backgroundColor, bool showLoading = false)
-        {
-            if (_panels.ContainsKey(panelGuid))
+            if (this.IsVisible)
             {
-                var panel = _panels[panelGuid];
-                while (!panel.IsLoaded)
-                    await Task.Delay(100);
-                panel.UpdatePanel(text, backgroundColor, showLoading);
+                if (_panels.ContainsKey(panelGuid))
+                {
+                    var panel = _panels[panelGuid];
+                    panel.UpdatePanel(text, backgroundColor, showLoading);
+                }
             }
-        }
-
-        private void RemovePanelEvent(object sender, EventArgs e)
-        {
-            if (sender is DispatcherTimer timer)
-                if (timer.Tag is Guid id)
-                    UnsubscribePanel_Event(id);
         }
 
         #region IWpfTextViewMargin
@@ -139,6 +106,8 @@ namespace HaskellTools.EditorMargins
         {
             if (!this.isDisposed)
             {
+                foreach (var panel in _panels.Values)
+                    panel.RemoveThisPanelFromParentAsync();
                 GC.SuppressFinalize(this);
                 this.isDisposed = true;
             }

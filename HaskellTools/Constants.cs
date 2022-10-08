@@ -10,6 +10,7 @@ namespace HaskellTools
     {
         public const string PackageGuidString = "6eaa553c-a41f-487b-99a1-a8383b6d1f74";
         public const string HaskellLanguageName = "Haskell";
+        public const int HaskellLanguageID = 1635;
         public const string HaskellExt = ".hs";
         public const string HaskellBaselanguageName = "CSharp";
         public const string HaskellGuidEditorFactory = "93fa4dc3-61ec-47af-b0ba-50cad3caf049";

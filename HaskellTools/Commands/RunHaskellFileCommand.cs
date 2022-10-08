@@ -27,6 +27,7 @@ namespace HaskellTools.Commands
         public override int CommandId { get; } = 256;
         public static RunHaskellFileCommand Instance { get; internal set; }
         private PowershellProcess _process;
+        private bool _isRunning = false;
 
         private string _sourceFilePath = "";
         private string _sourceFileName = "";
@@ -45,6 +46,12 @@ namespace HaskellTools.Commands
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            if (_isRunning)
+            {
+                HaskellEditorMarginFactory.UpdatePanel(HaskellEditorMarginFactory.SubscribePanel(), $"A Haskell file is already executing", StatusColors.StatusItemBadBackground(), false);
+                return;
+            }
+
             if (!DTE2Helper.IsValidFileOpen())
             {
                 MessageBox.Show("File must be a '.hs' file!");
@@ -55,8 +62,9 @@ namespace HaskellTools.Commands
             _sourceFilePath = DTE2Helper.GetSourceFilePath();
             _sourceFileName = DTE2Helper.GetSourceFileName();
 
-            _statusPanelGuid = HaskellEditorMargin.SubscribePanel();
-            HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}'", StatusColors.StatusItemNormalBackground(), true);
+            _statusPanelGuid = HaskellEditorMarginFactory.SubscribePanel();
+            HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}'", StatusColors.StatusItemNormalBackground(), true);
+            _isRunning = true;
 
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
@@ -83,14 +91,15 @@ namespace HaskellTools.Commands
             if (res == ProcessCompleteReson.ForceKilled)
             {
                 OutputPanel.WriteLine($"ERROR! Function ran for longer than {timeoutSpan}! Killing process...");
-                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' failed!", StatusColors.StatusItemBadBackground(), false);
+                HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' failed!", StatusColors.StatusItemBadBackground(), false);
             }
             else
             {
                 OutputPanel.WriteLineInvoke("Function ran to completion!");
                 OutputPanel.ActivateOutputWindow();
-                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}'", StatusColors.StatusItemGoodBackground(), false);
+                HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}'", StatusColors.StatusItemGoodBackground(), false);
             }
+            _isRunning = false;
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)

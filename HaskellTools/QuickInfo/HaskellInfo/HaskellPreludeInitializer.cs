@@ -31,8 +31,8 @@ namespace HaskellTools.QuickInfo.HaskellInfo
             Guid panelID = Guid.Empty;
             System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                panelID = HaskellEditorMargin.SubscribePanel();
-                HaskellEditorMargin.UpdatePanel(panelID, $"Loading QuickInfo from Prelude...", StatusColors.StatusItemNormalBackground(), true);
+                panelID = HaskellEditorMarginFactory.SubscribePanel();
+                HaskellEditorMarginFactory.UpdatePanel(panelID, $"Loading QuickInfo from Prelude...", StatusColors.StatusItemNormalBackground(), true);
             }));
             _parseCounter = 0;
             HaskellPreludeInfo.PreludeContent.Clear();
@@ -46,7 +46,7 @@ namespace HaskellTools.QuickInfo.HaskellInfo
 
             System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                HaskellEditorMargin.UpdatePanel(panelID, $"QuickInfo from Prelude loaded!", StatusColors.StatusItemGoodBackground(), false);
+                HaskellEditorMarginFactory.UpdatePanel(panelID, $"QuickInfo from Prelude loaded!", StatusColors.StatusItemGoodBackground(), false);
             }));
 
             HaskellPreludeInfo.IsLoading = false;

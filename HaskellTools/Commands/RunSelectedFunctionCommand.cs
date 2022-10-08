@@ -28,6 +28,7 @@ namespace HaskellTools.Commands
         public override int CommandId { get; } = 257;
         public static RunSelectedFunctionCommand Instance { get; internal set; }
         private PowershellProcess _process;
+        private bool _isRunning = false;
 
         private string _sourcePath = "";
         private string _sourceFileName = "";
@@ -48,6 +49,12 @@ namespace HaskellTools.Commands
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            if (_isRunning)
+            {
+                HaskellEditorMarginFactory.UpdatePanel(HaskellEditorMarginFactory.SubscribePanel(), $"A Haskell file is already executing", StatusColors.StatusItemBadBackground(), false);
+                return;
+            }
+
             if (!DTE2Helper.IsValidFileOpen())
             {
                 MessageBox.Show("File must be a '.hs' file!");
@@ -59,8 +66,9 @@ namespace HaskellTools.Commands
             _sourceFileName = DTE2Helper.GetSourceFileName();
             _selectedText = DTE2Helper.GetSelectedText();
 
-            _statusPanelGuid = HaskellEditorMargin.SubscribePanel();
-            HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemNormalBackground(), true);
+            _statusPanelGuid = HaskellEditorMarginFactory.SubscribePanel();
+            HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemNormalBackground(), true);
+            _isRunning = true;
 
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
@@ -89,14 +97,15 @@ namespace HaskellTools.Commands
             if (res == ProcessCompleteReson.ForceKilled)
             {
                 OutputPanel.WriteLine($"ERROR! Function ran for longer than {timeoutSpan}! Killing process...");
-                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!", StatusColors.StatusItemBadBackground(), false);
+                HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!", StatusColors.StatusItemBadBackground(), false);
             }
             else
             {
                 OutputPanel.WriteLineInvoke("Function ran to completion!");
                 OutputPanel.ActivateOutputWindow();
-                HaskellEditorMargin.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemGoodBackground(), false);
+                HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemGoodBackground(), false);
             }
+            _isRunning = false;
         }
 
 

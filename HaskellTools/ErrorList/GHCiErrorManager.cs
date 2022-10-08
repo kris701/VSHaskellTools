@@ -147,8 +147,8 @@ namespace HaskellTools.ErrorList
                     {
                         _previousDocument = newBuffer;
 
-                        Guid statusPanelGuid = HaskellEditorMargin.SubscribePanel();
-                        HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Checking file...", StatusColors.StatusItemNormalBackground(), true);
+                        Guid statusPanelGuid = HaskellEditorMarginFactory.SubscribePanel();
+                        HaskellEditorMarginFactory.UpdatePanel(statusPanelGuid, $"Checking file...", StatusColors.StatusItemNormalBackground(), true);
 
                         _currentErrors.Clear();
                         _foundAny = false;
@@ -169,11 +169,11 @@ namespace HaskellTools.ErrorList
                         if (_currentErrors.Count > 0)
                         {
                             _errorProvider.Show();
-                            HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"Compile Errors: {_currentErrors.Count}", StatusColors.StatusItemBadBackground(), false);
+                            HaskellEditorMarginFactory.UpdatePanel(statusPanelGuid, $"Compile Errors: {_currentErrors.Count}", StatusColors.StatusItemBadBackground(), false);
                         }
                         else
                         {
-                            HaskellEditorMargin.UpdatePanel(statusPanelGuid, $"No compile errors found!", StatusColors.StatusItemGoodBackground(), false);
+                            HaskellEditorMarginFactory.UpdatePanel(statusPanelGuid, $"No compile errors found!", StatusColors.StatusItemGoodBackground(), false);
                         }
                     }
                 }

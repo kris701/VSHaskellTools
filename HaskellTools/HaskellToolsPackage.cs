@@ -18,11 +18,11 @@ using Task = System.Threading.Tasks.Task;
 namespace HaskellTools
 {
     [ProvideService(typeof(HaskellLanguageFactory), ServiceName = nameof(HaskellLanguageFactory))]
-    [ProvideLanguageService(typeof(HaskellLanguageFactory), Constants.HaskellLanguageName, 0, 
-        ShowHotURLs = false, DefaultToNonHotURLs = true, EnableLineNumbers = true, 
-        EnableAsyncCompletion = true, EnableCommenting = true, ShowCompletion = true, 
+    [ProvideLanguageService(typeof(HaskellLanguageFactory), Constants.HaskellLanguageName, Constants.HaskellLanguageID,
+        ShowHotURLs = false, DefaultToNonHotURLs = true, EnableLineNumbers = true,
+        EnableAsyncCompletion = true, EnableCommenting = true, ShowCompletion = true,
         AutoOutlining = true, CodeSense = true, RequestStockColors = true, EnableFormatSelection = true,
-        QuickInfo = true
+        QuickInfo = true, ShowDropDownOptions = true, ShowMatchingBrace = true
         )]
     [ProvideLanguageExtension(typeof(HaskellLanguageFactory), Constants.HaskellExt)]
 

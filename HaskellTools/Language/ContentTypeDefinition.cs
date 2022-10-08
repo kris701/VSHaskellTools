@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.LanguageServer.Client;
+using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 using System;
 using System.Collections.Generic;
@@ -13,13 +14,15 @@ namespace HaskellTools
     public class ContentTypeDefinition
     {
         [Export]
-        [Name("haskell")]
+        [Name(Constants.HaskellLanguageName)]
         [BaseDefinition(CodeRemoteContentDefinition.CodeRemoteContentTypeName)]
+        [BaseDefinition(CodeRemoteContentDefinition.CodeRemoteTextMateBraceCompletionTypeName)]
+        [BaseDefinition(CodeRemoteContentDefinition.CodeRemoteTextMateStructureTypeName)]
         internal static Microsoft.VisualStudio.Utilities.ContentTypeDefinition HaskellContentTypeDefinition;
 
         [Export]
-        [FileExtension(".hs")]
-        [ContentType("haskell")]
+        [FileExtension(Constants.HaskellExt)]
+        [ContentType(Constants.HaskellLanguageName)]
         internal static FileExtensionToContentTypeDefinition HaskellFileExtensionDefinition;
     }
 #pragma warning restore 649
