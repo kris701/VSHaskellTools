@@ -94,16 +94,25 @@ namespace HaskellTools.Commands
             await RunSetupCommandsAsync();
 
             var res = await _process.WaitForExitAsync(timeoutSpan);
-            if (res == ProcessCompleteReson.ForceKilled)
+            OutputPanel.ActivateOutputWindow();
+            switch (res)
             {
-                OutputPanel.WriteLine($"ERROR! Function ran for longer than {timeoutSpan}! Killing process...");
-                HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!", StatusColors.StatusItemBadBackground(), false);
-            }
-            else
-            {
-                OutputPanel.WriteLineInvoke("Function ran to completion!");
-                OutputPanel.ActivateOutputWindow();
-                HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemGoodBackground(), false);
+                case ProcessCompleteReson.ForceKilled:
+                    OutputPanel.WriteLine($"ERROR! Function ran for longer than {timeoutSpan}! Killing process...");
+                    HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!", StatusColors.StatusItemBadBackground(), false);
+                    break;
+                case ProcessCompleteReson.StoppedOnError:
+                    OutputPanel.WriteLine($"Errors encountered!");
+                    HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!", StatusColors.StatusItemBadBackground(), false);
+                    break;
+                case ProcessCompleteReson.RanToCompletion:
+                    OutputPanel.WriteLineInvoke("Function ran to completion!");
+                    HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemGoodBackground(), false);
+                    break;
+                case ProcessCompleteReson.ProcessNotRunning:
+                    OutputPanel.WriteLineInvoke("Process is not running!");
+                    HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Process is not running", StatusColors.StatusItemBadBackground(), false);
+                    break;
             }
             _isRunning = false;
         }

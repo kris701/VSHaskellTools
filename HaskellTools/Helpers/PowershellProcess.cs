@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Threading;
+﻿using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +10,7 @@ using System.Windows.Threading;
 
 namespace HaskellTools.Helpers
 {
-    public enum ProcessCompleteReson { None, ProcessNotRunning, RanToCompletion, ForceKilled }
+    public enum ProcessCompleteReson { None, ProcessNotRunning, RanToCompletion, StoppedOnError, ForceKilled }
     public class PowershellProcess
     {
         public event DataReceivedEventHandler ErrorDataRecieved;
@@ -22,6 +23,7 @@ namespace HaskellTools.Helpers
         DispatcherTimer _timer;
         DispatcherTimer _OutputTimer;
         private bool _didForceKill = false;
+        private bool _didEncounterError = false;
 
         public async Task WriteLineAsync(string input)
         {
@@ -67,6 +69,10 @@ namespace HaskellTools.Helpers
         {
             if (_process != null && !_process.HasExited)
             {
+                if (_timer != null)
+                    _timer.Stop();
+                if (_OutputTimer != null)
+                    _OutputTimer.Stop();
                 ProcessHelper.KillProcessAndChildrens(_process.Id);
                 await _process.WaitForExitAsync();
             }
@@ -77,6 +83,10 @@ namespace HaskellTools.Helpers
         {
             if (_process != null && !_process.HasExited)
             {
+                if (_timer != null)
+                    _timer.Stop();
+                if (_OutputTimer != null)
+                    _OutputTimer.Stop();
                 ProcessHelper.KillProcessAndChildrens(_process.Id);
                 _process.WaitForExit();
             }
@@ -87,6 +97,8 @@ namespace HaskellTools.Helpers
         {
             if (_didForceKill)
                 return ProcessCompleteReson.ForceKilled;
+            if (_didEncounterError)
+                return ProcessCompleteReson.StoppedOnError;
             if (IsRunning)
             {
                 _timer = new DispatcherTimer();
@@ -96,6 +108,8 @@ namespace HaskellTools.Helpers
                 await WaitForExitAsync();
                 if (_didForceKill)
                     return ProcessCompleteReson.ForceKilled;
+                if (_didEncounterError)
+                    return ProcessCompleteReson.StoppedOnError;
                 return ProcessCompleteReson.RanToCompletion;
             }
             else return ProcessCompleteReson.ProcessNotRunning;
@@ -105,11 +119,15 @@ namespace HaskellTools.Helpers
         {
             if (_didForceKill)
                 return ProcessCompleteReson.ForceKilled;
+            if (_didEncounterError)
+                return ProcessCompleteReson.StoppedOnError;
             if (IsRunning)
             {
                 await _process.WaitForExitAsync();
                 if (_didForceKill)
                     return ProcessCompleteReson.ForceKilled;
+                if (_didEncounterError)
+                    return ProcessCompleteReson.StoppedOnError;
                 return ProcessCompleteReson.RanToCompletion;
             }
             else
@@ -155,21 +173,22 @@ namespace HaskellTools.Helpers
             if (OutputTimeout > TimeSpan.Zero)
                 _OutputTimer.Start();
             _didForceKill = false;
+            _didEncounterError = false;
         }
 
-        private void RecieveErrorData(object sender, DataReceivedEventArgs e)
+        private async void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
             if (e.Data != null && e.Data != "")
             {
-                if (StopOnError)
-                {
-                    _didForceKill = true;
-                    StopProcess();
-                }
                 if (OutputTimeout > TimeSpan.Zero)
                     _OutputTimer.Start();
                 if (ErrorDataRecieved != null)
                     ErrorDataRecieved.Invoke(sender, e);
+                if (StopOnError)
+                {
+                    _didEncounterError = true;
+                    await StopProcessAsync();
+                }
             }
         }
 
