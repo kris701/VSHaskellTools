@@ -40,7 +40,15 @@ namespace HaskellTools.Commands
             return newService;
         }
 
-        public abstract void Execute(object sender, EventArgs e);
+        public void Execute(object sender, EventArgs e)
+        {
+            this.package.JoinableTaskFactory.RunAsync(async delegate
+            {
+                await ExecuteAsync();
+            });
+        }
+
+        public abstract Task ExecuteAsync();
 
         private async void CheckQueryStatus(object sender, EventArgs e)
         {

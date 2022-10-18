@@ -19,10 +19,9 @@ namespace HaskellTools.Commands
             Instance = new GitHubCommand(package, await InitializeCommandServiceAsync(package));
         }
 
-        public override void Execute(object sender, EventArgs e)
+        public override async Task ExecuteAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            System.Diagnostics.Process.Start("https://github.com/kris701/HaskellRunner");
+            await Task.Run(() => System.Diagnostics.Process.Start("https://github.com/kris701/HaskellRunner"));
         }
     }
 }

@@ -45,37 +45,34 @@ namespace HaskellTools.Commands
             Instance = new RunSelectedFunctionCommand(package, await InitializeCommandServiceAsync(package));
         }
 
-        public override void Execute(object sender, EventArgs e)
+        public override async Task ExecuteAsync()
         {
-            this.package.JoinableTaskFactory.RunAsync(async delegate
+            if (_isRunning)
             {
-                if (_isRunning)
-                {
-                    HaskellEditorMarginFactory.UpdatePanel(HaskellEditorMarginFactory.SubscribePanel(), $"A Haskell file is already executing", StatusColors.StatusItemBadBackground(), false);
-                    return;
-                }
+                HaskellEditorMarginFactory.UpdatePanel(HaskellEditorMarginFactory.SubscribePanel(), $"A Haskell file is already executing", StatusColors.StatusItemBadBackground(), false);
+                return;
+            }
 
-                if (!await DTE2Helper.IsValidFileOpenAsync())
-                {
-                    MessageBox.Show("File must be a '.hs' file!");
-                    return;
-                }
-                await DTE2Helper.SaveActiveDocumentAsync();
+            if (!await DTE2Helper.IsValidFileOpenAsync())
+            {
+                MessageBox.Show("File must be a '.hs' file!");
+                return;
+            }
+            await DTE2Helper.SaveActiveDocumentAsync();
 
-                _sourcePath = await DTE2Helper.GetSourcePathAsync();
-                _sourceFileName = await DTE2Helper.GetSourceFileNameAsync();
-                _selectedText = await DTE2Helper.GetSelectedTextAsync();
+            _sourcePath = await DTE2Helper.GetSourcePathAsync();
+            _sourceFileName = await DTE2Helper.GetSourceFileNameAsync();
+            _selectedText = await DTE2Helper.GetSelectedTextAsync();
 
-                _statusPanelGuid = HaskellEditorMarginFactory.SubscribePanel();
-                HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemNormalBackground(), true);
-                _isRunning = true;
+            _statusPanelGuid = HaskellEditorMarginFactory.SubscribePanel();
+            HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemNormalBackground(), true);
+            _isRunning = true;
 
-                await OutputPanel.InitializeAsync();
-                await OutputPanel.ClearOutputAsync();
-                await OutputPanel.WriteLineAsync("Running Function with GHCi...");
-                _isReading = false;
-                await RunAsync();
-            });
+            await OutputPanel.InitializeAsync();
+            await OutputPanel.ClearOutputAsync();
+            await OutputPanel.WriteLineAsync("Running Function with GHCi...");
+            _isReading = false;
+            await RunAsync();
         }
 
         private async Task RunAsync()

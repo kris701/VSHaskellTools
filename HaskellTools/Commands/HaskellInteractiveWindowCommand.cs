@@ -25,23 +25,20 @@ namespace HaskellTools.Commands
             Instance = new HaskellInteractiveWindowCommand(package, await InitializeCommandServiceAsync(package));
         }
 
-        public override void Execute(object sender, EventArgs e)
+        public override async Task ExecuteAsync()
         {
-            this.package.JoinableTaskFactory.RunAsync(async delegate
+            if (!await DTE2Helper.IsValidFileOpenAsync())
             {
-                if (!await DTE2Helper.IsValidFileOpenAsync())
-                {
-                    MessageBox.Show("File must be a '.hs' file!");
-                    return;
-                }
-                await DTE2Helper.SaveActiveDocumentAsync();
+                MessageBox.Show("File must be a '.hs' file!");
+                return;
+            }
+            await DTE2Helper.SaveActiveDocumentAsync();
 
-                ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(HaskellInteractiveWindow), 0, true, this.package.DisposalToken);
-                if ((null == window) || (null == window.Frame))
-                {
-                    throw new NotSupportedException("Cannot create tool window");
-                }
-            });
+            ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(HaskellInteractiveWindow), 0, true, this.package.DisposalToken);
+            if ((null == window) || (null == window.Frame))
+            {
+                throw new NotSupportedException("Cannot create tool window");
+            }
         }
     }
 }

@@ -25,22 +25,19 @@ namespace HaskellTools
             Instance = new InstallGHCiWindowCommand(package, await InitializeCommandServiceAsync(package));
         }
 
-        public override void Execute(object sender, EventArgs e)
+        public override async Task ExecuteAsync()
         {
-            this.package.JoinableTaskFactory.RunAsync(async delegate
+            while (!await DTE2Helper.IsFullyVSOpenAsync())
             {
-                while (!await DTE2Helper.IsFullyVSOpenAsync())
-                {
-                    if (this.package.DisposalToken.IsCancellationRequested)
-                        return;
-                    await Task.Delay(1000);
-                }
-                ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(InstallGHCiWindow), 0, true, this.package.DisposalToken);
-                if ((null == window) || (null == window.Frame))
-                {
-                    throw new NotSupportedException("Cannot create tool window");
-                }
-            });
+                if (this.package.DisposalToken.IsCancellationRequested)
+                    return;
+                await Task.Delay(1000);
+            }
+            ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(InstallGHCiWindow), 0, true, this.package.DisposalToken);
+            if ((null == window) || (null == window.Frame))
+            {
+                throw new NotSupportedException("Cannot create tool window");
+            }
         }
     }
 }
