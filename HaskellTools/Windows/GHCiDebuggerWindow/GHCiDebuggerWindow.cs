@@ -18,7 +18,7 @@ namespace HaskellTools
 
         public int OnClose(ref uint pgrfSaveOptions)
         {
-            Task.Run(async () => (this.Content as GHCiDebuggerWindowControl).UnloadAsync());
+            Task.Run(async () => await (this.Content as GHCiDebuggerWindowControl).UnloadAsync());
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
 
@@ -34,7 +34,7 @@ namespace HaskellTools
 
         public int OnShow(int fShow)
         {
-            (this.Content as GHCiDebuggerWindowControl).Load();
+            Task.Run(async () => await (this.Content as GHCiDebuggerWindowControl).LoadAsync());
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
 

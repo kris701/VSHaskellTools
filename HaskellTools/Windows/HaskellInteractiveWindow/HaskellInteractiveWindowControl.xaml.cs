@@ -106,12 +106,12 @@ namespace HaskellTools
                 _process.OutputDataRecieved += RecieveOutputData;
                 await _process.StartProcessAsync();
 
-                await _process.WriteLineAsync($"cd '{DTE2Helper.GetSourcePath()}'");
+                await _process.WriteLineAsync($"cd '{await DTE2Helper.GetSourcePathAsync()}'");
                 if (OptionsAccessor.GHCUPPath == "")
                     await _process.WriteLineAsync($"& ghci");
                 else
                     await _process.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
-                string fileName = DTE2Helper.GetSourceFileName();
+                string fileName = await DTE2Helper.GetSourceFileNameAsync();
                 _isLoaded = true;
                 await _process.WriteLineAsync($":load \"{fileName}\"");
                 LoadedFileNameLabel.Content = $"File Loaded: '{fileName}'";

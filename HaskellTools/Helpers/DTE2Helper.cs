@@ -16,9 +16,9 @@ namespace HaskellTools.Helpers
             return Package.GetGlobalService(typeof(DTE)) as EnvDTE80.DTE2;
         }
 
-        public static bool IsValidFileOpen()
+        public static async Task<bool> IsValidFileOpenAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             try
             {
                 EnvDTE80.DTE2 _applicationObject = GetDTE2();
@@ -27,7 +27,7 @@ namespace HaskellTools.Helpers
                 var uih = _applicationObject.ActiveDocument;
                 if (uih == null)
                     return false;
-                var extension = GetSourceFileExtension();
+                var extension = await GetSourceFileExtensionAsync();
                 if (extension != Constants.HaskellExt)
                     return false;
                 return true;
@@ -37,66 +37,66 @@ namespace HaskellTools.Helpers
             }
         }
 
-        public static bool IsFullyVSOpen()
+        public static async Task<bool> IsFullyVSOpenAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             EnvDTE80.DTE2 _applicationObject = GetDTE2();
             if (_applicationObject == null)
                 return false;
             return _applicationObject.Solution.IsOpen;
         }
 
-        public static string GetSourceFilePath()
+        public static async Task<string> GetSourceFilePathAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             EnvDTE80.DTE2 _applicationObject = GetDTE2();
             var uih = _applicationObject.ActiveDocument;
             return uih.FullName;
         }
 
-        public static string GetSourceFileName()
+        public static async Task<string> GetSourceFileNameAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             EnvDTE80.DTE2 _applicationObject = GetDTE2();
             var uih = _applicationObject.ActiveDocument;
             return uih.Name;
         }
 
-        public static string GetSourceFileExtension()
+        public static async Task<string> GetSourceFileExtensionAsync()
         {
-            string name = GetSourceFileName();
+            string name = await GetSourceFileNameAsync();
             return name.Substring(name.LastIndexOf('.'));
         }
 
-        public static string GetSourcePath()
+        public static async Task<string> GetSourcePathAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             EnvDTE80.DTE2 _applicationObject = GetDTE2();
             var uih = _applicationObject.ActiveDocument;
             return uih.Path;
         }
 
-        public static void SaveActiveDocument()
+        public static async Task SaveActiveDocumentAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             EnvDTE80.DTE2 _applicationObject = GetDTE2();
             var uih = _applicationObject.ActiveDocument;
             if (uih != null)
                 uih.Save();
         }
 
-        public static void FocusActiveDocument()
+        public static async Task FocusActiveDocumentAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             EnvDTE80.DTE2 _applicationObject = GetDTE2();
             var uih = _applicationObject.ActiveDocument;
             if (uih != null)
                 uih.Activate();
         }
 
-        public static string GetSelectedText()
+        public static async Task<string> GetSelectedTextAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             EnvDTE80.DTE2 _applicationObject = GetDTE2();
             var uih = _applicationObject.ActiveDocument;
             var value = ComUtils.Get(uih.Selection, "Text").ToString();

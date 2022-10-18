@@ -30,7 +30,7 @@ namespace HaskellTools
         {
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
-                while (!DTE2Helper.IsFullyVSOpen())
+                while (!await DTE2Helper.IsFullyVSOpenAsync())
                 {
                     if (this.package.DisposalToken.IsCancellationRequested)
                         return;

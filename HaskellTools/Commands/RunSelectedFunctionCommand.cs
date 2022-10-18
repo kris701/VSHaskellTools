@@ -47,34 +47,32 @@ namespace HaskellTools.Commands
 
         public override void Execute(object sender, EventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (_isRunning)
-            {
-                HaskellEditorMarginFactory.UpdatePanel(HaskellEditorMarginFactory.SubscribePanel(), $"A Haskell file is already executing", StatusColors.StatusItemBadBackground(), false);
-                return;
-            }
-
-            if (!DTE2Helper.IsValidFileOpen())
-            {
-                MessageBox.Show("File must be a '.hs' file!");
-                return;
-            }
-            DTE2Helper.SaveActiveDocument();
-
-            _sourcePath = DTE2Helper.GetSourcePath();
-            _sourceFileName = DTE2Helper.GetSourceFileName();
-            _selectedText = DTE2Helper.GetSelectedText();
-
-            _statusPanelGuid = HaskellEditorMarginFactory.SubscribePanel();
-            HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemNormalBackground(), true);
-            _isRunning = true;
-
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
-                OutputPanel.Initialize();
-                OutputPanel.ClearOutput();
-                OutputPanel.WriteLineInvoke("Running Function with GHCi...");
+                if (_isRunning)
+                {
+                    HaskellEditorMarginFactory.UpdatePanel(HaskellEditorMarginFactory.SubscribePanel(), $"A Haskell file is already executing", StatusColors.StatusItemBadBackground(), false);
+                    return;
+                }
+
+                if (!await DTE2Helper.IsValidFileOpenAsync())
+                {
+                    MessageBox.Show("File must be a '.hs' file!");
+                    return;
+                }
+                await DTE2Helper.SaveActiveDocumentAsync();
+
+                _sourcePath = await DTE2Helper.GetSourcePathAsync();
+                _sourceFileName = await DTE2Helper.GetSourceFileNameAsync();
+                _selectedText = await DTE2Helper.GetSelectedTextAsync();
+
+                _statusPanelGuid = HaskellEditorMarginFactory.SubscribePanel();
+                HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Executing '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemNormalBackground(), true);
+                _isRunning = true;
+
+                await OutputPanel.InitializeAsync();
+                await OutputPanel.ClearOutputAsync();
+                await OutputPanel.WriteLineAsync("Running Function with GHCi...");
                 _isReading = false;
                 await RunAsync();
             });
@@ -94,23 +92,23 @@ namespace HaskellTools.Commands
             await RunSetupCommandsAsync();
 
             var res = await _process.WaitForExitAsync(timeoutSpan);
-            OutputPanel.ActivateOutputWindow();
+            await OutputPanel.ActivateOutputWindowAsync();
             switch (res)
             {
                 case ProcessCompleteReson.ForceKilled:
-                    OutputPanel.WriteLine($"ERROR! Function ran for longer than {timeoutSpan}! Killing process...");
+                    await OutputPanel.WriteLineAsync($"ERROR! Function ran for longer than {timeoutSpan}! Killing process...");
                     HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!", StatusColors.StatusItemBadBackground(), false);
                     break;
                 case ProcessCompleteReson.StoppedOnError:
-                    OutputPanel.WriteLine($"Errors encountered!");
+                    await OutputPanel.WriteLineAsync($"Errors encountered!");
                     HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Execution of '{_sourceFileName}' and function '{_selectedText}' failed!", StatusColors.StatusItemBadBackground(), false);
                     break;
                 case ProcessCompleteReson.RanToCompletion:
-                    OutputPanel.WriteLineInvoke("Function ran to completion!");
+                    await OutputPanel.WriteLineAsync("Function ran to completion!");
                     HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Successfully ran the file '{_sourceFileName}' and function '{_selectedText}'", StatusColors.StatusItemGoodBackground(), false);
                     break;
                 case ProcessCompleteReson.ProcessNotRunning:
-                    OutputPanel.WriteLineInvoke("Process is not running!");
+                    await OutputPanel.WriteLineAsync("Process is not running!");
                     HaskellEditorMarginFactory.UpdatePanel(_statusPanelGuid, $"Process is not running", StatusColors.StatusItemBadBackground(), false);
                     break;
             }
@@ -118,18 +116,18 @@ namespace HaskellTools.Commands
         }
 
 
-        private void RecieveErrorData(object sender, DataReceivedEventArgs e)
+        private async void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
-            OutputPanel.WriteLineInvoke($"ERROR! {e.Data}");
+            await OutputPanel.WriteLineAsync($"ERROR! {e.Data}");
         }
 
-        private void RecieveOutputData(object sender, DataReceivedEventArgs e)
+        private async void RecieveOutputData(object sender, DataReceivedEventArgs e)
         {
             string line = $"{e.Data}";
             if (line.Contains("Leaving GHCi"))
                 _isReading = false;
             if (_isReading)
-                OutputPanel.WriteLineInvoke(line);
+                await OutputPanel.WriteLineAsync(line);
             if (line.Contains("module loaded"))
                 _isReading = true;
         }

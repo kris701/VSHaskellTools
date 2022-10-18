@@ -1,5 +1,6 @@
 ﻿using EnvDTE;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +20,9 @@ namespace HaskellTools.Helpers
             OutputPaneName = outputPanelName;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             if (targetPanel != null)
                 return;
@@ -44,9 +45,9 @@ namespace HaskellTools.Helpers
             targetPanel.Clear();
         }
 
-        public void ClearOutput()
+        public async Task ClearOutputAsync()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             if (targetPanel == null)
                 throw new ArgumentNullException("Panel not initialized!");
@@ -54,10 +55,8 @@ namespace HaskellTools.Helpers
             targetPanel.Clear();
         }
 
-        public void WriteLine(string text)
+        private void WriteLine(string text)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
             if (targetPanel == null)
                 throw new ArgumentNullException("Panel not initialized!");
 
@@ -68,18 +67,17 @@ namespace HaskellTools.Helpers
                 targetPanel.OutputString($"{text}{Environment.NewLine}");
         }
 
-        public void WriteLineInvoke(string text)
+        public async Task WriteLineAsync(string text)
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                WriteLine(text);
-            }));
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            WriteLine(text);
         }
 
-        public void ActivateOutputWindow()
+        public async Task ActivateOutputWindowAsync()
         {
             if (targetPanel != null)
             {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 DTE dte = DTE2Helper.GetDTE2();
                 var window = dte.Windows.Item(EnvDTE.Constants.vsWindowKindOutput);
                 window.Activate();

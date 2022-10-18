@@ -118,7 +118,7 @@ namespace HaskellTools.ErrorList
             _buffer = "";
         }
 
-        private void JumpToError(object sender, EventArgs e)
+        private async void JumpToError(object sender, EventArgs e)
         {
             if (sender is ErrorTask item) {
                 foreach(var line in TextField.TextViewLines)
@@ -128,7 +128,7 @@ namespace HaskellTools.ErrorList
                     {
                         var newSpan = new Microsoft.VisualStudio.Text.SnapshotSpan(line.Extent.Snapshot, line.Extent.Span);
                         TextField.Selection.Select(newSpan, false);
-                        DTE2Helper.FocusActiveDocument();
+                        await DTE2Helper.FocusActiveDocumentAsync();
                         break;
                     }
                 }
@@ -139,9 +139,9 @@ namespace HaskellTools.ErrorList
         {
             if (IsStarted)
             {
-                if (DTE2Helper.IsValidFileOpen())
+                if (await DTE2Helper.IsValidFileOpenAsync())
                 {
-                    FileName = DTE2Helper.GetSourceFilePath();
+                    FileName = await DTE2Helper.GetSourceFilePathAsync();
                     var newBuffer = File.ReadAllText(FileName);
                     if (newBuffer != _previousDocument)
                     {

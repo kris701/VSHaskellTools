@@ -42,10 +42,10 @@ namespace HaskellTools.Commands
 
         public abstract void Execute(object sender, EventArgs e);
 
-        private void CheckQueryStatus(object sender, EventArgs e)
+        private async void CheckQueryStatus(object sender, EventArgs e)
         {
             var button = (MenuCommand)sender;
-            button.Enabled = DTE2Helper.IsValidFileOpen();
+            button.Enabled = await DTE2Helper.IsValidFileOpenAsync();
         }
     }
 }

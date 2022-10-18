@@ -29,8 +29,12 @@ namespace HaskellTools
         {
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
-                while (!DTE2Helper.IsValidFileOpen())
+                while (!await DTE2Helper.IsFullyVSOpenAsync())
+                {
+                    if (this.package.DisposalToken.IsCancellationRequested)
+                        return;
                     await Task.Delay(1000);
+                }
                 ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(InstallGHCiWindow), 0, true, this.package.DisposalToken);
                 if ((null == window) || (null == window.Frame))
                 {

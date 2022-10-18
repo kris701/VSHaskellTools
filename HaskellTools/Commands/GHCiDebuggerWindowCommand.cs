@@ -27,14 +27,15 @@ namespace HaskellTools.Commands
 
         public override void Execute(object sender, EventArgs e)
         {
-            if (!DTE2Helper.IsValidFileOpen())
-            {
-                MessageBox.Show("File must be a '.hs' file!");
-                return;
-            }
-            DTE2Helper.SaveActiveDocument();
             this.package.JoinableTaskFactory.RunAsync(async delegate
             {
+                if (!await DTE2Helper.IsValidFileOpenAsync())
+                {
+                    MessageBox.Show("File must be a '.hs' file!");
+                    return;
+                }
+                await DTE2Helper.SaveActiveDocumentAsync();
+
                 ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(GHCiDebuggerWindow), 0, true, this.package.DisposalToken);
                 if ((null == window) || (null == window.Frame))
                 {

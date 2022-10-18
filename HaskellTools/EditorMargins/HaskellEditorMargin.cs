@@ -106,8 +106,8 @@ namespace HaskellTools.EditorMargins
         {
             if (!this.isDisposed)
             {
-                foreach (var panel in _panels.Values)
-                    panel.RemoveThisPanelFromParent();
+                for (int i = 0; i < _panels.Values.Count; i++)
+                    _panels.Values.First().RemoveThisPanelFromParent();
                 GC.SuppressFinalize(this);
                 this.isDisposed = true;
             }

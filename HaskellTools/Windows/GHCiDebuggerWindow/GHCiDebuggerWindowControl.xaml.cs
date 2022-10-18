@@ -3,6 +3,7 @@ using HaskellTools.Options;
 using HaskellTools.Windows.DebugData;
 using HaskellTools.Windows.GHCiDebuggerWindow.UserControls;
 using HaskellTools.Windows.UserControls;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json.Linq;
 using System;
@@ -118,22 +119,22 @@ namespace HaskellTools
             await StopDebuggerAsync();
         }
 
-        public void Load()
+        public async Task LoadAsync()
         {
-            if (DTE2Helper.IsValidFileOpen()) {
+            if (await DTE2Helper.IsValidFileOpenAsync()) {
                 if (!_process.IsRunning)
                 {
-                    var newName = DTE2Helper.GetSourceFileName();
+                    var newName = await DTE2Helper.GetSourceFileNameAsync();
                     if (FileLoaded != newName)
                     {
                         if (_sourcePath == "")
-                            _sourcePath = DTE2Helper.GetSourcePath();
+                            _sourcePath = await DTE2Helper.GetSourcePathAsync();
 
                         FileLoaded = newName;
                         CurrentlyDebuggingLabel.Content = $"Loaded File: {FileLoaded}";
                         ErrorLabel.Visibility = Visibility.Hidden;
                         MainGrid.Visibility = Visibility.Visible;
-                        FillBreakPointLines();
+                        await FillBreakPointLinesAsync();
                         IsFileLoaded = true;
                         MainGrid.IsEnabled = true;
                     }
@@ -159,12 +160,10 @@ namespace HaskellTools
             OutputTextbox.AppendTextInvoke($"{e.Data}{Environment.NewLine}", "#ba4141");
         }
 
-        private void RecieveNormalData(object sender, DataReceivedEventArgs e)
+        private async void RecieveNormalData(object sender, DataReceivedEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                EvaluateOutput(e.Data);
-            }));
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            EvaluateOutput(e.Data);
         }
 
         private void EvaluateOutput(string text)
@@ -316,10 +315,10 @@ namespace HaskellTools
             }
         }
 
-        public void FillBreakPointLines()
+        public async Task FillBreakPointLinesAsync()
         {
             BreakpointPanel.Children.Clear();
-            string fileName = DTE2Helper.GetSourceFilePath();
+            string fileName = await DTE2Helper.GetSourceFilePathAsync();
             string[] text = File.ReadAllLines(fileName);
             int index = 1;
             foreach (string line in text)

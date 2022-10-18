@@ -1,6 +1,8 @@
 ﻿using HaskellTools.EditorMargins;
 using HaskellTools.Helpers;
+using HaskellTools.Options;
 using Microsoft.VisualStudio.Language.StandardClassification;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Adornments;
 using Microsoft.VisualStudio.Threading;
 using System;
@@ -29,11 +31,10 @@ namespace HaskellTools.QuickInfo.HaskellInfo
             // Little delay to let VS start fully
             await Task.Delay(5000);
             Guid panelID = Guid.Empty;
-            System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                panelID = HaskellEditorMarginFactory.SubscribePanel();
-                HaskellEditorMarginFactory.UpdatePanel(panelID, $"Loading QuickInfo from Prelude...", StatusColors.StatusItemNormalBackground(), true);
-            }));
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            panelID = HaskellEditorMarginFactory.SubscribePanel();
+            HaskellEditorMarginFactory.UpdatePanel(panelID, $"Loading QuickInfo from Prelude...", StatusColors.StatusItemNormalBackground(), true);
+
             _parseCounter = 0;
             HaskellPreludeInfo.PreludeContent.Clear();
             _process = new PowershellProcess();
@@ -44,10 +45,8 @@ namespace HaskellTools.QuickInfo.HaskellInfo
 
             await _process.WaitForExitAsync();
 
-            System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                HaskellEditorMarginFactory.UpdatePanel(panelID, $"QuickInfo from Prelude loaded!", StatusColors.StatusItemGoodBackground(), false);
-            }));
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            HaskellEditorMarginFactory.UpdatePanel(panelID, $"QuickInfo from Prelude loaded!", StatusColors.StatusItemGoodBackground(), false);
 
             HaskellPreludeInfo.IsLoading = false;
         }
