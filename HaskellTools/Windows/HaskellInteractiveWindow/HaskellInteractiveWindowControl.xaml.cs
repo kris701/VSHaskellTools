@@ -18,7 +18,7 @@ namespace HaskellTools
     {
         private PowershellProcess _process;
         private bool _isLoaded = false;
-        private List<string> _previousText = new List<string>();
+        private List<string> _previousText = new List<string>() { "" };
         private int _previousTextIndex = 0;
 
         public HaskellInteractiveWindowControl()
@@ -130,23 +130,23 @@ namespace HaskellTools
             _isLoaded = false;
         }
 
-        private void RecieveErrorData(object sender, DataReceivedEventArgs e)
+        private async void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
             if (_isLoaded)
             {
                 string data = CleanErrorDataString(e.Data);
                 if (data != "")
-                    OutputTextbox.AppendTextInvoke($"{data}{Environment.NewLine}", "#ba4141");
+                    await OutputTextbox.AppendTextAsync($"{data}{Environment.NewLine}", "#ba4141");
             }
         }
 
-        private void RecieveOutputData(object sender, DataReceivedEventArgs e)
+        private async void RecieveOutputData(object sender, DataReceivedEventArgs e)
         {
             if (_isLoaded)
             {
                 string data = CleanDataString(e.Data);
                 if (data != "")
-                    OutputTextbox.AppendTextInvoke($"{data}{Environment.NewLine}", "#ffffff");
+                    await OutputTextbox.AppendTextAsync($"{data}{Environment.NewLine}", "#ffffff");
             }
         }
 
@@ -174,6 +174,7 @@ namespace HaskellTools
         private void ClearHistoryButton_Click(object sender, RoutedEventArgs e)
         {
             _previousText.Clear();
+            _previousText.Add("");
             _previousTextIndex = 0;
         }
     }

@@ -155,9 +155,9 @@ namespace HaskellTools
             FileLoaded = "None";
         }
 
-        private void RecieveErrorData(object sender, DataReceivedEventArgs e)
+        private async void RecieveErrorData(object sender, DataReceivedEventArgs e)
         {
-            OutputTextbox.AppendTextInvoke($"{e.Data}{Environment.NewLine}", "#ba4141");
+            await OutputTextbox.AppendTextAsync($"{e.Data}{Environment.NewLine}", "#ba4141");
         }
 
         private async void RecieveNormalData(object sender, DataReceivedEventArgs e)

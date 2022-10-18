@@ -26,12 +26,10 @@ namespace HaskellTools.Helpers
             catch (FormatException) { }
         }
 
-        public static void AppendTextInvoke(this RichTextBox box, string text, string color)
+        public static async Task AppendTextAsync(this RichTextBox box, string text, string color)
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                box.AppendText(text, color);
-            }));
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            box.AppendText(text, color);
         }
     }
 }
