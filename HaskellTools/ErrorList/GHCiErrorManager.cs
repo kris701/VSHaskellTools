@@ -49,6 +49,7 @@ namespace HaskellTools.ErrorList
             _currentErrors = new List<TaskListItem>();
             _process = new PowershellProcess();
 
+            ThreadHelper.ThrowIfNotOnUIThread();
             var dte2 = DTE2Helper.GetDTE2();
             var docEvent = dte2.Events.DocumentEvents;
             events.Add(docEvent);

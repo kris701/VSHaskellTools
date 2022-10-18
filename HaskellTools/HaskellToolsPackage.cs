@@ -55,7 +55,9 @@ namespace HaskellTools
             if (OptionsAccessor.GHCiFound)
             {
                 if (OptionsAccessor.IsFirstStart)
+#pragma warning disable VSTHRD103 // Call async methods when in an async method
                     WelcomeWindowCommand.Instance.Execute(null, null);
+#pragma warning restore VSTHRD103 // Call async methods when in an async method
 
                 await RunHaskellFileCommand.InitializeAsync(this);
                 await RunSelectedFunctionCommand.InitializeAsync(this);

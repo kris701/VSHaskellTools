@@ -42,7 +42,9 @@ namespace HaskellTools.Checkers
             else
             {
                 await InstallGHCiWindowCommand.InitializeAsync(_package);
+#pragma warning disable VSTHRD103 // Call async methods when in an async method
                 InstallGHCiWindowCommand.Instance.Execute(null, null);
+#pragma warning restore VSTHRD103 // Call async methods when in an async method
             }
             await _process.StopProcessAsync();
         }
