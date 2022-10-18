@@ -20,7 +20,13 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="75"/>
+            <ColumnDefinition Width="30"/>
+        </Grid.ColumnDefinitions>
+        
+        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="3">
             <Button x:Name="ReloadButton" Width="30" Click="ReloadButton_Click">
                 <Button.Background>
                     <ImageBrush ImageSource="/HaskellTools;component/Windows/HaskellInteractiveWindow/Resources/reset.png" Stretch="Uniform"/>
@@ -31,7 +37,7 @@
             </Button>
             <Label x:Name="LoadedFileNameLabel" Content="File Loaded: None" Foreground="White"/>
         </StackPanel>
-        <RichTextBox x:Name="OutputTextbox" Grid.Row="1" IsReadOnly="true" Margin="5" FontSize="15" Background="#1e1e1e" Foreground="White" TextChanged="OutputTextbox_TextChanged">
+        <RichTextBox x:Name="OutputTextbox" Grid.Row="1" Grid.ColumnSpan="3" IsReadOnly="true" Margin="5" FontSize="15" Background="#1e1e1e" Foreground="White" TextChanged="OutputTextbox_TextChanged">
             <RichTextBox.Resources>
                 <Style TargetType="{x:Type Paragraph}">
                     <Setter Property="Margin" Value="0"/>
@@ -39,5 +45,21 @@
             </RichTextBox.Resources>
         </RichTextBox>
         <TextBox x:Name="InputTextbox" Grid.Row="2" Margin="5" IsEnabled="False" Background="#1e1e1e" Foreground="White" PreviewKeyDown="InputTextbox_KeyDown"/>
+        <Button x:Name="EnterHistoryButton" Grid.Column="1" Grid.Row="2" Click="EnterHistoryButton_Click">
+            <Button.Background>
+                <ImageBrush ImageSource="/HaskellTools;component/Windows/HaskellInteractiveWindow/Resources/enter.png" Stretch="Uniform"/>
+            </Button.Background>
+            <Button.ToolTip>
+                Enter
+            </Button.ToolTip>
+        </Button>
+        <Button x:Name="ClearHistoryButton" Grid.Column="2" Grid.Row="2" Click="ClearHistoryButton_Click">
+            <Button.Background>
+                <ImageBrush ImageSource="/HaskellTools;component/Windows/HaskellInteractiveWindow/Resources/history.png" Stretch="Uniform"/>
+            </Button.Background>
+            <Button.ToolTip>
+                Clear input history
+            </Button.ToolTip>
+        </Button>
     </Grid>
 </UserControl>

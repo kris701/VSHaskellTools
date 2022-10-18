@@ -49,12 +49,12 @@ namespace HaskellTools
 
         private async void StartDebuggingButton_Click(object sender, RoutedEventArgs e)
         {
-            await StartDebugger();
+            await StartDebuggerAsync();
         }
 
         private async void StopDebuggingButton_Click(object sender, RoutedEventArgs e)
         {
-            await StopDebugger();
+            await StopDebuggerAsync();
         }
 
         private async void ContinueButton_Click(object sender, RoutedEventArgs e)
@@ -115,7 +115,7 @@ namespace HaskellTools
 
         private async void KillDebuggingButton_Click(object sender, RoutedEventArgs e)
         {
-            await StopDebugger();
+            await StopDebuggerAsync();
         }
 
         public void Load()
@@ -146,9 +146,9 @@ namespace HaskellTools
             }
         }
 
-        public void Unload()
+        public async Task UnloadAsync()
         {
-            StopDebugger();
+            await StopDebuggerAsync();
             BreakpointPanel.Children.Clear();
             IsFileLoaded = false;
             FileLoaded = "None";
@@ -367,14 +367,14 @@ namespace HaskellTools
             }
         }
 
-        private async Task StartDebugger()
+        private async Task StartDebuggerAsync()
         {
             MainGrid.IsEnabled = false;
             StartDebuggingButton.IsEnabled = false;
             StopDebuggingButton.IsEnabled = true;
             BreakpointPanel.IsEnabled = false;
             ResetBreakpoints.IsEnabled = false;
-            await LoadSession();
+            await LoadSessionAsync();
             if (_process.IsRunning)
             {
                 _currentReadState = ReadState.Waiting;
@@ -385,10 +385,10 @@ namespace HaskellTools
             MainGrid.IsEnabled = true;
         }
 
-        private async Task LoadSession()
+        private async Task LoadSessionAsync()
         {
             if (_process.IsRunning)
-                await StopDebugger();
+                await StopDebuggerAsync();
 
             await _process.StartProcessAsync();
 
@@ -408,7 +408,7 @@ namespace HaskellTools
             await _process.WriteLineAsync($":set -fbreak-on-exception");
         }
 
-        private async Task StopDebugger()
+        private async Task StopDebuggerAsync()
         {
             MainGrid.IsEnabled = false;
             StartDebuggingButton.IsEnabled = true;

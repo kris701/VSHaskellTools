@@ -156,5 +156,14 @@ namespace HaskellTools.EditorMargins
                 parentPanel.Children.Remove(this);
             }
         }
+
+        public void RemoveThisPanelFromParent()
+        {
+            if (this.Parent is StackPanel parentPanel)
+            {
+                _panels.Remove(PanelID);
+                parentPanel.Children.Remove(this);
+            }
+        }
     }
 }

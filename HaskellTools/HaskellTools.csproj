@@ -50,6 +50,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>VSTHRD110, VSTHRD100,VSTHRD010</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -126,6 +127,9 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Windows\HaskellInteractiveWindow\Resources\enter.png" />
+    <Resource Include="Windows\HaskellInteractiveWindow\Resources\history.png" />
+    <Resource Include="Windows\HaskellInteractiveWindow\Resources\reset.png" />
     <Resource Include="Windows\InstallGHCIWindow\Resources\HaskellLogo.png" />
     <Content Include="Commands\Resources\GHCiDebuggerWindowCommand.png" />
     <Content Include="Commands\Resources\Welcome.png" />
@@ -138,7 +142,6 @@
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\back.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\UserControls\Resources\breakpointOption.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\UserControls\Resources\breakpoint.png" />
-    <Resource Include="Windows\HaskellInteractiveWindow\Resources\reset.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\evaluate.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\reset.png" />
     <Resource Include="Windows\GHCiDebuggerWindow\Resources\step.png" />

@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace HaskellTools
 {
@@ -17,7 +18,7 @@ namespace HaskellTools
 
         public int OnClose(ref uint pgrfSaveOptions)
         {
-            (this.Content as GHCiDebuggerWindowControl).Unload();
+            Task.Run(async () => (this.Content as GHCiDebuggerWindowControl).UnloadAsync());
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
 
