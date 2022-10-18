@@ -8,7 +8,7 @@
 			<Group guid="HaskellCommandSetGuid" id="HaskellToolsMenuGroup" priority="0x0600">
 				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsMenu" />
 			</Group>
-			<Group guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup">
+			<Group guid="HaskellCommandSetGuid" id="HaskellToolsToolbarGroup" priority="0x0600">
 				<Parent guid="HaskellCommandSetGuid" id="HaskellToolsToolbar" />
 			</Group>
 		</Groups>
