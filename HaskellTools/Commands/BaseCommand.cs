@@ -1,13 +1,7 @@
-﻿using EnvDTE;
-using EnvDTE80;
-using HaskellTools.Helpers;
+﻿using HaskellTools.Helpers;
 using Microsoft.VisualStudio.Shell;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HaskellTools.Commands

@@ -1,13 +1,7 @@
 ﻿using HaskellTools.Helpers;
 using HaskellTools.Options;
-using Microsoft.VisualStudio.Shell;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace HaskellTools.Checkers
 {
