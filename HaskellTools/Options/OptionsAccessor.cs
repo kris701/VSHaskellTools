@@ -20,8 +20,6 @@ namespace HaskellTools.Options
             set
             {
                 Instance.GHCUPPath = value;
-                Instance.GHCiFound = false;
-                Instance.CheckForGHCiAtStartup = true;
                 Instance.SaveSettingsToStorage();
             }
         }

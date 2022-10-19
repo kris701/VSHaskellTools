@@ -10,11 +10,19 @@ namespace HaskellTools.Options
 {
     public class OptionPageGrid : DialogPage
     {
+        private string _GHCUPPath = "";
         [Category("Haskell Tools")]
         [DisplayName("Optional GHCUP Path")]
         [Description("Optional path to your GHCUP installation folder. (Leave empty if environment variables is set). Note, restart of Visual Studio is required when changing this setting.")]
         [DefaultValue("")]
-        public string GHCUPPath { get; set; } = "";
+        public string GHCUPPath {
+            get { return _GHCUPPath; }
+            set {
+                _GHCUPPath = value;
+                GHCiFound = false;
+                CheckForGHCiAtStartup = true;
+            }
+        }
 
         [Category("Haskell Tools")]
         [DisplayName("Haskell File Execution Timeout")]
