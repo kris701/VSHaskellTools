@@ -121,6 +121,7 @@ namespace HaskellTools
 
         public async Task LoadAsync()
         {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             if (await DTE2Helper.IsValidFileOpenAsync()) {
                 if (!_process.IsRunning)
                 {
@@ -149,6 +150,7 @@ namespace HaskellTools
 
         public async Task UnloadAsync()
         {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             await StopDebuggerAsync();
             BreakpointPanel.Children.Clear();
             IsFileLoaded = false;

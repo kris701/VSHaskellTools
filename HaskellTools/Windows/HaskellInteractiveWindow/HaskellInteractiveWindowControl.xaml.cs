@@ -122,6 +122,7 @@ namespace HaskellTools
 
         public async Task UnloadAsync()
         {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             InputTextbox.IsEnabled = false;
             OutputTextbox.Document.Blocks.Clear();
             if (_process != null)
