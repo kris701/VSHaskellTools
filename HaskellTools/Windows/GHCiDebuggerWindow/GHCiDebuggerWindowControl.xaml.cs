@@ -126,19 +126,16 @@ namespace HaskellTools
                 if (!_process.IsRunning)
                 {
                     var newName = await DTE2Helper.GetSourceFileNameAsync();
-                    if (FileLoaded != newName)
-                    {
-                        if (_sourcePath == "")
-                            _sourcePath = await DTE2Helper.GetSourcePathAsync();
+                    if (_sourcePath == "")
+                        _sourcePath = await DTE2Helper.GetSourcePathAsync();
 
-                        FileLoaded = newName;
-                        CurrentlyDebuggingLabel.Content = $"Loaded File: {FileLoaded}";
-                        ErrorLabel.Visibility = Visibility.Hidden;
-                        MainGrid.Visibility = Visibility.Visible;
-                        await FillBreakPointLinesAsync();
-                        IsFileLoaded = true;
-                        MainGrid.IsEnabled = true;
-                    }
+                    FileLoaded = newName;
+                    CurrentlyDebuggingLabel.Content = $"Loaded File: {FileLoaded}";
+                    ErrorLabel.Visibility = Visibility.Hidden;
+                    MainGrid.Visibility = Visibility.Visible;
+                    await FillBreakPointLinesAsync();
+                    IsFileLoaded = true;
+                    MainGrid.IsEnabled = true;
                 }
             }
             else

@@ -38,12 +38,20 @@ namespace HaskellTools.Options
         [DisplayName("Is GHCi found?")]
         [Description("Indication that the extension have found GHC.")]
         [DefaultValue(false)]
+#if DEBUG
         public bool GHCiFound { get; set; } = false;
+#else
+        public bool GHCiFound { get; internal set; } = false;
+#endif
 
         [Category("Haskell Tools")]
         [DisplayName("Is this the first time the extension starts?")]
         [Description("Indication that the extention have been installed.")]
         [DefaultValue(true)]
+#if DEBUG
         public bool IsFirstStart { get; set; } = true;
+#else
+        public bool IsFirstStart { get; internal set; } = true;
+#endif
     }
 }

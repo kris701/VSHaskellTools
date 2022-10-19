@@ -13,16 +13,14 @@ namespace HaskellTools.Checkers
 {
     public class GHCiChecker
     {
-        private HaskellToolsPackage _package;
         private PowershellProcess _process;
         private bool _isStarted = false;
         private bool _isGood = true;
-        public GHCiChecker(HaskellToolsPackage package)
+        public GHCiChecker()
         {
-            _package = package;
         }
 
-        public async Task CheckForGHCiAsync()
+        public async Task<bool> CheckForGHCiAsync()
         {
             OptionsAccessor.GHCiFound = false;
             _process = new PowershellProcess();
@@ -34,19 +32,19 @@ namespace HaskellTools.Checkers
             else
                 await _process.WriteLineAsync($"& '{DirHelper.CombinePathAndFile(OptionsAccessor.GHCUPPath, "bin\\ghci.exe")}'");
             await Task.Delay(500);
+            await _process.StopProcessAsync();
             if (_isGood)
             {
                 OptionsAccessor.CheckForGHCiAtStartup = false;
                 OptionsAccessor.GHCiFound = true;
+                return true;
             }
             else
             {
-                await InstallGHCiWindowCommand.InitializeAsync(_package);
-#pragma warning disable VSTHRD103 // Call async methods when in an async method
-                InstallGHCiWindowCommand.Instance.Execute(null, null);
-#pragma warning restore VSTHRD103 // Call async methods when in an async method
+                OptionsAccessor.CheckForGHCiAtStartup = true;
+                OptionsAccessor.GHCiFound = false;
+                return false;
             }
-            await _process.StopProcessAsync();
         }
 
         private void RecieveErrorData(object sender, DataReceivedEventArgs e)

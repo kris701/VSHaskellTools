@@ -49,8 +49,14 @@ namespace HaskellTools
 
             if (OptionsAccessor.CheckForGHCiAtStartup || !OptionsAccessor.GHCiFound)
             {
-                var checker = new GHCiChecker(this);
-                await checker.CheckForGHCiAsync();
+                var checker = new GHCiChecker();
+                if (!await checker.CheckForGHCiAsync())
+                {
+                    await InstallGHCiWindowCommand.InitializeAsync(this);
+#pragma warning disable VSTHRD103 // Call async methods when in an async method
+                    InstallGHCiWindowCommand.Instance.Execute(null, null);
+#pragma warning restore VSTHRD103 // Call async methods when in an async method
+                }
             }
             if (OptionsAccessor.GHCiFound)
             {

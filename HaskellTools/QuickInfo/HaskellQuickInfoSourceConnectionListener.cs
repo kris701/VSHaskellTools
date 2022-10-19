@@ -20,6 +20,8 @@ namespace HaskellTools.ErrorList
     {
         public void SubjectBuffersConnected(ITextView textView, ConnectionReason reason, IReadOnlyCollection<ITextBuffer> subjectBuffers)
         {
+            if (!OptionsAccessor.GHCiFound)
+                return;
             if (HaskellPreludeInfo.PreludeContent.Count == 0)
             {
                 HaskellPreludeInfo.IsLoading = true;

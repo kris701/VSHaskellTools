@@ -8,7 +8,8 @@
              Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
-             Name="HaskellGHCNotFound">
+             Name="HaskellGHCNotFound"
+             Loaded="HaskellGHCNotFound_Loaded">
     <UserControl.Resources>
         <ResourceDictionary Source="../ResourceDictionary/Styles.xaml"/>
     </UserControl.Resources>
@@ -21,28 +22,37 @@
                 <Label Content="Haskell Tools" FontSize="40" Foreground="White" VerticalAlignment="Center"/>
             </StackPanel>
             <Separator Height="10" Width="0"/>
-            <Label Content="Glasgow Haskell Compiler not found!" FontSize="20" Foreground="White"/>
-            <TextBlock Foreground="White" TextWrapping="Wrap">
-                You either havent installed GHC or the environment variables for GHC is not set!
-            </TextBlock>
-            <TextBlock Foreground="White" TextWrapping="Wrap">
-                You can <Hyperlink NavigateUri="https://www.haskell.org/downloads/" RequestNavigate="Hyperlink_RequestNavigate">download GHC from the website here.</Hyperlink>
-            </TextBlock>
-            <TextBlock Foreground="White" TextWrapping="Wrap">
-                If you have downloaded GHC but your environment variables are not set, you can manually define a path to your ghcup installation under:
-            </TextBlock>
-            <TextBlock Foreground="Gray" TextWrapping="Wrap">
-                Tools -> Options -> Haskell Tools -> Optional GHCUP Path
-            </TextBlock>
-            <TextBlock Foreground="White" TextWrapping="Wrap">
-                The path should be pointing directly to the ghcup folder, NOT the bin folder inside of it, e.g.:
-            </TextBlock>
-            <TextBlock Foreground="Gray" TextWrapping="Wrap">
-                C:\Program Files\Haskell\ghcup
-            </TextBlock>
-            <TextBlock Foreground="White" TextWrapping="Wrap">
-                When you have done that, you can restart Visual Studio and this page should not show up.
-            </TextBlock>
+            <Button x:Name="CheckAgainButton" Content="Check Again" Background="Gray" Foreground="White" Width="200" HorizontalAlignment="Left" Margin="5" Click="CheckAgainButton_Click"/>
+            <StackPanel x:Name="NotFoundPanel">
+                <Label Content="Glasgow Haskell Compiler not found!" FontSize="20" Foreground="White"/>
+                <TextBlock Foreground="White" TextWrapping="Wrap">
+                    You either havent installed GHC or the environment variables for GHC is not set!
+                </TextBlock>
+                <TextBlock Foreground="White" TextWrapping="Wrap">
+                    You can <Hyperlink NavigateUri="https://www.haskell.org/downloads/" RequestNavigate="Hyperlink_RequestNavigate">download GHC from the website here.</Hyperlink>
+                </TextBlock>
+                <TextBlock Foreground="White" TextWrapping="Wrap">
+                    If you have downloaded GHC but your environment variables are not set, you can manually define a path to your ghcup installation under:
+                </TextBlock>
+                <TextBlock Foreground="Gray" TextWrapping="Wrap">
+                    Tools -> Options -> Haskell Tools -> Optional GHCUP Path
+                </TextBlock>
+                <TextBlock Foreground="White" TextWrapping="Wrap">
+                    The path should be pointing directly to the ghcup folder, NOT the bin folder inside of it, e.g.:
+                </TextBlock>
+                <TextBlock Foreground="Gray" TextWrapping="Wrap">
+                    C:\Program Files\Haskell\ghcup
+                </TextBlock>
+                <TextBlock Foreground="White" TextWrapping="Wrap">
+                    When you have done that, you can click the "Check Again" button, to see if the extension can now find GHCUP.
+                </TextBlock>
+            </StackPanel>
+            <StackPanel x:Name="FoundPanel" Visibility="Hidden">
+                <Label Content="Glasgow Haskell Compiler was found!" FontSize="20" Foreground="White"/>
+                <TextBlock Foreground="White" TextWrapping="Wrap">
+                    You dont need to do any more here, you can now restart Visual Studio and let the extension load normally.
+                </TextBlock>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>
