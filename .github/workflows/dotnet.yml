@@ -30,6 +30,3 @@ jobs:
       run: msbuild $env:SolutionPath /t:Rebuild
       env: 
         DeployExtension: False
-
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
