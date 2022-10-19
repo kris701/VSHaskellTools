@@ -12,7 +12,7 @@ namespace HaskellTools.Options
     {
         [Category("Haskell Tools")]
         [DisplayName("Optional GHCUP Path")]
-        [Description("Optional path to your GHCUP installation folder. (Leave empty if environment variables is set)")]
+        [Description("Optional path to your GHCUP installation folder. (Leave empty if environment variables is set). Note, restart of Visual Studio is required when changing this setting.")]
         [DefaultValue("")]
         public string GHCUPPath { get; set; } = "";
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management.Instrumentation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,6 +20,8 @@ namespace HaskellTools.Options
             set
             {
                 Instance.GHCUPPath = value;
+                Instance.GHCiFound = false;
+                Instance.CheckForGHCiAtStartup = true;
                 Instance.SaveSettingsToStorage();
             }
         }
